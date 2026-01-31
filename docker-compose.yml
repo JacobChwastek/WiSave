@@ -1,0 +1,62 @@
+services:
+  wisave-api:
+    build:
+      context: .
+      dockerfile: src/Bootstrappers/WiSave.Bootstrapper/Dockerfile
+    container_name: wisave-api
+    ports:
+      - "5100:8080"
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_HTTP_PORTS=8080
+      - ASPNETCORE_URLS=http://+:8080
+      - ConnectionStrings__MongoDB=mongodb://wisave:wisave_secret@mongodb:27017/wisave?authSource=admin
+    depends_on:
+      mongodb:
+        condition: service_healthy
+    networks:
+      - wisave-network
+
+  mongodb:
+    image: mongo:7
+    container_name: wisave-mongodb
+    ports:
+      - "27017:27017"
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=wisave
+      - MONGO_INITDB_ROOT_PASSWORD=wisave_secret
+      - MONGO_INITDB_DATABASE=wisave
+    volumes:
+      - mongodb-data:/data/db
+      - ./docker/mongo-init:/docker-entrypoint-initdb.d:ro
+    healthcheck:
+      test: ["CMD", "mongosh", "--eval", "db.adminCommand('ping')"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+    networks:
+      - wisave-network
+
+  mongo-express:
+    image: mongo-express:latest
+    container_name: wisave-mongo-express
+    ports:
+      - "8082:8081"
+    environment:
+      - ME_CONFIG_MONGODB_ADMINUSERNAME=wisave
+      - ME_CONFIG_MONGODB_ADMINPASSWORD=wisave_secret
+      - ME_CONFIG_MONGODB_URL=mongodb://wisave:wisave_secret@mongodb:27017/
+      - ME_CONFIG_BASICAUTH=false
+    depends_on:
+      mongodb:
+        condition: service_healthy
+    networks:
+      - wisave-network
+
+networks:
+  wisave-network:
+    driver: bridge
+
+volumes:
+  mongodb-data:

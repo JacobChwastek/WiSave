@@ -1,0 +1,71 @@
+# Build outputs
+bin/
+obj/
+out/
+publish/
+artifacts/
+
+# NuGet
+*.nupkg
+*.snupkg
+/packages/
+.nuget/
+
+# IDE - Rider
+.idea/
+*.sln.iml
+riderModule.iml
+
+# IDE - Visual Studio
+.vs/
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+
+# IDE - VS Code
+.vscode/
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+
+# ReSharper
+_ReSharper.Caches/
+*.DotSettings.user
+
+# Test results
+TestResults/
+coverage/
+*.coverage
+*.coveragexml
+
+# OS files
+.DS_Store
+Thumbs.db
+ehthumbs.db
+
+# Environment & secrets
+.env
+.env.*
+*.local
+appsettings.*.local.json
+secrets.json
+
+# Docker
+docker-compose.override.yml
+
+# Logs
+logs/
+*.log
+nlog-*.log
+
+# Temporary files
+*.tmp
+*.temp
+*.swp
+*~
+
+# User-specific
+*.rsuser
+*.sln.ide/

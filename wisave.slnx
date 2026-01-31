@@ -1,0 +1,19 @@
+<Solution>
+  <Folder Name="/solution items/">
+    <File Path="docker-compose.yml" />
+  </Folder>
+  <Folder Name="/src/" />
+  <Folder Name="/src/Bootstrappers/">
+    <Project Path="src/Bootstrappers/WiSave.Bootstrapper/WiSave.Bootstrapper.csproj" />
+  </Folder>
+  <Folder Name="/src/External/" />
+  <Folder Name="/src/Modules/" />
+  <Folder Name="/src/Modules/Incomes/" />
+  <Folder Name="/src/Modules/Incomes/Core/" />
+  <Folder Name="/src/Modules/Incomes/Projections/" />
+  <Folder Name="/src/Shared/">
+    <Project Path="src/Shared/WiSave.Shared.Abstractions/WiSave.Shared.Abstractions.csproj" />
+    <Project Path="src/Shared/WiSave.Shared.Infrastructure/WiSave.Shared.Infrastructure.csproj" />
+  </Folder>
+  <Folder Name="/tests/" />
+</Solution>
