@@ -7,10 +7,8 @@
     </PropertyGroup>
 
     <ItemGroup>
-      <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="10.0.2">
-        <PrivateAssets>all</PrivateAssets>
-        <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-      </PackageReference>
+        <ProjectReference Include="..\..\Modules\Incomes\WiSave.Modules.Incomes.Api\WiSave.Modules.Incomes.Api.csproj" />
+        <ProjectReference Include="..\..\Shared\WiSave.Shared.Infrastructure\WiSave.Shared.Infrastructure.csproj" />
     </ItemGroup>
 
 </Project>

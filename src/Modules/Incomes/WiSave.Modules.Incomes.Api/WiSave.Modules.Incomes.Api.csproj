@@ -1,0 +1,15 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>net10.0</TargetFramework>
+        <Nullable>enable</Nullable>
+        <ImplicitUsings>enable</ImplicitUsings>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <ProjectReference Include="..\WiSave.Modules.Incomes.Core\WiSave.Modules.Incomes.Core.csproj" />
+        <ProjectReference Include="..\WiSave.Modules.Incomes.Projections\WiSave.Modules.Incomes.Projections.csproj" />
+        <ProjectReference Include="..\..\..\Shared\WiSave.Shared.Abstractions\WiSave.Shared.Abstractions.csproj" />
+    </ItemGroup>
+
+</Project>

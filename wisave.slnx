@@ -8,9 +8,11 @@
   </Folder>
   <Folder Name="/src/External/" />
   <Folder Name="/src/Modules/" />
-  <Folder Name="/src/Modules/Incomes/" />
-  <Folder Name="/src/Modules/Incomes/Core/" />
-  <Folder Name="/src/Modules/Incomes/Projections/" />
+  <Folder Name="/src/Modules/Incomes/">
+    <Project Path="src/Modules/Incomes/WiSave.Modules.Incomes.Api/WiSave.Modules.Incomes.Api.csproj" />
+    <Project Path="src/Modules/Incomes/WiSave.Modules.Incomes.Core/WiSave.Modules.Incomes.Core.csproj" />
+    <Project Path="src/Modules/Incomes/WiSave.Modules.Incomes.Projections/WiSave.Modules.Incomes.Projections.csproj" />
+  </Folder>
   <Folder Name="/src/Shared/">
     <Project Path="src/Shared/WiSave.Shared.Abstractions/WiSave.Shared.Abstractions.csproj" />
     <Project Path="src/Shared/WiSave.Shared.Infrastructure/WiSave.Shared.Infrastructure.csproj" />
