@@ -1,6 +1,0 @@
-schema: schema.graphql
-extensions:
-  endpoints:
-    Local:
-      url: http://localhost:5100/graphql
-      introspect: true
