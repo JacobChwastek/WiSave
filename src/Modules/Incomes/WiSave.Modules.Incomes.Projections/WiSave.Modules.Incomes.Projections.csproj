@@ -8,6 +8,7 @@
 
     <ItemGroup>
         <ProjectReference Include="..\..\..\Shared\WiSave.Shared.Abstractions\WiSave.Shared.Abstractions.csproj" />
+        <ProjectReference Include="..\..\..\Shared\WiSave.Shared.Infrastructure\WiSave.Shared.Infrastructure.csproj" />
     </ItemGroup>
 
     <ItemGroup>

@@ -17,7 +17,7 @@ public static class MongoDbExtensions
         RegisterConventions();
 
         var connectionString = configuration.GetConnectionString("MongoDB")
-            ?? "mongodb://wisave:wisave_secret@localhost:27017/wisave?authSource=admin";
+            ?? throw new InvalidOperationException("MongoDB connection string is not configured. Set 'ConnectionStrings:MongoDB' in appsettings or environment variables.");
 
         var mongoClient = new MongoClient(connectionString);
         var mongoDatabase = mongoClient.GetDatabase("wisave");
