@@ -38,11 +38,12 @@ public static class MongoAggregationHelper
 
     private static string GetMemberName<TDocument, TProperty>(Expression<Func<TDocument, TProperty>> expression)
     {
-        if (expression.Body is MemberExpression member)
+        if (expression.Body is not MemberExpression member)
         {
-            return member.Member.Name;
-        }
+            throw new ArgumentException("Expression must be a member access expression.");
+        } 
+        var name = member.Member.Name;
+        return char.ToLowerInvariant(name[0]) + name[1..];
 
-        throw new ArgumentException("Expression must be a member access expression.");
     }
 }

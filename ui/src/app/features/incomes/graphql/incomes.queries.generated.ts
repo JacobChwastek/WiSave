@@ -48,7 +48,7 @@ export type GetIncomeMonthlyStatsQueryVariables = Types.Exact<{
 }>;
 
 
-export type GetIncomeMonthlyStatsQuery = { __typename?: 'Query', incomeMonthlyStats: Array<{ __typename?: 'MonthlyIncomeStats', year: number, month: number, recurringTotal: number, nonRecurringTotal: number, total: number }> };
+export type GetIncomeMonthlyStatsQuery = { __typename?: 'Query', incomeMonthlyStats: Array<{ __typename?: 'MonthlyIncomeStats', year: number, month: number, recurringTotal: number, nonRecurringTotal: number }> };
 
 export const GetIncomesDocument = gql`
     query GetIncomes($first: Int, $after: String, $last: Int, $before: String, $where: IncomeDocumentFilterInput, $order: [IncomeDocumentSortInput!]) {
@@ -164,7 +164,6 @@ export const GetIncomeMonthlyStatsDocument = gql`
     month
     recurringTotal
     nonRecurringTotal
-    total
   }
 }
     `;

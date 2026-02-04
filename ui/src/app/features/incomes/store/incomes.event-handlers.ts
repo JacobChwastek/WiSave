@@ -9,7 +9,7 @@ import { CursorDirection, initialPagination } from '@shared/types';
 
 import { IIncomesQueryParams, IncomesGraphQLService } from '../services/incomes-graphql.service';
 import { incomesApiEvents, incomesPageEvents } from './incomes.events';
-import { IncomeStatsScope, IIncomesFilter, IIncomesSortOrder, initialFilter, initialSort } from './incomes.state';
+import { IncomeStatsScope, IIncomesFilter, IIncomesSortOrder, initialFilter, initialSort, MONTHLY_STATS_SCALE_SIZES, MonthlyStatsScale } from './incomes.state';
 
 export function withIncomesEventHandlers() {
   return signalStoreFeature(
@@ -43,13 +43,15 @@ export function withIncomesEventHandlers() {
           }),
         );
 
-      const loadMonthlyStats$ = () =>
-        api.getIncomeMonthlyStats().pipe(
+      const loadMonthlyStats$ = (scale: MonthlyStatsScale, offset = 0) => {
+        const pageSize = MONTHLY_STATS_SCALE_SIZES[scale];
+        return api.getIncomeMonthlyStats(pageSize, offset).pipe(
           mapResponse({
             next: (stats) => incomesApiEvents.monthlyStatsLoadedSuccess({ stats }),
             error: (error: { message: string }) => incomesApiEvents.monthlyStatsLoadedFailure({ error: error.message }),
           }),
         );
+      };
 
       const getQueryParams = (
         pageSize: number,
@@ -69,6 +71,8 @@ export function withIncomesEventHandlers() {
       const getSort = (): IIncomesSortOrder => store.sort?.() ?? initialSort;
       const getRows = (): number => store.pagination?.().rows ?? initialPagination.rows;
       const getStatsScope = (): IncomeStatsScope => store.statsScope?.() ?? 'recurring';
+      const getMonthlyStatsOffset = (): number => store.monthlyStatsOffset?.() ?? 0;
+      const getMonthlyStatsScale = (): MonthlyStatsScale => store.monthlyStatsScale?.() ?? 'quarter';
 
       return {
         loadIncomes$: events.on(incomesPageEvents.opened).pipe(
@@ -77,13 +81,21 @@ export function withIncomesEventHandlers() {
               loadIncomes$(getQueryParams(initialPagination.rows, 'first', null, getFilter(), getSort())),
               loadCategories$(),
               loadStats$(getStatsScope()),
-              loadMonthlyStats$(),
+              loadMonthlyStats$(getMonthlyStatsScale(), getMonthlyStatsOffset()),
             ),
           ),
         ),
 
         statsScopeChanged$: events.on(incomesPageEvents.statsScopeChanged).pipe(
           switchMap(({ payload }) => loadStats$(payload.scope)),
+        ),
+
+        monthlyStatsNavigate$: events.on(incomesPageEvents.monthlyStatsNavigate).pipe(
+          switchMap(() => loadMonthlyStats$(getMonthlyStatsScale(), getMonthlyStatsOffset())),
+        ),
+
+        monthlyStatsScaleChanged$: events.on(incomesPageEvents.monthlyStatsScaleChanged).pipe(
+          switchMap(({ payload }) => loadMonthlyStats$(payload.scale, 0)),
         ),
 
         navigatePage$: events.on(incomesPageEvents.navigatePage).pipe(

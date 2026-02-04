@@ -4,7 +4,7 @@ import { eventGroup } from '@ngrx/signals/events';
 
 import { CursorDirection, IPageInfo } from '@shared/types';
 
-import { IIncomeMonthlyStats, IIncomeStats, IncomeStatsScope, IIncomesFilter, IIncomesSortOrder } from './incomes.state';
+import { IIncomeMonthlyStats, IIncomeStats, IncomeStatsScope, IIncomesFilter, IIncomesSortOrder, MonthlyStatsScale } from './incomes.state';
 
 // UI/Component events - commands from user interactions
 export const incomesPageEvents = eventGroup({
@@ -20,6 +20,8 @@ export const incomesPageEvents = eventGroup({
     filtersCleared: type<void>(),
     sortChanged: type<{ sort: IIncomesSortOrder }>(),
     statsScopeChanged: type<{ scope: IncomeStatsScope }>(),
+    monthlyStatsNavigate: type<{ direction: 'back' | 'forward' }>(),
+    monthlyStatsScaleChanged: type<{ scale: MonthlyStatsScale }>(),
   },
 });
 

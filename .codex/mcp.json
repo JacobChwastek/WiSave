@@ -1,0 +1,16 @@
+{
+  "mcpServers": {
+    "mongodb": {
+      "type": "stdio",
+      "command": "npx",
+      "args": [
+        "-y",
+        "mongodb-mcp-server@latest",
+        "--readOnly"
+      ],
+      "env": {
+        "MDB_MCP_CONNECTION_STRING": "mongodb://wisave:wisave_secret@localhost:27017/wisave?authSource=admin"
+      }
+    }
+  }
+}

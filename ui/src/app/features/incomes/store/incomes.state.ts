@@ -31,10 +31,17 @@ export interface IIncomeMonthlyStats {
   month: number;
   recurringTotal: number;
   nonRecurringTotal: number;
-  total: number;
 }
 
 export type IncomeStatsScope = 'recurring' | 'all';
+
+export type MonthlyStatsScale = 'quarter' | 'half' | 'year';
+
+export const MONTHLY_STATS_SCALE_SIZES: Record<MonthlyStatsScale, number> = {
+  quarter: 3,
+  half: 6,
+  year: 12,
+};
 
 export interface IncomesState {
   isLoading: boolean;
@@ -49,6 +56,9 @@ export interface IncomesState {
   statsScope: IncomeStatsScope;
   monthlyStats: IIncomeMonthlyStats[];
   monthlyStatsLoading: boolean;
+  monthlyStatsOffset: number;
+  monthlyStatsHasMore: boolean;
+  monthlyStatsScale: MonthlyStatsScale;
 }
 
 export const initialFilter: IIncomesFilter = {
@@ -76,4 +86,7 @@ export const initialState: IncomesState = {
   statsScope: 'recurring',
   monthlyStats: [],
   monthlyStatsLoading: false,
+  monthlyStatsOffset: 0,
+  monthlyStatsHasMore: true,
+  monthlyStatsScale: 'quarter',
 };

@@ -181,9 +181,18 @@ export class IncomesGraphQLService {
       );
   }
 
-  getIncomeMonthlyStats(monthsBack = 12): Observable<IIncomeMonthlyStats[]> {
+  getIncomeMonthlyStats(monthsBack = 5, offset = 0): Observable<IIncomeMonthlyStats[]> {
+    const skipMonths = offset * monthsBack;
     return this.#graphql
-      .query<GetIncomeMonthlyStatsQuery, GetIncomeMonthlyStatsQueryVariables>(GetIncomeMonthlyStatsDocument, { monthsBack })
-      .pipe(map((data) => data.incomeMonthlyStats));
+      .query<GetIncomeMonthlyStatsQuery, GetIncomeMonthlyStatsQueryVariables>(GetIncomeMonthlyStatsDocument, { monthsBack: monthsBack + skipMonths })
+      .pipe(
+        map((data) => {
+          const stats = data.incomeMonthlyStats;
+          if (skipMonths === 0) {
+            return stats.slice(-monthsBack);
+          }
+          return stats.slice(0, stats.length - skipMonths).slice(-monthsBack);
+        }),
+      );
   }
 }

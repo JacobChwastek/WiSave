@@ -5,6 +5,7 @@ import { TableModule } from 'primeng/table';
 import { IFilterAppliedEvent, IncomesTableComponent } from '@features/incomes/components/incomes-table/incomes-table.component';
 import { MonthlyIncomeChartComponent } from '@features/incomes/components/monthly-income-chart/monthly-income-chart.component';
 import { incomesPageEvents } from '@features/incomes/store/incomes.events';
+import { MonthlyStatsScale } from '@features/incomes/store/incomes.state';
 import { IncomesStore } from '@features/incomes/store/incomes.store';
 import { injectDispatch } from '@ngrx/signals/events';
 
@@ -38,7 +39,15 @@ import { IPageNavigationEvent, IPageSizeChangeEvent, IStatItem } from '@shared/t
       </div>
       <div class="w-1/4">
         <app-chart-card title="Monthly income" subtitle="Recurring vs non-recurring">
-          <app-monthly-income-chart [stats]="monthlyStats()" />
+          <div class="mb-4 flex justify-end">
+            <app-segmented-toggle [options]="monthlyStatsScaleOptions" [value]="monthlyStatsScale()" (valueChange)="onMonthlyStatsScaleChange($event)" />
+          </div>
+          <app-monthly-income-chart
+            [stats]="monthlyStats()"
+            [loading]="monthlyStatsLoading()"
+            [offset]="monthlyStatsOffset()"
+            [hasMore]="monthlyStatsHasMore()"
+            (navigate)="onMonthlyStatsNavigate($event)" />
         </app-chart-card>
       </div>
     </div>
@@ -60,9 +69,19 @@ export class IncomesComponent implements OnInit {
     { label: 'All', value: 'all' },
   ];
 
+  readonly monthlyStatsScaleOptions: ISegmentedToggleOption[] = [
+    { label: '3 months', value: 'quarter' },
+    { label: '6 months', value: 'half' },
+    { label: '12 months', value: 'year' },
+  ];
+
   readonly incomes = computed(() => this.store.entities());
   readonly statsScope = computed(() => this.store.statsScope());
   readonly monthlyStats = computed(() => this.store.monthlyStats());
+  readonly monthlyStatsLoading = computed(() => this.store.monthlyStatsLoading());
+  readonly monthlyStatsOffset = computed(() => this.store.monthlyStatsOffset());
+  readonly monthlyStatsHasMore = computed(() => this.store.monthlyStatsHasMore());
+  readonly monthlyStatsScale = computed(() => this.store.monthlyStatsScale());
   readonly statItems = computed((): IStatItem[] => {
     const stats = this.store.stats();
 
@@ -127,5 +146,21 @@ export class IncomesComponent implements OnInit {
     }
 
     this.dispatch.statsScopeChanged({ scope });
+  }
+
+  onMonthlyStatsNavigate(direction: 'back' | 'forward'): void {
+    this.dispatch.monthlyStatsNavigate({ direction });
+  }
+
+  onMonthlyStatsScaleChange(scale: string): void {
+    if (scale !== 'quarter' && scale !== 'half' && scale !== 'year') {
+      return;
+    }
+
+    if (this.monthlyStatsScale() === scale) {
+      return;
+    }
+
+    this.dispatch.monthlyStatsScaleChanged({ scale: scale as MonthlyStatsScale });
   }
 }

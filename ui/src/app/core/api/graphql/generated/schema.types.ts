@@ -13,7 +13,9 @@ export type Scalars = {
   Boolean: { input: boolean; output: boolean; }
   Int: { input: number; output: number; }
   Float: { input: number; output: number; }
+  /** The `DateTime` scalar represents an ISO-8601 compliant date time type. */
   DateTime: { input: string; output: string; }
+  /** The `Decimal` scalar type represents a decimal floating-point number. */
   Decimal: { input: number; output: number; }
 };
 
@@ -30,7 +32,11 @@ export type DateTimeOperationFilterInput = {
   lt?: InputMaybe<Scalars['DateTime']['input']>;
   lte?: InputMaybe<Scalars['DateTime']['input']>;
   neq?: InputMaybe<Scalars['DateTime']['input']>;
+  ngt?: InputMaybe<Scalars['DateTime']['input']>;
+  ngte?: InputMaybe<Scalars['DateTime']['input']>;
   nin?: InputMaybe<Array<InputMaybe<Scalars['DateTime']['input']>>>;
+  nlt?: InputMaybe<Scalars['DateTime']['input']>;
+  nlte?: InputMaybe<Scalars['DateTime']['input']>;
 };
 
 export type DecimalOperationFilterInput = {
@@ -41,7 +47,11 @@ export type DecimalOperationFilterInput = {
   lt?: InputMaybe<Scalars['Decimal']['input']>;
   lte?: InputMaybe<Scalars['Decimal']['input']>;
   neq?: InputMaybe<Scalars['Decimal']['input']>;
+  ngt?: InputMaybe<Scalars['Decimal']['input']>;
+  ngte?: InputMaybe<Scalars['Decimal']['input']>;
   nin?: InputMaybe<Array<InputMaybe<Scalars['Decimal']['input']>>>;
+  nlt?: InputMaybe<Scalars['Decimal']['input']>;
+  nlte?: InputMaybe<Scalars['Decimal']['input']>;
 };
 
 export type IncomeDocument = {
@@ -92,17 +102,25 @@ export type IncomeStats = {
   yearRecurringTotal: Scalars['Decimal']['output'];
 };
 
+/** A connection to a list of items. */
 export type IncomesConnection = {
   __typename?: 'IncomesConnection';
+  /** A list of edges. */
   edges?: Maybe<Array<IncomesEdge>>;
+  /** A flattened list of the nodes. */
   nodes?: Maybe<Array<IncomeDocument>>;
+  /** Information to aid in pagination. */
   pageInfo: PageInfo;
+  /** Identifies the total count of items in the connection. */
   totalCount: Scalars['Int']['output'];
 };
 
+/** An edge in a connection. */
 export type IncomesEdge = {
   __typename?: 'IncomesEdge';
+  /** A cursor for use in pagination. */
   cursor: Scalars['String']['output'];
+  /** The item at the end of the edge. */
   node: IncomeDocument;
 };
 
@@ -118,15 +136,19 @@ export type MonthlyIncomeStats = {
   month: Scalars['Int']['output'];
   nonRecurringTotal: Scalars['Decimal']['output'];
   recurringTotal: Scalars['Decimal']['output'];
-  total: Scalars['Decimal']['output'];
   year: Scalars['Int']['output'];
 };
 
+/** Information about pagination in a connection. */
 export type PageInfo = {
   __typename?: 'PageInfo';
+  /** When paginating forwards, the cursor to continue. */
   endCursor?: Maybe<Scalars['String']['output']>;
+  /** Indicates whether more edges exist following the set defined by the clients arguments. */
   hasNextPage: Scalars['Boolean']['output'];
+  /** Indicates whether more edges exist prior the set defined by the clients arguments. */
   hasPreviousPage: Scalars['Boolean']['output'];
+  /** When paginating backwards, the cursor to continue. */
   startCursor?: Maybe<Scalars['String']['output']>;
 };
 
@@ -175,6 +197,7 @@ export type SortEnumType =
   | 'DESC';
 
 export type StringOperationFilterInput = {
+  and?: InputMaybe<Array<StringOperationFilterInput>>;
   contains?: InputMaybe<Scalars['String']['input']>;
   endsWith?: InputMaybe<Scalars['String']['input']>;
   eq?: InputMaybe<Scalars['String']['input']>;
@@ -184,5 +207,6 @@ export type StringOperationFilterInput = {
   neq?: InputMaybe<Scalars['String']['input']>;
   nin?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
   nstartsWith?: InputMaybe<Scalars['String']['input']>;
+  or?: InputMaybe<Array<StringOperationFilterInput>>;
   startsWith?: InputMaybe<Scalars['String']['input']>;
 };

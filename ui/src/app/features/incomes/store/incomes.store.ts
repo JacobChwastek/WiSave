@@ -71,6 +71,15 @@ export const IncomesStore = signalStore(
       },
     })),
     on(incomesPageEvents.statsScopeChanged, ({ payload }) => ({ statsScope: payload.scope, statsLoading: true })),
+    on(incomesPageEvents.monthlyStatsNavigate, ({ payload }, state) => ({
+      monthlyStatsLoading: true,
+      monthlyStatsOffset: payload.direction === 'back' ? state.monthlyStatsOffset + 1 : Math.max(0, state.monthlyStatsOffset - 1),
+    })),
+    on(incomesPageEvents.monthlyStatsScaleChanged, ({ payload }) => ({
+      monthlyStatsLoading: true,
+      monthlyStatsScale: payload.scale,
+      monthlyStatsOffset: 0,
+    })),
 
     on(incomesApiEvents.loadedSuccess, ({ payload }, state) => [
       setAllEntities<IIncome>(payload.incomes),
@@ -127,6 +136,7 @@ export const IncomesStore = signalStore(
     on(incomesApiEvents.monthlyStatsLoadedSuccess, ({ payload }) => ({
       monthlyStats: payload.stats,
       monthlyStatsLoading: false,
+      monthlyStatsHasMore: payload.stats.length > 0,
     })),
     on(incomesApiEvents.monthlyStatsLoadedFailure, () => ({
       monthlyStatsLoading: false,

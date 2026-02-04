@@ -58,6 +58,5 @@ query GetIncomeMonthlyStats($monthsBack: Int) {
     month
     recurringTotal
     nonRecurringTotal
-    total
   }
 }

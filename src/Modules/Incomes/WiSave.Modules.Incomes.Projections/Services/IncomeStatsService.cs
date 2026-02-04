@@ -76,18 +76,23 @@ public sealed class IncomeStatsService(IMongoCollection<IncomeDocument> collecti
                 {
                     "_id", new BsonDocument
                     {
-                        { "year", new BsonDocument("$year", "$Date") },
-                        { "month", new BsonDocument("$month", "$Date") },
-                        { "recurring", new BsonDocument("$ifNull", new BsonArray { "$Recurring", false }) }
+                        { "year", new BsonDocument("$year", "$date") },
+                        { "month", new BsonDocument("$month", "$date") },
+                        { "recurring", new BsonDocument("$ifNull", new BsonArray { "$recurring", false }) }
                     }
                 },
-                { "total", new BsonDocument("$sum", "$Amount") }
+                { "total", new BsonDocument("$sum", "$amount") }
             })
         };
 
         var results = await collection.Aggregate<BsonDocument>(pipeline).ToListAsync(ct);
 
         var grouped = results
+            .Where(doc =>
+            {
+                var id = doc["_id"].AsBsonDocument;
+                return id["year"].BsonType != BsonType.Null && id["month"].BsonType != BsonType.Null;
+            })
             .Select(doc =>
             {
                 var id = doc["_id"].AsBsonDocument;
@@ -118,11 +123,10 @@ public sealed class IncomeStatsService(IMongoCollection<IncomeDocument> collecti
             var nonRecurring = grouped.TryGetValue(key, out totals) ? totals.NonRecurring : 0m;
 
             stats.Add(new MonthlyIncomeStats(
-                year: cursor.Year,
-                month: cursor.Month,
-                recurringTotal: recurring,
-                nonRecurringTotal: nonRecurring,
-                total: recurring + nonRecurring
+                Year: cursor.Year,
+                Month: cursor.Month,
+                RecurringTotal: recurring,
+                NonRecurringTotal: nonRecurring
             ));
 
             cursor = cursor.AddMonths(1);
