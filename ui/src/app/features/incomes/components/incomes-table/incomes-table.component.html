@@ -1,0 +1,145 @@
+<div class="flex w-full flex-col">
+  <p-table
+    [value]="data()"
+    [rows]="rows()"
+    [loading]="isLoading()"
+    [paginator]="false"
+    [scrollable]="true"
+    [virtualScroll]="true"
+    [virtualScrollItemSize]="52"
+    [tableStyle]="{ minWidth: '100%' }"
+    [stripedRows]="true"
+    class="p-datatable-sm"
+    scrollHeight="flex"
+    dataKey="id"
+    editMode="row">
+    <ng-template #caption>
+      <div class="flex items-center justify-between py-1">
+        <app-button-bar-datepicker (datesChanged)="onDatesFilterChange($event)" />
+        <div class="flex flex-row gap-2">
+          <p-button (click)="filter()" class="p-button-xs" icon="pi pi-filter" severity="secondary" size="small" />
+          <p-button (click)="clearFilters()" class="p-button-xs" icon="pi pi-trash" severity="secondary" size="small" />
+          <p-button (click)="addNewIncome()" class="p-button-xs" label="Add Income" icon="pi pi-plus" severity="success" size="small" />
+        </div>
+      </div>
+    </ng-template>
+    <ng-template #header>
+      <tr class="text-xs">
+        <th style="min-width: 7rem">Date</th>
+        <th style="min-width: 10rem">Description</th>
+        <th style="min-width: 8rem">Category</th>
+        <th style="min-width: 7rem">Amount</th>
+        <th style="width: 5rem">Recurring</th>
+        <th style="width: 6rem"></th>
+      </tr>
+    </ng-template>
+    <ng-template #body let-income let-editing="editing" let-ri="rowIndex">
+      @let isNew = income.id | isNewIncome: newIncomeId();
+      <tr [pEditableRow]="income" class="text-sm">
+        <td>
+          @if (editing || isNew) {
+            <p-datepicker [(ngModel)]="income.date" dateFormat="dd/mm/yy" inputStyleClass="p-inputtext-sm" />
+          } @else {
+            {{ income.date | date: 'dd/MM/yyyy' }}
+          }
+        </td>
+        <td>
+          @if (editing || isNew) {
+            <input [(ngModel)]="income.description" class="p-inputtext-sm" pInputText type="text" />
+          } @else {
+            {{ income.description }}
+          }
+        </td>
+        <td>
+          @if (editing || isNew) {
+            <p-autoComplete
+              [(ngModel)]="income.category"
+              [suggestions]="filteredCategories"
+              [multiple]="true"
+              [forceSelection]="false"
+              [typeahead]="false"
+              [addOnBlur]="true"
+              [addOnTab]="true"
+              (completeMethod)="filterCategories($event)"
+              class="w-full"
+              placeholder="Select or add categories"
+              size="small" />
+          } @else {
+            <div class="flex flex-wrap gap-1">
+              @for (cat of income.category; track cat) {
+                <p-chip [label]="cat" class="text-sm [&_.p-chip]:px-2 [&_.p-chip]:py-1" />
+              }
+            </div>
+          }
+        </td>
+        <td>
+          @if (editing || isNew) {
+            <input [(ngModel)]="income.amount.amount" class="p-inputtext-sm w-24" pInputText type="number" />
+          } @else {
+            {{ income.amount.amount | currency: income.amount.currency }}
+          }
+        </td>
+        <td class="text-center">
+          @if (income.recurring) {
+            <i class="pi pi-check-circle text-accent-500 dark:text-accent-400 text-base"></i>
+          } @else {
+            <i class="pi pi-minus text-secondary-400 dark:text-dark-secondary-400 text-base"></i>
+          }
+        </td>
+        <td>
+          <div class="flex items-center justify-center gap-1">
+            @if (!editing && !isNew) {
+              <button (click)="onRowEditInit(income)" class="p-button-sm" pButton pRipple type="button" pInitEditableRow text rounded severity="secondary">
+                <i class="pi pi-pencil" pButtonIcon></i>
+              </button>
+              <button (click)="onRowArchive(income, ri)" class="p-button-sm" pButton pRipple type="button" text rounded severity="danger">
+                <i class="pi pi-trash" pButtonIcon></i>
+              </button>
+            } @else {
+              <button (click)="onRowEditSave(income)" class="p-button-sm" pButton pRipple type="button" pSaveEditableRow text rounded severity="success">
+                <i class="pi pi-check" pButtonIcon></i>
+              </button>
+              @if (isNew) {
+                <button (click)="onRowDelete(income, ri)" class="p-button-sm" pButton pRipple type="button" text rounded severity="danger">
+                  <i class="pi pi-trash" pButtonIcon></i>
+                </button>
+              } @else {
+                <button (click)="onRowEditCancel(income, ri)" class="p-button-sm" pButton pRipple type="button" pCancelEditableRow text rounded severity="danger">
+                  <i class="pi pi-times" pButtonIcon></i>
+                </button>
+              }
+            }
+          </div>
+        </td>
+      </tr>
+    </ng-template>
+    <ng-template #footer>
+      <tr class="text-sm">
+        <td colspan="3"></td>
+        <td class="text-secondary-900 dark:text-dark-secondary-50 font-semibold">
+          {{ totalAmount() | currency: totalCurrency() }}
+        </td>
+        <td colspan="2"></td>
+      </tr>
+    </ng-template>
+    <ng-template #emptymessage>
+      <tr>
+        <td colspan="6">
+          <div class="flex flex-col items-center justify-center py-8">
+            <i class="pi pi-inbox text-secondary-300 dark:text-dark-secondary-400 mb-3 text-4xl"></i>
+            <span class="text-secondary-700 dark:text-dark-secondary-300">No incomes found</span>
+            <span class="text-secondary-500 dark:text-dark-secondary-400 mt-1 text-sm">Try adjusting your search or add a new income</span>
+          </div>
+        </td>
+      </tr>
+    </ng-template>
+  </p-table>
+  <app-cursor-pagination
+    [isLoading]="isLoading()"
+    [rows]="rows()"
+    [currentPage]="currentPage()"
+    [totalRecords]="totalRecords()"
+    [pageInfo]="pageInfo()"
+    (navigatePage)="navigatePage.emit($event)"
+    (pageSizeChange)="pageSizeChange.emit($event)" />
+</div>

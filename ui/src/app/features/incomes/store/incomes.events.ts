@@ -1,0 +1,45 @@
+import { IIncome } from '@features/incomes/types/incomes.interfaces';
+import { type } from '@ngrx/signals';
+import { eventGroup } from '@ngrx/signals/events';
+
+import { CursorDirection, IPageInfo } from '@shared/types';
+
+import { IIncomeMonthlyStats, IIncomeStats, IncomeStatsScope, IIncomesFilter, IIncomesSortOrder } from './incomes.state';
+
+// UI/Component events - commands from user interactions
+export const incomesPageEvents = eventGroup({
+  source: 'Incomes Page',
+  events: {
+    opened: type<void>(),
+    navigatePage: type<{ direction: CursorDirection; cursor: string | null; pageSize: number }>(),
+    pageSizeChanged: type<{ rows: number }>(),
+    add: type<{ income: Omit<IIncome, 'id'> }>(),
+    update: type<{ id: string; changes: Partial<IIncome> }>(),
+    remove: type<{ id: string }>(),
+    filterApplied: type<{ filter: Partial<IIncomesFilter> }>(),
+    filtersCleared: type<void>(),
+    sortChanged: type<{ sort: IIncomesSortOrder }>(),
+    statsScopeChanged: type<{ scope: IncomeStatsScope }>(),
+  },
+});
+
+// API response events - results from async operations
+export const incomesApiEvents = eventGroup({
+  source: 'Incomes API',
+  events: {
+    loadedSuccess: type<{ incomes: IIncome[]; totalCount: number; pageInfo: IPageInfo }>(),
+    loadedFailure: type<{ error: string }>(),
+    addedSuccess: type<{ income: IIncome }>(),
+    addedFailure: type<{ error: string }>(),
+    updatedSuccess: type<{ income: IIncome }>(),
+    updatedFailure: type<{ id: string; error: string }>(),
+    removedSuccess: type<{ id: string }>(),
+    removedFailure: type<{ id: string; error: string }>(),
+    categoriesLoadedSuccess: type<{ categories: string[] }>(),
+    categoriesLoadedFailure: type<{ error: string }>(),
+    statsLoadedSuccess: type<{ stats: IIncomeStats }>(),
+    statsLoadedFailure: type<{ error: string }>(),
+    monthlyStatsLoadedSuccess: type<{ stats: IIncomeMonthlyStats[] }>(),
+    monthlyStatsLoadedFailure: type<{ error: string }>(),
+  },
+});

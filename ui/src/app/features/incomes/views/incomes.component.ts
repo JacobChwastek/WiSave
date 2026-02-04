@@ -1,0 +1,131 @@
+import { Component, computed, inject, OnInit } from '@angular/core';
+
+import { TableModule } from 'primeng/table';
+
+import { IFilterAppliedEvent, IncomesTableComponent } from '@features/incomes/components/incomes-table/incomes-table.component';
+import { MonthlyIncomeChartComponent } from '@features/incomes/components/monthly-income-chart/monthly-income-chart.component';
+import { incomesPageEvents } from '@features/incomes/store/incomes.events';
+import { IncomesStore } from '@features/incomes/store/incomes.store';
+import { injectDispatch } from '@ngrx/signals/events';
+
+import { ChartCardComponent } from '@shared/components/chart-card';
+import { ISegmentedToggleOption, SegmentedToggleComponent } from '@shared/components/segmented-toggle';
+import { StatGroupComponent } from '@shared/components/stat-card';
+import { formatAmount } from '@shared/helpers/money.helper';
+import { IPageNavigationEvent, IPageSizeChangeEvent, IStatItem } from '@shared/types';
+
+@Component({
+  selector: 'app-incomes',
+  imports: [TableModule, SegmentedToggleComponent, IncomesTableComponent, StatGroupComponent, ChartCardComponent, MonthlyIncomeChartComponent],
+  template: `
+    <div class="flex h-full flex-1 gap-8 p-4">
+      <div class="flex w-3/4 flex-col gap-4">
+        <div class="flex items-center justify-end">
+          <app-segmented-toggle [options]="statsScopeOptions" [value]="statsScope()" (valueChange)="onStatsScopeChange($event)" />
+        </div>
+        <app-stat-group [items]="statItems()" />
+        <app-incomes-table
+          [isLoading]="store.isLoading()"
+          [data]="incomes()"
+          [totalRecords]="store.pagination().totalRecords"
+          [rows]="store.pagination().rows"
+          [currentPage]="store.pagination().currentPage"
+          [pageInfo]="store.pagination().pageInfo"
+          (navigatePage)="onNavigatePage($event)"
+          (pageSizeChange)="onPageSizeChange($event)"
+          (filtersApplied)="onFilterApplied($event)"
+          (filtersCleared)="onFiltersClear()" />
+      </div>
+      <div class="w-1/4">
+        <app-chart-card title="Monthly income" subtitle="Recurring vs non-recurring">
+          <app-monthly-income-chart [stats]="monthlyStats()" />
+        </app-chart-card>
+      </div>
+    </div>
+  `,
+  styles: `
+    :host {
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+    }
+  `,
+})
+export class IncomesComponent implements OnInit {
+  readonly store = inject(IncomesStore);
+  readonly dispatch = injectDispatch(incomesPageEvents);
+
+  readonly statsScopeOptions: ISegmentedToggleOption[] = [
+    { label: 'Recurring', value: 'recurring' },
+    { label: 'All', value: 'all' },
+  ];
+
+  readonly incomes = computed(() => this.store.entities());
+  readonly statsScope = computed(() => this.store.statsScope());
+  readonly monthlyStats = computed(() => this.store.monthlyStats());
+  readonly statItems = computed((): IStatItem[] => {
+    const stats = this.store.stats();
+
+    if (!stats) {
+      return [];
+    }
+
+    return [
+      {
+        title: 'This year recurring',
+        value: formatAmount(stats.yearRecurringTotal),
+        description: 'since Jan 1 (UTC)',
+        showChange: false,
+      },
+      {
+        title: 'Last month recurring',
+        value: formatAmount(stats.lastMonthRecurringTotal),
+        change: stats.lastMonthRecurringChangePct ?? undefined,
+        description: 'vs two months ago',
+      },
+      {
+        title: 'This month recurring',
+        value: formatAmount(stats.thisMonthRecurringTotal),
+        change: stats.thisMonthRecurringChangePct ?? undefined,
+        description: 'vs last month',
+      },
+      {
+        title: 'Last 3 months avg',
+        value: formatAmount(stats.last3MonthsRecurringAverage),
+        description: 'full months only',
+      },
+    ];
+  });
+
+  ngOnInit(): void {
+    this.dispatch.opened();
+  }
+
+  onNavigatePage(event: IPageNavigationEvent): void {
+    this.dispatch.navigatePage({ direction: event.direction, cursor: event.cursor, pageSize: event.pageSize });
+  }
+
+  onPageSizeChange(event: IPageSizeChangeEvent): void {
+    this.dispatch.pageSizeChanged({ rows: event.rows });
+  }
+
+  onFilterApplied(event: IFilterAppliedEvent): void {
+    this.dispatch.filterApplied({ filter: event.filter });
+  }
+
+  onFiltersClear(): void {
+    this.dispatch.filtersCleared();
+  }
+
+  onStatsScopeChange(scope: string): void {
+    if (scope !== 'recurring' && scope !== 'all') {
+      return;
+    }
+
+    if (this.statsScope() === scope) {
+      return;
+    }
+
+    this.dispatch.statsScopeChanged({ scope });
+  }
+}

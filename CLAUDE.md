@@ -4,6 +4,17 @@
 
 WiSave is a modular monolith financial tracking application built with .NET 10, following CQRS and Event Sourcing patterns.
 
+## Repository Structure
+
+```
+wisave/
+├── src/          # .NET backend (modular monolith)
+├── ui/           # Angular frontend (see ui/CLAUDE.md for details)
+├── docker/       # Docker init scripts
+├── schema.graphql  # Shared GraphQL schema (single source of truth)
+└── docker-compose.yml
+```
+
 ## Architecture
 
 ### Pattern: Modular Monolith + CQRS + Event Sourcing
@@ -124,8 +135,14 @@ docker compose up -d
 ## Common Commands
 
 ```bash
-# Run locally
+# Backend - run locally
 dotnet run --project src/Bootstrappers/WiSave.Bootstrapper
+
+# Frontend - dev server (http://localhost:4200)
+cd ui && yarn start
+
+# Frontend - build
+cd ui && yarn build
 
 # Docker
 docker compose up -d          # Start all services
@@ -134,6 +151,9 @@ docker compose logs -f        # View logs
 
 # Database
 mongosh "mongodb://wisave:wisave_secret@localhost:27017/wisave?authSource=admin"
+
+# GraphQL codegen (from ui/)
+cd ui && yarn graphql-codegen
 ```
 
 ## Environment Variables

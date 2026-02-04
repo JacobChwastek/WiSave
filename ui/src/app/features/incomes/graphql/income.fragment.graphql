@@ -1,0 +1,11 @@
+fragment IncomeFields on IncomeDocument {
+  id
+  date
+  description
+  categories
+  amount
+  currency
+  recurring
+  createdAt
+  updatedAt
+}

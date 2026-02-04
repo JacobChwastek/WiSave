@@ -1,0 +1,35 @@
+# Dependencies
+node_modules
+
+# Build outputs
+coverage
+.angular
+
+# Lock files
+package-lock.json
+pnpm-lock.yaml
+yarn.lock
+
+# IDE
+.vscode
+.idea
+.fleet
+
+# Git hooks
+.husky
+
+# Binary/font files
+*.ico
+*.woff
+*.woff2
+*.ttf
+*.eot
+
+# Environment
+.env
+.env.*
+
+# Misc
+*.log
+tmp
+temp

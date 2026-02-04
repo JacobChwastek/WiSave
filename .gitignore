@@ -69,3 +69,13 @@ nlog-*.log
 # User-specific
 *.rsuser
 *.sln.ide/
+
+# Frontend (ui/)
+node_modules/
+/ui/dist/
+/ui/.angular/
+/ui/out-tsc/
+.pnp.*
+
+# Claude Code
+.claude/settings.local.json

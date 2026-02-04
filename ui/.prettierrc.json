@@ -1,0 +1,58 @@
+{
+  "printWidth": 200,
+  "singleQuote": true,
+  "semi": true,
+  "tabWidth": 2,
+  "useTabs": false,
+  "bracketSameLine": true,
+  "trailingComma": "all",
+  "arrowParens": "always",
+  "endOfLine": "lf",
+
+  "plugins": ["@ianvs/prettier-plugin-sort-imports", "prettier-plugin-organize-attributes", "prettier-plugin-tailwindcss"],
+
+  "importOrder": [
+    "<BUILTIN_MODULES>",
+    "",
+    "^@angular/(.*)$",
+    "^rxjs(.*)$",
+    "",
+    "^primeng(.*)$",
+    "^@primeuix/(.*)$",
+    "",
+    "<THIRD_PARTY_MODULES>",
+    "",
+    "^@app/(.*)$",
+    "^@core/(.*)$",
+    "^@shared/(.*)$",
+    "",
+    "^[./]"
+  ],
+  "importOrderParserPlugins": ["typescript", "decorators-legacy"],
+  "importOrderTypeScriptVersion": "5.9.0",
+
+  "attributeGroups": [
+    "^(id|name)$",
+    "$ANGULAR_STRUCTURAL_DIRECTIVE",
+    "$ANGULAR_ELEMENT_REF",
+    "^\\[attr",
+    "$ANGULAR_TWO_WAY_BINDING",
+    "$ANGULAR_INPUT",
+    "$ANGULAR_OUTPUT",
+    "^\\[class\\.",
+    "^\\[style\\.",
+    "^class$",
+    "ngClass",
+    "$CLASS"
+  ],
+
+  "overrides": [
+    {
+      "files": "*.html",
+      "options": {
+        "parser": "angular",
+        "htmlWhitespaceSensitivity": "ignore"
+      }
+    }
+  ]
+}

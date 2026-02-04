@@ -1,0 +1,63 @@
+query GetIncomes(
+  $first: Int
+  $after: String
+  $last: Int
+  $before: String
+  $where: IncomeDocumentFilterInput
+  $order: [IncomeDocumentSortInput!]
+) {
+  incomes(
+    first: $first
+    after: $after
+    last: $last
+    before: $before
+    where: $where
+    order: $order
+  ) {
+    pageInfo {
+      hasNextPage
+      hasPreviousPage
+      startCursor
+      endCursor
+    }
+    nodes {
+      ...IncomeFields
+    }
+    totalCount
+  }
+}
+
+query GetIncomeById($id: String!) {
+  incomeById(id: $id) {
+    ...IncomeFields
+  }
+}
+
+query GetTotalAmount($currency: String) {
+  totalAmount(currency: $currency)
+}
+
+query GetCategories {
+  categories
+}
+
+query GetIncomeStats($includeNonRecurring: Boolean) {
+  incomeStats(includeNonRecurring: $includeNonRecurring) {
+    yearRecurringTotal
+    lastMonthRecurringTotal
+    lastMonthRecurringChangePct
+    thisMonthRecurringTotal
+    thisMonthRecurringChangePct
+    last3MonthsRecurringAverage
+  }
+}
+
+query GetIncomeMonthlyStats($monthsBack: Int) {
+  incomeMonthlyStats(monthsBack: $monthsBack) {
+    year
+    month
+    recurringTotal
+    nonRecurringTotal
+    total
+  }
+}

@@ -1,0 +1,1328 @@
+.p-button-xs .p-button {
+  padding: 0.375rem 0.625rem;
+  font-size: 0.8125rem;
+
+  .p-button-icon {
+    font-size: 0.75rem;
+  }
+}
+
+.p-button-outlined {
+  color: var(--color-secondary-600);
+  border-color: var(--color-secondary-400);
+
+  &:hover {
+    color: var(--color-secondary-800);
+    background-color: var(--color-secondary-100);
+    border-color: var(--color-secondary-400);
+  }
+
+  .dark & {
+    color: var(--color-dark-primary-100);
+    border-color: var(--color-dark-primary-400);
+
+    &:hover {
+      color: var(--color-dark-secondary-50);
+      border-color: var(--color-dark-secondary-200);
+      background-color: var(--color-dark-primary-700);
+    }
+  }
+}
+
+.p-datatable-sm {
+  .p-datatable-header {
+    padding: 0.5rem 0.75rem;
+  }
+
+  .p-datatable-thead > tr > th {
+    padding: 0.5rem 0.75rem;
+  }
+
+  .p-datatable-tbody > tr > td {
+    padding: 0.4rem 0.75rem;
+  }
+
+  .p-paginator {
+    padding: 0.4rem 0.75rem;
+  }
+}
+
+.p-datatable {
+  border-radius: 0.75rem;
+  overflow: hidden;
+  box-shadow:
+    0 1px 3px 0 rgba(0, 0, 0, 0.1),
+    0 1px 2px -1px rgba(0, 0, 0, 0.1);
+}
+
+.p-datatable-header {
+  border-bottom: 1px solid var(--color-divider-strong);
+}
+
+.p-datatable-thead > tr > th {
+  border-bottom: 1px solid var(--color-divider) !important;
+  border-right: none !important;
+  font-size: 0.8125rem;
+  text-transform: uppercase;
+  letter-spacing: 0.025em;
+}
+
+.p-datatable-tbody > tr > td {
+  border-bottom: 1px solid var(--color-divider);
+  border-right: none !important;
+}
+
+.p-datatable-tbody > tr:last-child > td {
+  border-bottom: none;
+}
+
+/* Remove border between table and paginator */
+.p-datatable .p-datatable-paginator-bottom,
+.p-datatable .p-paginator-bottom,
+.p-datatable-footer,
+.p-datatable .p-paginator {
+  border-top: none !important;
+  border-color: transparent !important;
+}
+
+.p-datatable-tbody > tr {
+  transition: background-color 0.15s ease;
+}
+
+.p-datatable-tbody > tr.p-row-editing {
+  background-color: var(--color-secondary-100) !important;
+}
+
+.p-datatable-striped .p-datatable-tbody > tr:nth-child(even) {
+  background-color: var(--color-secondary-50);
+}
+
+.p-column-filter-menu-button {
+  color: var(--color-secondary-400);
+
+  &:hover {
+    background-color: var(--color-secondary-100);
+    color: var(--color-secondary-700);
+  }
+
+  &.p-column-filter-menu-button-active {
+    background-color: var(--color-accent-500);
+    color: var(--color-secondary-50);
+  }
+}
+
+.p-datatable-sortable-column .p-sortable-column-icon {
+  color: var(--color-secondary-400);
+}
+
+.p-datatable-sortable-column:hover .p-sortable-column-icon {
+  color: var(--color-secondary-600);
+}
+
+.p-datatable-sortable-column.p-highlight .p-sortable-column-icon {
+  color: var(--color-accent-600);
+}
+
+.p-datatable-emptymessage td {
+  text-align: center;
+  padding: 3rem 1rem !important;
+  color: var(--color-secondary-400);
+  font-style: italic;
+}
+
+.p-datatable-column-filter-button {
+  width: auto;
+  height: auto;
+  padding: 0.25rem;
+  border-radius: 0.25rem;
+
+  .p-icon {
+    width: 0.625rem;
+    height: 0.625rem;
+  }
+
+  &:hover {
+    background-color: var(--color-secondary-100);
+  }
+}
+
+.dark {
+  .p-datatable {
+    border-radius: 0.75rem;
+    overflow: hidden;
+    box-shadow:
+      0 4px 6px -1px rgba(0, 0, 0, 0.2),
+      0 2px 4px -2px rgba(0, 0, 0, 0.15);
+  }
+
+  .p-datatable-header {
+    border-bottom: 1px solid var(--color-dark-divider-strong);
+  }
+
+  .p-datatable-thead > tr > th {
+    border-bottom: 1px solid var(--color-dark-divider) !important;
+    border-right: none !important;
+    font-size: 0.8125rem;
+    text-transform: uppercase;
+    letter-spacing: 0.025em;
+  }
+
+  .p-datatable-tbody > tr > td {
+    border-bottom: 1px solid var(--color-dark-divider);
+    border-right: none !important;
+  }
+
+  .p-datatable-tbody > tr:last-child > td {
+    border-bottom: none;
+  }
+
+  /* Remove border between table and paginator */
+  .p-datatable .p-datatable-paginator-bottom,
+  .p-datatable .p-paginator-bottom,
+  .p-datatable-footer,
+  .p-datatable .p-paginator {
+    border-top: none !important;
+    border-color: transparent !important;
+  }
+
+  .p-datatable-tbody > tr {
+    transition: background-color 0.15s ease;
+  }
+
+  .p-datatable-tbody > tr.p-row-editing {
+    background-color: var(--color-dark-primary-750) !important;
+  }
+
+  .p-datatable-striped .p-datatable-tbody > tr:nth-child(even) {
+    background-color: var(--color-dark-primary-850);
+  }
+
+  .p-column-filter-menu-button {
+    color: var(--color-dark-secondary-400);
+
+    &:hover {
+      background-color: var(--color-dark-primary-700);
+      color: var(--color-dark-secondary-100);
+    }
+
+    &.p-column-filter-menu-button-active {
+      background-color: var(--color-accent-600);
+      color: var(--color-dark-primary-950);
+    }
+  }
+
+  .p-datatable-sortable-column .p-sortable-column-icon {
+    color: var(--color-dark-secondary-400);
+  }
+
+  .p-datatable-sortable-column:hover .p-sortable-column-icon {
+    color: var(--color-dark-secondary-200);
+  }
+
+  .p-datatable-sortable-column.p-highlight .p-sortable-column-icon {
+    color: var(--color-accent-400);
+  }
+
+  .p-datatable-emptymessage td {
+    text-align: center;
+    padding: 3rem 1rem !important;
+    color: var(--color-dark-secondary-400);
+    font-style: italic;
+  }
+
+  .p-datatable-column-filter-button:hover {
+    background-color: var(--color-dark-primary-700);
+  }
+}
+
+.p-inputtext-sm {
+  padding: 0.375rem 0.625rem;
+  font-size: 0.8125rem;
+}
+
+.p-iconfield {
+  .p-inputtext-sm {
+    padding-left: 2rem;
+  }
+
+  .p-inputicon {
+    top: 50% !important;
+    transform: translateY(-50%) !important;
+    margin-top: 0 !important;
+  }
+}
+
+.p-inputtext {
+  background-color: var(--color-secondary-50);
+  border-color: var(--color-secondary-400);
+  color: var(--color-secondary-900);
+  transition:
+    border-color 0.15s ease,
+    box-shadow 0.15s ease;
+
+  &::placeholder {
+    color: var(--color-secondary-400);
+  }
+
+  &:hover {
+    border-color: var(--color-secondary-400);
+  }
+
+  &:focus {
+    border-color: var(--color-accent-500);
+    box-shadow: 0 0 0 2px rgba(194, 120, 20, 0.15);
+  }
+}
+
+.p-iconfield {
+  .p-inputicon {
+    color: var(--color-secondary-400);
+  }
+
+  .p-inputtext {
+    background-color: var(--color-secondary-50);
+  }
+}
+
+.dark {
+  .p-inputtext {
+    background-color: var(--color-dark-primary-900);
+    border-color: var(--color-dark-primary-500);
+    color: var(--color-dark-secondary-50);
+    transition:
+      border-color 0.15s ease,
+      box-shadow 0.15s ease;
+
+    &::placeholder {
+      color: var(--color-dark-secondary-400);
+    }
+
+    &:hover {
+      border-color: var(--color-dark-primary-400);
+    }
+
+    &:focus {
+      border-color: var(--color-accent-500);
+      box-shadow: 0 0 0 2px rgba(234, 170, 50, 0.2);
+    }
+  }
+
+  .p-iconfield {
+    .p-inputicon {
+      color: var(--color-dark-secondary-400);
+    }
+
+    .p-inputtext {
+      background-color: var(--color-dark-primary-850);
+    }
+  }
+}
+
+.p-chip {
+  background-color: var(--color-secondary-100);
+  color: var(--color-secondary-700);
+  border: 1px solid var(--color-divider);
+
+  &.p-chip-success {
+    background-color: rgba(194, 120, 20, 0.1);
+    border-color: rgba(194, 120, 20, 0.25);
+    color: var(--color-accent-700);
+  }
+
+  &.p-chip-info {
+    background-color: rgba(59, 130, 246, 0.1);
+    border-color: rgba(59, 130, 246, 0.25);
+    color: #2563eb;
+  }
+
+  &.p-chip-warning {
+    background-color: rgba(245, 158, 11, 0.1);
+    border-color: rgba(245, 158, 11, 0.25);
+    color: #b45309;
+  }
+}
+
+.dark {
+  .p-chip {
+    background-color: var(--color-dark-primary-700);
+    color: var(--color-dark-secondary-100);
+    border: 1px solid var(--color-dark-primary-600);
+
+    &.p-chip-success {
+      background-color: rgba(234, 170, 50, 0.15);
+      border-color: rgba(234, 170, 50, 0.3);
+      color: var(--color-accent-400);
+    }
+
+    &.p-chip-info {
+      background-color: rgba(59, 130, 246, 0.15);
+      border-color: rgba(59, 130, 246, 0.3);
+      color: #93c5fd;
+    }
+
+    &.p-chip-warning {
+      background-color: rgba(234, 170, 50, 0.15);
+      border-color: rgba(234, 170, 50, 0.3);
+      color: #fde047;
+    }
+  }
+}
+
+/* DatePicker component - comprehensive styling */
+.p-datepicker {
+  /* Input field styling */
+  .p-datepicker-input {
+    background-color: var(--color-secondary-50);
+    border: 1px solid var(--color-divider);
+    color: var(--color-secondary-900);
+    font-size: 0.8125rem;
+    padding: 0.375rem 0.625rem;
+    border-radius: 0.375rem;
+    min-width: 220px;
+    transition:
+      border-color 0.15s ease,
+      box-shadow 0.15s ease;
+
+    &::placeholder {
+      color: var(--color-secondary-400);
+    }
+
+    &:hover {
+      border-color: var(--color-secondary-400);
+    }
+
+    &:focus {
+      border-color: var(--color-accent-500);
+      box-shadow: 0 0 0 2px rgba(194, 120, 20, 0.15);
+      outline: none;
+    }
+  }
+
+  /* When icon is shown, adjust input border-radius */
+  &.p-datepicker-icon .p-datepicker-input,
+  &:has(.p-datepicker-dropdown) .p-datepicker-input {
+    border-right: none;
+    border-radius: 0.375rem 0 0 0.375rem;
+  }
+
+  /* Dropdown trigger button (icon) */
+  .p-datepicker-dropdown {
+    background-color: var(--color-secondary-100);
+    border: 1px solid var(--color-divider);
+    color: var(--color-secondary-600);
+    border-radius: 0 0.375rem 0.375rem 0;
+    padding: 0 0.625rem;
+
+    &:hover {
+      background-color: var(--color-secondary-200);
+      color: var(--color-secondary-800);
+    }
+
+    &:focus {
+      box-shadow: 0 0 0 2px rgba(194, 120, 20, 0.15);
+      outline: none;
+      z-index: 1;
+    }
+  }
+}
+
+/* DatePicker panel (popup calendar) */
+.p-datepicker-panel {
+  background-color: var(--color-secondary-50);
+  border: 1px solid var(--color-divider);
+  border-radius: 0.5rem;
+  box-shadow:
+    0 10px 15px -3px rgba(0, 0, 0, 0.1),
+    0 4px 6px -4px rgba(0, 0, 0, 0.1);
+  padding: 1rem;
+  min-width: 320px;
+
+  /* Calendar header with month/year navigation */
+  .p-datepicker-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 0 0.5rem 0;
+    margin-bottom: 0.5rem;
+    border-bottom: 1px solid var(--color-divider);
+  }
+
+  /* Month/Year title */
+  .p-datepicker-title {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+
+    .p-datepicker-select-month,
+    .p-datepicker-select-year {
+      font-size: 0.875rem;
+      font-weight: 600;
+      color: var(--color-secondary-800);
+      background: transparent;
+      border: none;
+      padding: 0.25rem 0.5rem;
+      border-radius: 0.25rem;
+      cursor: pointer;
+      transition: background-color 0.15s ease;
+
+      &:hover {
+        background-color: var(--color-secondary-100);
+      }
+    }
+  }
+
+  /* Navigation buttons (prev/next month) */
+  .p-datepicker-prev,
+  .p-datepicker-next {
+    width: 1.75rem;
+    height: 1.75rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 0.375rem;
+    color: var(--color-secondary-600);
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    transition: all 0.15s ease;
+
+    &:hover {
+      background-color: var(--color-secondary-100);
+      color: var(--color-secondary-800);
+    }
+
+    &:focus {
+      box-shadow: 0 0 0 2px rgba(194, 120, 20, 0.15);
+      outline: none;
+    }
+
+    .p-icon {
+      width: 0.75rem;
+      height: 0.75rem;
+    }
+  }
+
+  /* Calendar table */
+  .p-datepicker-calendar {
+    width: 100%;
+    font-size: 0.875rem;
+    border-collapse: collapse;
+
+    th {
+      padding: 0.625rem 0.25rem;
+      color: var(--color-secondary-500);
+      font-weight: 500;
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.025em;
+    }
+
+    td {
+      padding: 0.125rem;
+
+      > span {
+        width: 2.25rem;
+        height: 2.25rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 0.375rem;
+        cursor: pointer;
+        transition: all 0.15s ease;
+        color: var(--color-secondary-800);
+
+        &:hover:not(.p-disabled):not(.p-datepicker-day-selected) {
+          background-color: var(--color-secondary-100);
+        }
+
+        &.p-datepicker-day-selected {
+          background-color: var(--color-accent-500);
+          color: var(--color-secondary-50);
+          font-weight: 600;
+        }
+
+        &.p-datepicker-today:not(.p-datepicker-day-selected) {
+          border: 1px solid var(--color-accent-500);
+          color: var(--color-accent-600);
+          font-weight: 600;
+        }
+
+        &.p-disabled {
+          color: var(--color-secondary-300);
+          cursor: not-allowed;
+        }
+      }
+    }
+  }
+
+  /* Other month days */
+  .p-datepicker-other-month {
+    > span {
+      color: var(--color-secondary-400) !important;
+    }
+  }
+
+  /* Range selection highlight */
+  .p-datepicker-day-selected-range {
+    > span {
+      background-color: rgba(194, 120, 20, 0.12) !important;
+      color: var(--color-accent-700) !important;
+      border-radius: 0;
+    }
+
+    &:first-child > span,
+    &.p-datepicker-day-selected > span {
+      border-radius: 0.375rem 0 0 0.375rem;
+    }
+
+    &:last-child > span {
+      border-radius: 0 0.375rem 0.375rem 0;
+    }
+  }
+
+  /* Month/Year picker panels */
+  .p-datepicker-month-view,
+  .p-datepicker-year-view {
+    .p-datepicker-month,
+    .p-datepicker-year {
+      padding: 0.5rem;
+      border-radius: 0.375rem;
+      color: var(--color-secondary-700);
+      cursor: pointer;
+      transition: all 0.15s ease;
+
+      &:hover {
+        background-color: var(--color-secondary-100);
+      }
+
+      &.p-datepicker-month-selected,
+      &.p-datepicker-year-selected {
+        background-color: var(--color-accent-500);
+        color: var(--color-secondary-50);
+        font-weight: 600;
+      }
+    }
+  }
+
+  /* Button bar */
+  .p-datepicker-buttonbar {
+    display: flex;
+    justify-content: space-between;
+    padding: 0.75rem 0 0 0;
+    margin-top: 0.5rem;
+    border-top: 1px solid var(--color-divider);
+    gap: 0.5rem;
+
+    /* Base button styling in button bar */
+    .p-button {
+      font-size: 0.75rem;
+      padding: 0.3rem 0.5rem;
+      border-radius: 0.25rem;
+      font-weight: 500;
+      transition: all 0.15s ease;
+
+      .p-button-icon {
+        font-size: 0.7rem;
+      }
+    }
+
+    /* Secondary buttons (Last month, This month) - chip-like style */
+    .p-button-secondary {
+      background-color: var(--color-secondary-100);
+      border: 1px solid var(--color-secondary-200);
+      color: var(--color-secondary-600);
+
+      &:hover {
+        background-color: var(--color-secondary-200);
+        border-color: var(--color-secondary-300);
+        color: var(--color-secondary-800);
+      }
+
+      &:focus {
+        box-shadow: 0 0 0 2px rgba(194, 120, 20, 0.12);
+      }
+    }
+
+    /* Outlined buttons (Today) */
+    .p-button-outlined {
+      background-color: transparent;
+      border: 1px solid var(--color-accent-500);
+      color: var(--color-accent-600);
+
+      &:hover {
+        background-color: rgba(194, 120, 20, 0.08);
+        border-color: var(--color-accent-600);
+        color: var(--color-accent-700);
+      }
+
+      &:focus {
+        box-shadow: 0 0 0 2px rgba(194, 120, 20, 0.15);
+      }
+    }
+
+    /* Text buttons (Clear/X) */
+    .p-button-text {
+      background-color: transparent;
+      border: none;
+      padding: 0.3rem;
+
+      &.p-button-danger {
+        color: var(--color-secondary-400);
+
+        &:hover {
+          background-color: rgba(239, 68, 68, 0.1);
+          color: #dc2626;
+        }
+      }
+    }
+  }
+
+  /* Time picker */
+  .p-datepicker-time-picker {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.25rem;
+    padding: 0.5rem 0;
+    border-top: 1px solid var(--color-divider);
+    margin-top: 0.5rem;
+
+    .p-datepicker-hour-picker,
+    .p-datepicker-minute-picker,
+    .p-datepicker-second-picker {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.25rem;
+
+      button {
+        width: 1.75rem;
+        height: 1.5rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 0.25rem;
+        color: var(--color-secondary-600);
+        background: transparent;
+        border: none;
+        cursor: pointer;
+        transition: all 0.15s ease;
+
+        &:hover {
+          background-color: var(--color-secondary-100);
+          color: var(--color-secondary-800);
+        }
+
+        .p-icon {
+          width: 0.625rem;
+          height: 0.625rem;
+        }
+      }
+
+      span {
+        font-size: 0.875rem;
+        font-weight: 500;
+        color: var(--color-secondary-800);
+        min-width: 2rem;
+        text-align: center;
+      }
+    }
+
+    .p-datepicker-separator {
+      font-size: 0.875rem;
+      color: var(--color-secondary-500);
+      margin: 0 0.25rem;
+    }
+
+    .p-datepicker-ampm-picker {
+      margin-left: 0.5rem;
+
+      button {
+        padding: 0.25rem 0.5rem;
+        font-size: 0.75rem;
+        font-weight: 600;
+        border-radius: 0.25rem;
+        background: var(--color-secondary-100);
+        color: var(--color-secondary-700);
+        border: none;
+        cursor: pointer;
+        transition: all 0.15s ease;
+
+        &:hover {
+          background: var(--color-secondary-200);
+        }
+      }
+    }
+  }
+}
+
+/* Dark mode */
+.dark {
+  .p-datepicker {
+    .p-datepicker-input {
+      background-color: var(--color-dark-primary-900);
+      border-color: var(--color-dark-primary-500);
+      color: var(--color-dark-secondary-50);
+
+      &::placeholder {
+        color: var(--color-dark-secondary-400);
+      }
+
+      &:hover {
+        border-color: var(--color-dark-primary-400);
+      }
+
+      &:focus {
+        border-color: var(--color-accent-500);
+        box-shadow: 0 0 0 2px rgba(234, 170, 50, 0.2);
+      }
+    }
+
+    .p-datepicker-dropdown {
+      background-color: var(--color-dark-primary-800);
+      border-color: var(--color-dark-primary-500);
+      color: var(--color-dark-secondary-200);
+
+      &:hover {
+        background-color: var(--color-dark-primary-700);
+        color: var(--color-dark-secondary-50);
+      }
+
+      &:focus {
+        box-shadow: 0 0 0 2px rgba(234, 170, 50, 0.2);
+        outline: none;
+        z-index: 1;
+      }
+    }
+
+    /* When icon is shown, adjust input border-radius */
+    &.p-datepicker-icon .p-datepicker-input,
+    &:has(.p-datepicker-dropdown) .p-datepicker-input {
+      border-right: none;
+    }
+  }
+
+  .p-datepicker-panel {
+    background-color: var(--color-dark-primary-800);
+    border-color: var(--color-dark-divider-strong);
+    box-shadow:
+      0 10px 15px -3px rgba(0, 0, 0, 0.4),
+      0 4px 6px -4px rgba(0, 0, 0, 0.3);
+
+    .p-datepicker-header {
+      border-bottom-color: var(--color-dark-divider-strong);
+    }
+
+    .p-datepicker-title {
+      .p-datepicker-select-month,
+      .p-datepicker-select-year {
+        color: var(--color-dark-secondary-50);
+
+        &:hover {
+          background-color: var(--color-dark-primary-700);
+        }
+      }
+    }
+
+    .p-datepicker-prev,
+    .p-datepicker-next {
+      color: var(--color-dark-secondary-200);
+
+      &:hover {
+        background-color: var(--color-dark-primary-700);
+        color: var(--color-dark-secondary-50);
+      }
+
+      &:focus {
+        box-shadow: 0 0 0 2px rgba(234, 170, 50, 0.2);
+      }
+    }
+
+    .p-datepicker-calendar {
+      th {
+        color: var(--color-dark-secondary-400);
+      }
+
+      td > span {
+        color: var(--color-dark-secondary-100);
+
+        &:hover:not(.p-disabled):not(.p-datepicker-day-selected) {
+          background-color: var(--color-dark-primary-700);
+        }
+
+        &.p-datepicker-day-selected {
+          background-color: var(--color-accent-500);
+          color: var(--color-dark-primary-950);
+        }
+
+        &.p-datepicker-today:not(.p-datepicker-day-selected) {
+          border-color: var(--color-accent-500);
+          color: var(--color-accent-400);
+        }
+
+        &.p-disabled {
+          color: var(--color-dark-secondary-500);
+        }
+      }
+    }
+
+    .p-datepicker-other-month > span {
+      color: var(--color-dark-secondary-500) !important;
+    }
+
+    .p-datepicker-day-selected-range > span {
+      background-color: rgba(234, 170, 50, 0.15) !important;
+      color: var(--color-accent-400) !important;
+    }
+
+    .p-datepicker-month-view,
+    .p-datepicker-year-view {
+      .p-datepicker-month,
+      .p-datepicker-year {
+        color: var(--color-dark-secondary-100);
+
+        &:hover {
+          background-color: var(--color-dark-primary-700);
+        }
+
+        &.p-datepicker-month-selected,
+        &.p-datepicker-year-selected {
+          background-color: var(--color-accent-500);
+          color: var(--color-dark-primary-950);
+        }
+      }
+    }
+
+    .p-datepicker-buttonbar {
+      border-top-color: var(--color-dark-divider-strong);
+
+      /* Secondary buttons (Last month, This month) */
+      .p-button-secondary {
+        background-color: var(--color-dark-primary-700);
+        border-color: var(--color-dark-primary-600);
+        color: var(--color-dark-secondary-200);
+
+        &:hover {
+          background-color: var(--color-dark-primary-600);
+          border-color: var(--color-dark-primary-500);
+          color: var(--color-dark-secondary-50);
+        }
+
+        &:focus {
+          box-shadow: 0 0 0 2px rgba(234, 170, 50, 0.15);
+        }
+      }
+
+      /* Outlined buttons (Today) */
+      .p-button-outlined {
+        background-color: transparent;
+        border-color: var(--color-accent-500);
+        color: var(--color-accent-400);
+
+        &:hover {
+          background-color: rgba(234, 170, 50, 0.12);
+          border-color: var(--color-accent-400);
+          color: var(--color-accent-300);
+        }
+
+        &:focus {
+          box-shadow: 0 0 0 2px rgba(234, 170, 50, 0.2);
+        }
+      }
+
+      /* Text buttons (Clear/X) */
+      .p-button-text.p-button-danger {
+        color: var(--color-dark-secondary-400);
+
+        &:hover {
+          background-color: rgba(239, 68, 68, 0.15);
+          color: #fca5a5;
+        }
+      }
+    }
+
+    .p-datepicker-time-picker {
+      border-top-color: var(--color-dark-divider-strong);
+
+      .p-datepicker-hour-picker,
+      .p-datepicker-minute-picker,
+      .p-datepicker-second-picker {
+        button {
+          color: var(--color-dark-secondary-200);
+
+          &:hover {
+            background-color: var(--color-dark-primary-700);
+            color: var(--color-dark-secondary-50);
+          }
+        }
+
+        span {
+          color: var(--color-dark-secondary-50);
+        }
+      }
+
+      .p-datepicker-separator {
+        color: var(--color-dark-secondary-400);
+      }
+
+      .p-datepicker-ampm-picker button {
+        background: var(--color-dark-primary-700);
+        color: var(--color-dark-secondary-100);
+
+        &:hover {
+          background: var(--color-dark-primary-600);
+        }
+      }
+    }
+  }
+}
+
+.p-paginator {
+  background-color: var(--color-secondary-50);
+  border-top: none;
+  padding: 0.5rem 0.75rem;
+
+  .p-paginator-element {
+    border: 1px solid var(--color-secondary-400);
+    font-size: 0.75rem;
+    font-weight: 500;
+
+    &:hover:not(.p-disabled) {
+      border-color: var(--color-secondary-400);
+      background-color: var(--color-secondary-100);
+    }
+
+    &.p-paginator-page.p-highlight,
+    &.p-paginator-page-selected {
+      font-weight: 600;
+    }
+  }
+
+  .p-paginator-current {
+    color: var(--color-secondary-500);
+    font-size: 0.75rem;
+  }
+
+  .p-select {
+    background-color: transparent;
+    border: 1px solid var(--color-secondary-400);
+    color: var(--color-secondary-700);
+    font-size: 0.75rem;
+    height: 1.75rem;
+
+    .p-select-label {
+      padding: 0 0.5rem;
+      font-size: 0.75rem;
+      line-height: 1.75rem;
+      display: flex;
+      align-items: center;
+    }
+
+    .p-select-dropdown {
+      width: 1.75rem;
+    }
+
+    &:hover {
+      border-color: var(--color-secondary-400);
+      background-color: var(--color-secondary-100);
+    }
+  }
+}
+
+.dark {
+  .p-paginator {
+    background-color: var(--color-dark-primary-900);
+    border-top: none;
+    padding: 0.5rem 0.75rem;
+
+    .p-paginator-element {
+      border: 1px solid var(--color-dark-primary-400);
+      font-size: 0.75rem;
+      font-weight: 500;
+
+      &:hover:not(.p-disabled) {
+        border-color: var(--color-dark-secondary-200);
+      }
+
+      &.p-paginator-page.p-highlight,
+      &.p-paginator-page-selected {
+        font-weight: 600;
+      }
+    }
+
+    .p-paginator-current {
+      color: var(--color-dark-secondary-300);
+      font-size: 0.75rem;
+    }
+
+    .p-select {
+      background-color: transparent;
+      border: 1px solid var(--color-dark-primary-400);
+      color: var(--color-dark-primary-100);
+      font-size: 0.75rem;
+      height: 1.75rem;
+
+      .p-select-label {
+        padding: 0 0.5rem;
+        font-size: 0.75rem;
+        line-height: 1.75rem;
+        display: flex;
+        align-items: center;
+      }
+
+      .p-select-dropdown {
+        width: 1.75rem;
+      }
+
+      &:hover {
+        border-color: var(--color-dark-secondary-200);
+        background-color: var(--color-dark-primary-700);
+      }
+    }
+  }
+}
+
+.p-datatable-filter-overlay {
+  background-color: var(--color-secondary-50);
+  border: 1px solid var(--color-divider);
+  box-shadow:
+    0 10px 15px -3px rgba(0, 0, 0, 0.1),
+    0 4px 6px -4px rgba(0, 0, 0, 0.1);
+  border-radius: 0.5rem;
+}
+
+.dark {
+  .p-datatable-filter-overlay {
+    background-color: var(--color-dark-primary-800);
+    border: 1px solid var(--color-dark-divider);
+    box-shadow:
+      0 10px 15px -3px rgba(0, 0, 0, 0.3),
+      0 4px 6px -4px rgba(0, 0, 0, 0.2);
+    border-radius: 0.5rem;
+  }
+}
+
+.p-button-sm.p-button-icon-only.p-button-rounded {
+  width: 1.75rem;
+  height: 1.75rem;
+  padding: 0;
+
+  .p-button-icon {
+    font-size: 0.75rem;
+  }
+}
+
+.p-datatable-tbody {
+  .p-button-text {
+    &.p-button-secondary {
+      color: var(--color-secondary-500);
+
+      &:hover {
+        background-color: var(--color-secondary-100);
+        color: var(--color-secondary-800);
+      }
+    }
+
+    &.p-button-success {
+      color: var(--color-accent-600);
+
+      &:hover {
+        background-color: rgba(194, 120, 20, 0.1);
+      }
+    }
+
+    &.p-button-danger {
+      color: #dc2626;
+
+      &:hover {
+        background-color: rgba(239, 68, 68, 0.1);
+      }
+    }
+  }
+}
+
+.dark {
+  .p-datatable-tbody {
+    .p-button-text {
+      &.p-button-secondary {
+        color: var(--color-dark-secondary-300);
+
+        &:hover {
+          background-color: var(--color-dark-primary-700);
+          color: var(--color-dark-secondary-50);
+        }
+      }
+
+      &.p-button-success {
+        color: var(--color-accent-400);
+
+        &:hover {
+          background-color: rgba(234, 170, 50, 0.15);
+        }
+      }
+
+      &.p-button-danger {
+        color: #fca5a5;
+
+        &:hover {
+          background-color: rgba(239, 68, 68, 0.15);
+        }
+      }
+    }
+  }
+}
+
+.sidebar-actions {
+  .sidebar-btn .p-button {
+    color: var(--color-secondary-200);
+    background: transparent;
+    border: 1px solid var(--color-secondary-500);
+    border-radius: 0.5rem;
+
+    &:hover {
+      color: var(--color-secondary-50);
+      background: var(--color-secondary-800);
+      border-color: var(--color-secondary-400);
+    }
+  }
+}
+
+.dark .sidebar-actions {
+  .sidebar-btn .p-button {
+    color: var(--color-dark-secondary-300);
+    border-color: var(--color-dark-primary-500);
+
+    &:hover {
+      color: var(--color-dark-secondary-100);
+      background: var(--color-dark-primary-700);
+      border-color: var(--color-dark-primary-400);
+    }
+  }
+}
+
+.text-accent-500 {
+  color: var(--color-accent-500) !important;
+}
+
+.dark {
+  .text-accent-500 {
+    color: var(--color-accent-400) !important;
+  }
+
+  .text-accent-400 {
+    color: var(--color-accent-400) !important;
+  }
+}
+
+/* Divider component */
+.p-divider {
+  &.p-divider-horizontal {
+    margin: 1rem 0;
+    padding: 0;
+
+    &::before {
+      border-top: 1px solid var(--color-divider);
+    }
+  }
+
+  &.p-divider-vertical {
+    margin: 0 1rem;
+    padding: 0;
+
+    &::before {
+      border-left: 1px solid var(--color-divider);
+    }
+  }
+}
+
+.dark .p-divider {
+  &.p-divider-horizontal::before {
+    border-top-color: var(--color-dark-divider);
+  }
+
+  &.p-divider-vertical::before {
+    border-left-color: var(--color-dark-divider);
+  }
+}
+
+/* ButtonGroup component */
+.p-buttongroup {
+  .p-button {
+    background-color: var(--color-secondary-50);
+    border: 1px solid var(--color-divider);
+    color: var(--color-secondary-700);
+
+    &:hover {
+      background-color: var(--color-secondary-100);
+      border-color: var(--color-secondary-400);
+      color: var(--color-secondary-800);
+    }
+
+    &:focus {
+      box-shadow: 0 0 0 2px rgba(194, 120, 20, 0.15);
+      z-index: 1;
+    }
+
+    &:active {
+      background-color: var(--color-secondary-200);
+    }
+  }
+
+  > .p-button:not(:last-child),
+  > .p-button-group:not(:last-child) > .p-button {
+    border-right: none;
+  }
+
+  > .p-button:first-child,
+  > .p-button-group:first-child > .p-button {
+    border-top-left-radius: 0.375rem;
+    border-bottom-left-radius: 0.375rem;
+  }
+
+  > .p-button:last-child,
+  > .p-button-group:last-child > .p-button {
+    border-top-right-radius: 0.375rem;
+    border-bottom-right-radius: 0.375rem;
+  }
+
+  > .p-button:not(:first-child):not(:last-child) {
+    border-radius: 0;
+  }
+
+  &.p-buttongroup-sm .p-button {
+    padding: 0.375rem 0.625rem;
+    font-size: 0.8125rem;
+
+    .p-button-icon {
+      font-size: 0.75rem;
+    }
+  }
+}
+
+.dark .p-buttongroup {
+  .p-button {
+    background-color: var(--color-dark-primary-800);
+    border: 1px solid var(--color-dark-primary-500);
+    color: var(--color-dark-secondary-200);
+
+    &:hover {
+      background-color: var(--color-dark-primary-700);
+      border-color: var(--color-dark-primary-400);
+      color: var(--color-dark-secondary-50);
+    }
+
+    &:focus {
+      box-shadow: 0 0 0 2px rgba(234, 170, 50, 0.2);
+      z-index: 1;
+    }
+
+    &:active {
+      background-color: var(--color-dark-primary-600);
+    }
+  }
+
+  > .p-button:not(:last-child),
+  > .p-button-group:not(:last-child) > .p-button {
+    border-right: none;
+  }
+}
