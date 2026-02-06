@@ -1,4 +1,5 @@
 using HotChocolate.Execution;
+using HotChocolate.AspNetCore;
 using WiSave.Shared.Infrastructure;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -15,4 +16,4 @@ app.MapGraphQL().WithOptions(new HotChocolate.AspNetCore.GraphQLServerOptions
     Tool = { Enable = true }
 });
 
-app.Run();
+await app.RunWithGraphQLCommandsAsync(args);

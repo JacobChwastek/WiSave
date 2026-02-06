@@ -169,12 +169,12 @@ export type QueryIncomeByIdArgs = {
 
 
 export type QueryIncomeMonthlyStatsArgs = {
-  monthsBack?: InputMaybe<Scalars['Int']['input']>;
+  monthsBack?: Scalars['Int']['input'];
 };
 
 
 export type QueryIncomeStatsArgs = {
-  includeNonRecurring?: InputMaybe<Scalars['Boolean']['input']>;
+  includeNonRecurring?: Scalars['Boolean']['input'];
 };
 
 

@@ -14,6 +14,15 @@ type IncomeDocument {
   updatedAt: DateTime
 }
 
+type IncomeStats {
+  yearRecurringTotal: Decimal!
+  lastMonthRecurringTotal: Decimal!
+  lastMonthRecurringChangePct: Decimal
+  thisMonthRecurringTotal: Decimal!
+  thisMonthRecurringChangePct: Decimal
+  last3MonthsRecurringAverage: Decimal!
+}
+
 "A connection to a list of items."
 type IncomesConnection {
   "Information to aid in pagination."
@@ -34,6 +43,13 @@ type IncomesEdge {
   node: IncomeDocument!
 }
 
+type MonthlyIncomeStats {
+  year: Int!
+  month: Int!
+  recurringTotal: Decimal!
+  nonRecurringTotal: Decimal!
+}
+
 "Information about pagination in a connection."
 type PageInfo {
   "Indicates whether more edges exist following the set defined by the clients arguments."
@@ -46,29 +62,13 @@ type PageInfo {
   endCursor: String
 }
 
-type IncomeStats {
-  yearRecurringTotal: Decimal!
-  lastMonthRecurringTotal: Decimal!
-  lastMonthRecurringChangePct: Decimal
-  thisMonthRecurringTotal: Decimal!
-  thisMonthRecurringChangePct: Decimal
-  last3MonthsRecurringAverage: Decimal!
-}
-
-type MonthlyIncomeStats {
-  year: Int!
-  month: Int!
-  recurringTotal: Decimal!
-  nonRecurringTotal: Decimal!
-}
-
 type Query {
   incomes("Returns the first _n_ elements from the list." first: Int "Returns the elements in the list that come after the specified cursor." after: String "Returns the last _n_ elements from the list." last: Int "Returns the elements in the list that come before the specified cursor." before: String where: IncomeDocumentFilterInput @cost(weight: "10") order: [IncomeDocumentSortInput!] @cost(weight: "10")): IncomesConnection @listSize(assumedSize: 50, slicingArguments: [ "first", "last" ], slicingArgumentDefaultValue: 10, sizedFields: [ "edges", "nodes" ], requireOneSlicingArgument: false) @cost(weight: "10")
   incomeById(id: String!): IncomeDocument @cost(weight: "10")
   totalAmount(currency: String): Decimal! @cost(weight: "10")
   categories: [String!]! @cost(weight: "10")
-  incomeStats(includeNonRecurring: Boolean): IncomeStats! @cost(weight: "10")
-  incomeMonthlyStats(monthsBack: Int): [MonthlyIncomeStats!]! @cost(weight: "10")
+  incomeStats(includeNonRecurring: Boolean! = false): IncomeStats! @cost(weight: "10")
+  incomeMonthlyStats(monthsBack: Int! = 12): [MonthlyIncomeStats!]! @cost(weight: "10")
 }
 
 input BooleanOperationFilterInput {

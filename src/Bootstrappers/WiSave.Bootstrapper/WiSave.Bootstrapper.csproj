@@ -7,6 +7,10 @@
     </PropertyGroup>
 
     <ItemGroup>
+        <PackageReference Include="HotChocolate.AspNetCore.CommandLine" Version="15.1.5" />
+    </ItemGroup>
+
+    <ItemGroup>
         <ProjectReference Include="..\..\Modules\Incomes\WiSave.Modules.Incomes.Api\WiSave.Modules.Incomes.Api.csproj" />
         <ProjectReference Include="..\..\Shared\WiSave.Shared.Infrastructure\WiSave.Shared.Infrastructure.csproj" />
     </ItemGroup>

@@ -2,6 +2,10 @@
   <Folder Name="/solution items/">
     <File Path="docker-compose.yml" />
   </Folder>
+  <Folder Name="/solution items/grapql/">
+    <File Path="scripts\check-schema.sh" />
+    <File Path="scripts\export-schema.sh" />
+  </Folder>
   <Folder Name="/src/" />
   <Folder Name="/src/Bootstrappers/">
     <Project Path="src/Bootstrappers/WiSave.Bootstrapper/WiSave.Bootstrapper.csproj" />

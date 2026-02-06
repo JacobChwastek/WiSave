@@ -37,6 +37,9 @@ yarn-error.log
 !.vscode/extensions.json
 .history/*
 
+# Generated schema (canonical copy is at repo root)
+/schema.graphql
+
 # Miscellaneous
 /.angular/cache
 .sass-cache/

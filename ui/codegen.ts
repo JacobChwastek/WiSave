@@ -3,7 +3,7 @@ import type { CodegenConfig } from '@graphql-codegen/cli';
 const eslintDisableHeader = '/* eslint-disable */';
 
 const config: CodegenConfig = {
-  schema: '../schema.graphql',
+  schema: 'schema.graphql',
   generates: {
     // Generate base schema types in core
     'src/app/core/api/graphql/generated/schema.types.ts': {
