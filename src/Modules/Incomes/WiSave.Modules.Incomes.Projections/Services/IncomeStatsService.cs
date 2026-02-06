@@ -40,12 +40,12 @@ public sealed class IncomeStatsService(IMongoCollection<IncomeDocument> collecti
         var last3MonthsAverage = last3FullMonthsRecurring / 3m;
 
         return new IncomeStats(
-            yearRecurringTotal: yearRecurring,
-            lastMonthRecurringTotal: lastMonthRecurring,
-            lastMonthRecurringChangePct: StatisticsHelper.CalculateChangePercent(lastMonthRecurring, twoMonthsAgoRecurring),
-            thisMonthRecurringTotal: thisMonthRecurring,
-            thisMonthRecurringChangePct: StatisticsHelper.CalculateChangePercent(thisMonthRecurring, lastMonthRecurring),
-            last3MonthsRecurringAverage: last3MonthsAverage
+            YearRecurringTotal: yearRecurring,
+            LastMonthRecurringTotal: lastMonthRecurring,
+            LastMonthRecurringChangePct: StatisticsHelper.CalculateChangePercent(lastMonthRecurring, twoMonthsAgoRecurring),
+            ThisMonthRecurringTotal: thisMonthRecurring,
+            ThisMonthRecurringChangePct: StatisticsHelper.CalculateChangePercent(thisMonthRecurring, lastMonthRecurring),
+            Last3MonthsRecurringAverage: last3MonthsAverage
         );
     }
 

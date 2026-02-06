@@ -2,7 +2,7 @@ import { Component, inject } from '@angular/core';
 
 import { ButtonModule } from 'primeng/button';
 
-import { ThemeService } from '@services/ThemeService';
+import { ThemeService } from '@core/services/theme.service';
 
 @Component({
   selector: 'app-theme-icon-button',

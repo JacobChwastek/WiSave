@@ -43,3 +43,9 @@ export interface IPageNavigationEvent {
 export interface IPageSizeChangeEvent {
   rows: number;
 }
+
+export interface ICursorPaginationParams {
+  direction: CursorDirection;
+  cursor: string | null;
+  pageSize: number;
+}

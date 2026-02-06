@@ -3,8 +3,9 @@ import { Component, computed, inject, input, output } from '@angular/core';
 import { ButtonModule } from 'primeng/button';
 import { ChartModule } from 'primeng/chart';
 
-import { ThemeService } from '@services/ThemeService';
 import { IIncomeMonthlyStats } from '@features/incomes/store/incomes.state';
+
+import { ThemeService } from '@core/services/theme.service';
 
 @Component({
   selector: 'app-monthly-income-chart',
@@ -12,11 +13,11 @@ import { IIncomeMonthlyStats } from '@features/incomes/store/incomes.state';
   imports: [ChartModule, ButtonModule],
   template: `
     <div class="flex h-72 items-center gap-2">
-      <p-button icon="pi pi-chevron-left" [outlined]="true" [rounded]="true" size="small" [disabled]="!canGoBack()" [loading]="loading()" (onClick)="onGoBack()" />
+      <p-button [outlined]="true" [rounded]="true" [disabled]="!canGoBack()" [loading]="loading()" (onClick)="onGoBack()" icon="pi pi-chevron-left" size="small" />
       <div class="flex h-full w-full flex-1">
-        <p-chart class="w-full" type="bar" [data]="chartData()" [options]="chartOptions()" />
+        <p-chart [data]="chartData()" [options]="chartOptions()" class="w-full" type="bar" />
       </div>
-      <p-button icon="pi pi-chevron-right" [outlined]="true" [rounded]="true" size="small" [disabled]="!canGoForward()" [loading]="loading()" (onClick)="onGoForward()" />
+      <p-button [outlined]="true" [rounded]="true" [disabled]="!canGoForward()" [loading]="loading()" (onClick)="onGoForward()" icon="pi pi-chevron-right" size="small" />
     </div>
   `,
 })
