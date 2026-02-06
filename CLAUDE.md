@@ -8,10 +8,12 @@ WiSave is a modular monolith financial tracking application built with .NET 10, 
 
 ```
 wisave/
-├── src/          # .NET backend (modular monolith)
-├── ui/           # Angular frontend (see ui/CLAUDE.md for details)
-├── docker/       # Docker init scripts
-├── schema.graphql  # Shared GraphQL schema (single source of truth)
+├── src/            # .NET backend (modular monolith)
+├── ui/             # Angular frontend (see ui/CLAUDE.md for details)
+├── docs/           # Project documentation (see docs/README.md)
+├── docker/         # Docker init scripts
+├── scripts/        # Schema export & check scripts
+├── schema.graphql  # GraphQL schema (exported from Hot Chocolate, do not edit manually)
 └── docker-compose.yml
 ```
 
@@ -152,9 +154,22 @@ docker compose logs -f        # View logs
 # Database
 mongosh "mongodb://wisave:wisave_secret@localhost:27017/wisave?authSource=admin"
 
-# GraphQL codegen (from ui/)
-cd ui && yarn graphql-codegen
+# GraphQL schema workflow
+./scripts/export-schema.sh    # Export schema from Hot Chocolate → schema.graphql + ui/schema.graphql
+./scripts/check-schema.sh     # Diff check (CI: fails if schema.graphql is stale)
+cd ui && yarn schema:update   # Export schema + run codegen in one step
+cd ui && yarn codegen         # Run codegen only (uses existing schema.graphql)
 ```
+
+## GraphQL Schema Workflow
+
+The Hot Chocolate runtime schema is the **canonical source**. The `schema.graphql` file at the repo root is an export — never edit it manually.
+
+1. Modify resolvers/types in the .NET backend
+2. Run `./scripts/export-schema.sh` (or `cd ui && yarn schema:update`)
+3. This exports `schema.graphql` to repo root and copies to `ui/` for codegen
+4. Frontend codegen reads `ui/schema.graphql` to generate TypeScript types
+5. CI runs `./scripts/check-schema.sh` to ensure `schema.graphql` matches the server
 
 ## Environment Variables
 
