@@ -19,7 +19,7 @@ export class GraphQLService {
     variables?: TVariables,
   ): Observable<IGraphQLResult<TData>> {
     return this.#apollo
-      .query<TData, TVariables>({ query: document, variables, errorPolicy: 'all', fetchPolicy: 'network-only' } as never)
+      .query<TData, TVariables>({ query: document, variables, errorPolicy: 'all', fetchPolicy: 'cache-and-network' } as never)
       .pipe(
         map((result) => this.#toResult<TData>(result.error as ErrorLike | undefined, result.data as TData)),
         catchError((err) => of(this.#networkError<TData>(err))),
