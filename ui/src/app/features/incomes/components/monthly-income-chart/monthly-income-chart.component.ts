@@ -120,22 +120,22 @@ export class MonthlyIncomeChartComponent {
 
     return isDark
       ? {
-          recurring: '#b5750a',
-          recurringBorder: '#9a6208',
-          nonRecurring: '#949fac',
-          nonRecurringBorder: '#737e8c',
-          text: '#f5f7fa',
-          textMuted: '#949fac',
-          grid: 'rgba(148, 163, 184, 0.15)',
+          recurring: 'hsl(215, 45%, 52%)',
+          recurringBorder: 'hsl(215, 45%, 44%)',
+          nonRecurring: 'hsl(215, 15%, 35%)',
+          nonRecurringBorder: 'hsl(215, 15%, 28%)',
+          text: 'hsl(210, 15%, 92%)',
+          textMuted: 'hsl(210, 12%, 58%)',
+          grid: 'hsla(215, 20%, 50%, 0.12)',
         }
       : {
-          recurring: '#b5750a',
-          recurringBorder: '#9a6208',
-          nonRecurring: '#b4bcc7',
-          nonRecurringBorder: '#8a95a3',
-          text: '#283548',
-          textMuted: '#4a5568',
-          grid: 'rgba(71, 85, 105, 0.12)',
+          recurring: 'hsl(215, 50%, 55%)',
+          recurringBorder: 'hsl(215, 50%, 48%)',
+          nonRecurring: 'hsl(213, 14%, 82%)',
+          nonRecurringBorder: 'hsl(213, 14%, 72%)',
+          text: 'hsl(220, 30%, 14%)',
+          textMuted: 'hsl(215, 14%, 46%)',
+          grid: 'hsla(215, 15%, 50%, 0.10)',
         };
   }
 }
