@@ -24,7 +24,7 @@ export const IncomesStore = signalStore(
         error: null,
         pagination: {
           ...state.pagination,
-          currentPage: newPage,
+          pendingPage: newPage,
         },
       };
     }),
@@ -33,6 +33,7 @@ export const IncomesStore = signalStore(
       error: null,
       pagination: {
         ...state.pagination,
+        pendingPage: null,
         rows: payload.rows,
         currentPage: 1,
       },
@@ -49,6 +50,7 @@ export const IncomesStore = signalStore(
       },
       pagination: {
         ...state.pagination,
+        pendingPage: null,
         currentPage: 1,
       },
     })),
@@ -58,6 +60,7 @@ export const IncomesStore = signalStore(
       filter: initialFilter,
       pagination: {
         ...state.pagination,
+        pendingPage: null,
         currentPage: 1,
       },
     })),
@@ -67,6 +70,7 @@ export const IncomesStore = signalStore(
       sort: payload.sort,
       pagination: {
         ...state.pagination,
+        pendingPage: null,
         currentPage: 1,
       },
     })),
@@ -88,6 +92,9 @@ export const IncomesStore = signalStore(
         error: payload.error,
         pagination: {
           ...state.pagination,
+          // Commit pendingPage from pre-reduction state, then clear it.
+          pendingPage: null,
+          currentPage: state.pagination.pendingPage ?? state.pagination.currentPage,
           totalRecords: payload.totalCount,
           pageInfo: payload.pageInfo,
         },
@@ -100,9 +107,13 @@ export const IncomesStore = signalStore(
     ]),
     on(incomesApiEvents.removedSuccess, ({ payload }) => [removeEntity(payload.id), () => ({ isLoading: false, error: null })]),
 
-    on(incomesApiEvents.loadedFailure, ({ payload }) => ({
+    on(incomesApiEvents.loadedFailure, ({ payload }, state) => ({
       isLoading: false,
       error: payload.error,
+      pagination: {
+        ...state.pagination,
+        pendingPage: null,
+      },
     })),
     on(incomesApiEvents.addedFailure, ({ payload }) => ({
       isLoading: false,

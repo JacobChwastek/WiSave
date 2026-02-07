@@ -102,7 +102,9 @@ export class IncomesGraphQLService {
       variables.where = this.#buildFilterInput(filter);
     }
     if (sort) {
-      variables.order = [{ [sort.field]: sort.direction.toUpperCase() as 'ASC' | 'DESC' }];
+      const sortDirection = sort.direction.toUpperCase() as 'ASC' | 'DESC';
+      const order: NonNullable<GetIncomesQueryVariables['order']> = [{ [sort.field]: sortDirection }, { id: sortDirection }];
+      variables.order = order;
     }
 
     return variables;

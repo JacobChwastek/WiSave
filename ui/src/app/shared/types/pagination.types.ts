@@ -16,6 +16,7 @@ export interface ICursorPaginationRequest {
 export interface IPagination {
   rows: number;
   currentPage: number;
+  pendingPage: number | null;
   totalRecords: number;
   pageInfo: IPageInfo;
 }
@@ -30,6 +31,7 @@ export const initialPageInfo: IPageInfo = {
 export const initialPagination: IPagination = {
   rows: 10,
   currentPage: 1,
+  pendingPage: null,
   totalRecords: 0,
   pageInfo: initialPageInfo,
 };
