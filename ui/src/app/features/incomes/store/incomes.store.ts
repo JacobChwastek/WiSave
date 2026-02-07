@@ -85,7 +85,7 @@ export const IncomesStore = signalStore(
       setAllEntities<IIncome>(payload.incomes),
       () => ({
         isLoading: false,
-        error: null,
+        error: payload.error,
         pagination: {
           ...state.pagination,
           totalRecords: payload.totalCount,
@@ -94,7 +94,10 @@ export const IncomesStore = signalStore(
       }),
     ]),
     on(incomesApiEvents.addedSuccess, ({ payload }) => [addEntity<IIncome>(payload.income), () => ({ isLoading: false, error: null })]),
-    on(incomesApiEvents.updatedSuccess, ({ payload }) => [updateEntity<IIncome>({ id: payload.income.id, changes: payload.income }), () => ({ isLoading: false, error: null })]),
+    on(incomesApiEvents.updatedSuccess, ({ payload }) => [
+      updateEntity<IIncome>({ id: payload.income.id, changes: payload.income }),
+      () => ({ isLoading: false, error: null }),
+    ]),
     on(incomesApiEvents.removedSuccess, ({ payload }) => [removeEntity(payload.id), () => ({ isLoading: false, error: null })]),
 
     on(incomesApiEvents.loadedFailure, ({ payload }) => ({
@@ -119,8 +122,9 @@ export const IncomesStore = signalStore(
       availableCategories: payload.categories,
       categoriesLoading: false,
     })),
-    on(incomesApiEvents.categoriesLoadedFailure, () => ({
+    on(incomesApiEvents.categoriesLoadedFailure, ({ payload }) => ({
       categoriesLoading: false,
+      error: payload.error,
     })),
 
     // Stats
@@ -128,8 +132,9 @@ export const IncomesStore = signalStore(
       stats: payload.stats,
       statsLoading: false,
     })),
-    on(incomesApiEvents.statsLoadedFailure, () => ({
+    on(incomesApiEvents.statsLoadedFailure, ({ payload }) => ({
       statsLoading: false,
+      error: payload.error,
     })),
 
     // Monthly stats
@@ -138,8 +143,9 @@ export const IncomesStore = signalStore(
       monthlyStatsLoading: false,
       monthlyStatsHasMore: payload.stats.length > 0,
     })),
-    on(incomesApiEvents.monthlyStatsLoadedFailure, () => ({
+    on(incomesApiEvents.monthlyStatsLoadedFailure, ({ payload }) => ({
       monthlyStatsLoading: false,
+      error: payload.error,
     })),
   ),
   withIncomesEventHandlers(),

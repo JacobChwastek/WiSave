@@ -2,7 +2,7 @@ import { IIncome } from '@features/incomes/types/incomes.interfaces';
 import { type } from '@ngrx/signals';
 import { eventGroup } from '@ngrx/signals/events';
 
-import { CursorDirection, IPageInfo } from '@shared/types';
+import { CursorDirection, IPageInfo, type IStoreError } from '@shared/types';
 
 import { IIncomeMonthlyStats, IIncomeStats, IncomeStatsScope, IIncomesFilter, IIncomesSortOrder, MonthlyStatsScale } from './incomes.state';
 
@@ -29,19 +29,19 @@ export const incomesPageEvents = eventGroup({
 export const incomesApiEvents = eventGroup({
   source: 'Incomes API',
   events: {
-    loadedSuccess: type<{ incomes: IIncome[]; totalCount: number; pageInfo: IPageInfo }>(),
-    loadedFailure: type<{ error: string }>(),
+    loadedSuccess: type<{ incomes: IIncome[]; totalCount: number; pageInfo: IPageInfo; error: IStoreError | null }>(),
+    loadedFailure: type<{ error: IStoreError }>(),
     addedSuccess: type<{ income: IIncome }>(),
-    addedFailure: type<{ error: string }>(),
+    addedFailure: type<{ error: IStoreError }>(),
     updatedSuccess: type<{ income: IIncome }>(),
-    updatedFailure: type<{ id: string; error: string }>(),
+    updatedFailure: type<{ id: string; error: IStoreError }>(),
     removedSuccess: type<{ id: string }>(),
-    removedFailure: type<{ id: string; error: string }>(),
+    removedFailure: type<{ id: string; error: IStoreError }>(),
     categoriesLoadedSuccess: type<{ categories: string[] }>(),
-    categoriesLoadedFailure: type<{ error: string }>(),
+    categoriesLoadedFailure: type<{ error: IStoreError }>(),
     statsLoadedSuccess: type<{ stats: IIncomeStats }>(),
-    statsLoadedFailure: type<{ error: string }>(),
+    statsLoadedFailure: type<{ error: IStoreError }>(),
     monthlyStatsLoadedSuccess: type<{ stats: IIncomeMonthlyStats[] }>(),
-    monthlyStatsLoadedFailure: type<{ error: string }>(),
+    monthlyStatsLoadedFailure: type<{ error: IStoreError }>(),
   },
 });

@@ -23,3 +23,8 @@ export interface IPaginationVariables {
   last?: number;
   before?: string;
 }
+
+export interface IGraphQLResult<TData> {
+  data: TData;
+  error: import('./graphql-error').GraphQLRequestError | null;
+}

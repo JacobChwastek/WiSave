@@ -1,4 +1,4 @@
-import { initialPagination, type IPagination } from '@shared/types';
+import { initialPagination, type IPagination, type IStoreError } from '@shared/types';
 
 export interface IDateRangeFilter {
   from: Date | null;
@@ -45,7 +45,7 @@ export const MONTHLY_STATS_SCALE_SIZES: Record<MonthlyStatsScale, number> = {
 
 export interface IncomesState {
   isLoading: boolean;
-  error: string | null;
+  error: IStoreError | null;
   filter: IIncomesFilter;
   sort: IIncomesSortOrder;
   pagination: IPagination;

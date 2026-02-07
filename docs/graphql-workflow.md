@@ -80,6 +80,8 @@ Contains typed query variables, response types, and injectable Angular services.
 | `DateTime` | `string` (ISO-8601) |
 | `Decimal` | `number` |
 
+Note: `Decimal` maps to JS `number` (IEEE 754 float64). Precision beyond ~15 significant digits can be lost; fine for display, but be cautious with client-side arithmetic for large amounts.
+
 ### Writing Queries
 
 Place `.graphql` files in `features/{feature}/graphql/`:
