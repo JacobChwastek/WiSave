@@ -10,7 +10,7 @@ import { CursorDirection, initialPagination, type IStoreError } from '@shared/ty
 
 import { IIncomesQueryParams, IncomesGraphQLService } from '../services/incomes-graphql.service';
 import { incomesApiEvents, incomesPageEvents } from './incomes.events';
-import { IncomeStatsScope, IIncomesFilter, IIncomesSortOrder, initialFilter, initialSort, MONTHLY_STATS_SCALE_SIZES, MonthlyStatsScale } from './incomes.state';
+import { IncomeStatsScope, IIncomesFilter, IIncomesSortOrder, createInitialFilter, emptyFilter, initialSort, MONTHLY_STATS_SCALE_SIZES, MonthlyStatsScale } from './incomes.state';
 
 const toStoreError = (err: unknown): IStoreError => {
   if (err instanceof GraphQLRequestError) {
@@ -81,7 +81,7 @@ export function withIncomesEventHandlers() {
         sort,
       });
 
-      const getFilter = (): IIncomesFilter => store.filter?.() ?? initialFilter;
+      const getFilter = (): IIncomesFilter => store.filter?.() ?? createInitialFilter();
       const getSort = (): IIncomesSortOrder => store.sort?.() ?? initialSort;
       const getRows = (): number => store.pagination?.().rows ?? initialPagination.rows;
       const getStatsScope = (): IncomeStatsScope => store.statsScope?.() ?? 'recurring';
@@ -129,7 +129,7 @@ export function withIncomesEventHandlers() {
         ),
 
         filtersCleared$: events.on(incomesPageEvents.filtersCleared).pipe(
-          switchMap(() => loadIncomes$(getQueryParams(getRows(), 'first', null, initialFilter, getSort()))),
+          switchMap(() => loadIncomes$(getQueryParams(getRows(), 'first', null, emptyFilter, getSort()))),
         ),
 
         sortChanged$: events.on(incomesPageEvents.sortChanged).pipe(

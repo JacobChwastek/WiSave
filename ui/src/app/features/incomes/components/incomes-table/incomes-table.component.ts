@@ -64,7 +64,10 @@ export class IncomesTableComponent {
   readonly filtersApplied = output<IFilterAppliedEvent>();
   readonly filtersCleared = output<void>();
 
-  readonly datesFilter = signal<Date[] | null>(null);
+  readonly datesFilter = signal<Date[] | null>((() => {
+    const now = new Date();
+    return [new Date(now.getFullYear(), now.getMonth(), 1), now];
+  })());
 
   filteredCategories: string[] = [];
 
@@ -131,6 +134,7 @@ export class IncomesTableComponent {
   }
 
   clearFilters(): void {
+    this.datesFilter.set(null);
     this.filtersCleared.emit();
   }
 

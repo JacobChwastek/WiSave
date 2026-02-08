@@ -6,7 +6,7 @@ import { on } from '@ngrx/signals/events';
 
 import { withIncomesEventHandlers } from './incomes.event-handlers';
 import { incomesApiEvents, incomesPageEvents } from './incomes.events';
-import { initialFilter, initialState } from './incomes.state';
+import { emptyFilter, initialState } from './incomes.state';
 
 export const IncomesStore = signalStore(
   { providedIn: 'root' },
@@ -57,7 +57,7 @@ export const IncomesStore = signalStore(
     on(incomesPageEvents.filtersCleared, (_, state) => ({
       isLoading: true,
       error: null,
-      filter: initialFilter,
+      filter: emptyFilter,
       pagination: {
         ...state.pagination,
         pendingPage: null,

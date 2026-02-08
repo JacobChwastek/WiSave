@@ -61,7 +61,22 @@ export interface IncomesState {
   monthlyStatsScale: MonthlyStatsScale;
 }
 
-export const initialFilter: IIncomesFilter = {
+export function createInitialFilter(): IIncomesFilter {
+  const now = new Date();
+  return {
+    dateRange: {
+      from: new Date(now.getFullYear(), now.getMonth(), 1),
+      to: now,
+    },
+    searchQuery: '',
+    categories: [],
+    recurring: null,
+  };
+}
+
+export const initialFilter: IIncomesFilter = createInitialFilter();
+
+export const emptyFilter: IIncomesFilter = {
   dateRange: { from: null, to: null },
   searchQuery: '',
   categories: [],

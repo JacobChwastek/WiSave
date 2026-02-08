@@ -27,7 +27,10 @@ import { DatePicker } from 'primeng/datepicker';
 export class ButtonBarDatepickerComponent {
   datesChanged = output<Date[]>();
 
-  dates: Date[] = [];
+  dates: Date[] = (() => {
+    const now = new Date();
+    return [new Date(now.getFullYear(), now.getMonth(), 1), now];
+  })();
 
   onLastMonthSelected() {
     const now = new Date();
