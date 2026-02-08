@@ -7,7 +7,7 @@
     [scrollable]="true"
     [virtualScroll]="true"
     [virtualScrollItemSize]="52"
-    [tableStyle]="{ minWidth: '100%' }"
+    [tableStyle]="{ minWidth: '100%', tableLayout: 'fixed' }"
     [stripedRows]="true"
     class="p-datatable-sm"
     scrollHeight="flex"
@@ -19,51 +19,51 @@
         <div class="flex flex-row gap-2">
           <p-button (click)="filter()" class="p-button-xs" icon="pi pi-filter" severity="secondary" size="small" />
           <p-button (click)="clearFilters()" class="p-button-xs" icon="pi pi-trash" severity="secondary" size="small" />
+          <p-button (click)="uploadIncomes()" class="p-button-xs" icon="pi pi-upload" severity="secondary" size="small" />
           <p-button (click)="addNewIncome()" class="p-button-xs" label="Add Income" icon="pi pi-plus" severity="success" size="small" />
         </div>
       </div>
     </ng-template>
     <ng-template #header>
       <tr class="text-xs">
-        <th style="min-width: 7rem">Date</th>
-        <th style="min-width: 10rem">Description</th>
-        <th style="min-width: 8rem">Category</th>
-        <th style="min-width: 7rem">Amount</th>
+        <th style="width: 7rem">Date</th>
+        <th style="width: 14rem">Description</th>
+        <th style="width: 10rem">Category</th>
+        <th style="width: 8rem">Amount</th>
         <th style="width: 5rem">Recurring</th>
         <th style="width: 6rem"></th>
       </tr>
     </ng-template>
     <ng-template #body let-income let-editing="editing" let-ri="rowIndex">
-      @let isNew = income.id | isNewIncome: newIncomeId();
       <tr [pEditableRow]="income" class="text-sm">
         <td>
-          @if (editing || isNew) {
-            <p-datepicker [(ngModel)]="income.date" dateFormat="dd/mm/yy" inputStyleClass="p-inputtext-sm" />
+          @if (editing) {
+            <p-datepicker [(ngModel)]="income.date" dateFormat="dd/mm/yy" inputStyleClass="p-inputtext-sm w-full" styleClass="w-full" />
           } @else {
             {{ income.date | date: 'dd/MM/yyyy' }}
           }
         </td>
         <td>
-          @if (editing || isNew) {
-            <input [(ngModel)]="income.description" class="p-inputtext-sm" pInputText type="text" />
+          @if (editing) {
+            <input [(ngModel)]="income.description" class="p-inputtext-sm w-full" pInputText type="text" />
           } @else {
             {{ income.description }}
           }
         </td>
         <td>
-          @if (editing || isNew) {
+          @if (editing) {
             <p-autoComplete
               [(ngModel)]="income.category"
               [suggestions]="filteredCategories"
               [multiple]="true"
+              [dropdown]="true"
+              [dropdownMode]="'blank'"
               [forceSelection]="false"
               [typeahead]="false"
               [addOnBlur]="true"
               [addOnTab]="true"
               (completeMethod)="filterCategories($event)"
-              class="w-full"
-              placeholder="Select or add categories"
-              size="small" />
+              placeholder="Select or add categories" />
           } @else {
             <div class="flex flex-wrap gap-1">
               @for (cat of income.category; track cat) {
@@ -73,22 +73,30 @@
           }
         </td>
         <td>
-          @if (editing || isNew) {
-            <input [(ngModel)]="income.amount.amount" class="p-inputtext-sm w-24" pInputText type="number" />
+          @if (editing) {
+            <input [(ngModel)]="income.amount.amount" class="p-inputtext-sm w-full" pInputText type="number" />
           } @else {
             {{ income.amount.amount | currency: income.amount.currency }}
           }
         </td>
-        <td class="text-center">
-          @if (income.recurring) {
-            <i class="pi pi-check-circle text-accent-500 dark:text-accent-400 text-base"></i>
-          } @else {
-            <i class="pi pi-minus text-secondary-400 dark:text-dark-secondary-400 text-base"></i>
-          }
+        <td>
+          <div class="flex items-center justify-center">
+            @if (editing) {
+              <p-toggleswitch [(ngModel)]="income.recurring">
+                <ng-template #handle let-checked="checked">
+                  <i [class]="checked ? 'pi-check-circle' : 'pi-minus'" class="pi" style="font-size: 0.5rem"></i>
+                </ng-template>
+              </p-toggleswitch>
+            } @else if (income.recurring) {
+              <i class="pi pi-check-circle text-accent-500 dark:text-accent-400 text-base"></i>
+            } @else {
+              <i class="pi pi-minus text-secondary-400 dark:text-dark-secondary-400 text-base"></i>
+            }
+          </div>
         </td>
         <td>
           <div class="flex items-center justify-center gap-1">
-            @if (!editing && !isNew) {
+            @if (!editing) {
               <button (click)="onRowEditInit(income)" class="p-button-sm" pButton pRipple type="button" pInitEditableRow text rounded severity="secondary">
                 <i class="pi pi-pencil" pButtonIcon></i>
               </button>
@@ -99,15 +107,9 @@
               <button (click)="onRowEditSave(income)" class="p-button-sm" pButton pRipple type="button" pSaveEditableRow text rounded severity="success">
                 <i class="pi pi-check" pButtonIcon></i>
               </button>
-              @if (isNew) {
-                <button (click)="onRowDelete(income, ri)" class="p-button-sm" pButton pRipple type="button" text rounded severity="danger">
-                  <i class="pi pi-trash" pButtonIcon></i>
-                </button>
-              } @else {
-                <button (click)="onRowEditCancel(income, ri)" class="p-button-sm" pButton pRipple type="button" pCancelEditableRow text rounded severity="danger">
-                  <i class="pi pi-times" pButtonIcon></i>
-                </button>
-              }
+              <button (click)="onRowEditCancel(income, ri)" class="p-button-sm" pButton pRipple type="button" pCancelEditableRow text rounded severity="danger">
+                <i class="pi pi-times" pButtonIcon></i>
+              </button>
             }
           </div>
         </td>

@@ -9,11 +9,10 @@ import { DatePicker } from 'primeng/datepicker';
 import { InputText } from 'primeng/inputtext';
 import { Ripple } from 'primeng/ripple';
 import { TableModule } from 'primeng/table';
+import { ToggleSwitch } from 'primeng/toggleswitch';
 
-import { IsNewIncomePipe } from '@features/incomes/pipes';
 import { IIncomesFilter } from '@features/incomes/store/incomes.state';
 import { IIncome } from '@features/incomes/types/incomes.interfaces';
-import { v7 as uuid } from 'uuid';
 
 import { Currency } from '@core/types';
 import { ButtonBarDatepickerComponent } from '@shared/components/datepicker/button-bar-datepicker';
@@ -37,9 +36,9 @@ export interface IFilterAppliedEvent {
     Chip,
     DatePicker,
     InputText,
-    IsNewIncomePipe,
     Ripple,
     TableModule,
+    ToggleSwitch,
     ButtonBarDatepickerComponent,
     CursorPaginationComponent,
   ],
@@ -65,7 +64,6 @@ export class IncomesTableComponent {
   readonly filtersApplied = output<IFilterAppliedEvent>();
   readonly filtersCleared = output<void>();
 
-  readonly newIncomeId = signal<string | null>(null);
   readonly datesFilter = signal<Date[] | null>(null);
 
   filteredCategories: string[] = [];
@@ -80,12 +78,6 @@ export class IncomesTableComponent {
     return [...new Set(allCategories)].sort();
   });
 
-  readonly #isNewIncome = (incomeId: string): boolean => this.newIncomeId() === incomeId;
-
-  onDatesFilterChange(dates: Date[] | null): void {
-    this.datesFilter.set(dates);
-  }
-
   filterCategories(event: { query: string }): void {
     const query = event.query.toLowerCase();
     const available = this.availableCategories();
@@ -97,18 +89,8 @@ export class IncomesTableComponent {
     }
   }
 
-  addNewIncome(): void {
-    const newIncome: IIncome = {
-      id: uuid(),
-      date: new Date(),
-      description: '',
-      category: [],
-      amount: { amount: 0, currency: Currency.PLN },
-      recurring: false,
-    };
-
-    this.newIncomeId.set(newIncome.id);
-    this.data().unshift(newIncome);
+  onDatesFilterChange(dates: Date[] | null): void {
+    this.datesFilter.set(dates);
   }
 
   onRowEditInit(income: IIncome): void {
@@ -117,32 +99,14 @@ export class IncomesTableComponent {
 
   onRowEditSave(income: IIncome): void {
     this.#clonedIncomes.delete(income.id);
-
-    if (this.#isNewIncome(income.id)) {
-      this.newIncomeId.set(null);
-    }
   }
 
   onRowEditCancel(income: IIncome, index: number): void {
-    if (this.#isNewIncome(income.id)) {
-      this.data().splice(index, 1);
-      this.newIncomeId.set(null);
-    } else {
-      const cloned = this.#clonedIncomes.get(income.id);
-      if (cloned) {
-        this.data()[index] = cloned;
-      }
+    const cloned = this.#clonedIncomes.get(income.id);
+    if (cloned) {
+      this.data()[index] = cloned;
     }
-
     this.#clonedIncomes.delete(income.id);
-  }
-
-  onRowDelete(income: IIncome, index: number): void {
-    this.data().splice(index, 1);
-
-    if (this.#isNewIncome(income.id)) {
-      this.newIncomeId.set(null);
-    }
   }
 
   onRowArchive(_income: IIncome, index: number): void {
@@ -169,4 +133,8 @@ export class IncomesTableComponent {
   clearFilters(): void {
     this.filtersCleared.emit();
   }
+
+  uploadIncomes(): void {}
+
+  addNewIncome(): void {}
 }

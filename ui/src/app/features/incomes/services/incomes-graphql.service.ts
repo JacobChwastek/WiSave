@@ -62,7 +62,7 @@ export class IncomesGraphQLService {
   getAllWithPagination(params: IIncomesQueryParams): Observable<IGraphQLResult<IIncomesQueryResult>> {
     const variables = this.#buildQueryVariables(params);
 
-    return this.#graphql.query<GetIncomesQuery, GetIncomesQueryVariables>(GetIncomesDocument, variables).pipe(
+    return this.#graphql.watchQuery<GetIncomesQuery, GetIncomesQueryVariables>(GetIncomesDocument, variables, { fetchPolicy: 'cache-and-network' }).pipe(
       map((result) => {
         const incomes = result.data?.incomes;
         return {

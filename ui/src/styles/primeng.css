@@ -240,6 +240,38 @@
   font-size: 0.8125rem;
 }
 
+.p-toggleswitch {
+  --p-toggleswitch-width: 2.25rem;
+  --p-toggleswitch-height: 1.25rem;
+  --p-toggleswitch-gap: 2px;
+  --p-toggleswitch-handle-size: 0.875rem;
+}
+
+/* AutoComplete – match p-inputtext-sm sizing inside tables */
+.p-datatable p-autocomplete {
+  display: block;
+  width: 100%;
+}
+
+.p-datatable .p-autocomplete {
+  display: inline-flex !important;
+  width: 100% !important;
+  --p-autocomplete-padding-x: 0.625rem;
+  --p-autocomplete-padding-y: 0.375rem;
+}
+
+.p-datatable .p-autocomplete-input-multiple {
+  flex: 1 1 auto !important;
+}
+
+.p-datatable .p-autocomplete-input-chip input {
+  font-size: 0.8125rem !important;
+}
+
+.p-datatable .p-autocomplete-dropdown {
+  flex: 0 0 auto !important;
+}
+
 .p-iconfield {
   .p-inputtext-sm {
     padding-left: 2rem;
