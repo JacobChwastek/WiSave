@@ -26,7 +26,7 @@ import {
   type GetTotalAmountQueryVariables,
 } from '../graphql/incomes.queries.generated';
 import { IIncomeMonthlyStats, IIncomesFilter, IIncomesSortOrder, IIncomeStats } from '../store/incomes.state';
-import type { IIncome } from '../types/incomes.interfaces';
+import type { IIncome, IncomeId } from '../types/incomes.interfaces';
 import { IncomesMapperService } from './incomes-mapper.service';
 
 export interface IIncomesQueryResult {
@@ -144,7 +144,7 @@ export class IncomesGraphQLService {
     return Object.keys(where).length > 0 ? where : undefined;
   }
 
-  getById(id: string): Observable<IGraphQLResult<IIncome | null>> {
+  getById(id: IncomeId): Observable<IGraphQLResult<IIncome | null>> {
     return this.#graphql
       .query<GetIncomeByIdQuery, GetIncomeByIdQueryVariables>(GetIncomeByIdDocument, { id })
       .pipe(

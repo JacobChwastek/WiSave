@@ -11,8 +11,7 @@
     [stripedRows]="true"
     class="p-datatable-sm"
     scrollHeight="flex"
-    dataKey="id"
-    editMode="row">
+    dataKey="id">
     <ng-template #caption>
       <div class="flex items-center justify-between py-1">
         <app-button-bar-datepicker (datesChanged)="onDatesFilterChange($event)" />
@@ -34,60 +33,27 @@
         <th style="width: 6rem"></th>
       </tr>
     </ng-template>
-    <ng-template #body let-income let-editing="editing" let-ri="rowIndex">
-      <tr [pEditableRow]="income" class="text-sm">
+    <ng-template #body let-income let-ri="rowIndex">
+      <tr class="text-sm">
         <td>
-          @if (editing) {
-            <p-datepicker [(ngModel)]="income.date" dateFormat="dd/mm/yy" inputStyleClass="p-inputtext-sm w-full" styleClass="w-full" />
-          } @else {
-            {{ income.date | date: 'dd/MM/yyyy' }}
-          }
+          {{ income.date | date: 'dd/MM/yyyy' }}
         </td>
         <td>
-          @if (editing) {
-            <input [(ngModel)]="income.description" class="p-inputtext-sm w-full" pInputText type="text" />
-          } @else {
-            {{ income.description }}
-          }
+          {{ income.description }}
         </td>
         <td>
-          @if (editing) {
-            <p-autoComplete
-              [(ngModel)]="income.category"
-              [suggestions]="filteredCategories"
-              [multiple]="true"
-              [dropdown]="true"
-              [dropdownMode]="'blank'"
-              [forceSelection]="false"
-              [typeahead]="false"
-              [addOnBlur]="true"
-              [addOnTab]="true"
-              (completeMethod)="filterCategories($event)"
-              placeholder="Select or add categories" />
-          } @else {
-            <div class="flex flex-wrap gap-1">
-              @for (cat of income.category; track cat) {
-                <p-chip [label]="cat" class="text-sm [&_.p-chip]:px-2 [&_.p-chip]:py-1" />
-              }
-            </div>
-          }
+          <div class="flex flex-wrap gap-1">
+            @for (cat of income.category; track cat) {
+              <p-chip [label]="cat" class="text-sm [&_.p-chip]:px-2 [&_.p-chip]:py-1" />
+            }
+          </div>
         </td>
         <td>
-          @if (editing) {
-            <input [(ngModel)]="income.amount.amount" class="p-inputtext-sm w-full" pInputText type="number" />
-          } @else {
-            {{ income.amount.amount | currency: income.amount.currency }}
-          }
+          {{ income.amount.amount | currency: income.amount.currency }}
         </td>
         <td>
           <div class="flex items-center justify-center">
-            @if (editing) {
-              <p-toggleswitch [(ngModel)]="income.recurring">
-                <ng-template #handle let-checked="checked">
-                  <i [class]="checked ? 'pi-check-circle' : 'pi-minus'" class="pi" style="font-size: 0.5rem"></i>
-                </ng-template>
-              </p-toggleswitch>
-            } @else if (income.recurring) {
+            @if (income.recurring) {
               <i class="pi pi-check-circle text-accent-500 dark:text-accent-400 text-base"></i>
             } @else {
               <i class="pi pi-minus text-secondary-400 dark:text-dark-secondary-400 text-base"></i>
@@ -96,21 +62,12 @@
         </td>
         <td>
           <div class="flex items-center justify-center gap-1">
-            @if (!editing) {
-              <button (click)="onRowEditInit(income)" class="p-button-sm" pButton pRipple type="button" pInitEditableRow text rounded severity="secondary">
-                <i class="pi pi-pencil" pButtonIcon></i>
-              </button>
-              <button (click)="onRowArchive(income, ri)" class="p-button-sm" pButton pRipple type="button" text rounded severity="danger">
-                <i class="pi pi-trash" pButtonIcon></i>
-              </button>
-            } @else {
-              <button (click)="onRowEditSave(income)" class="p-button-sm" pButton pRipple type="button" pSaveEditableRow text rounded severity="success">
-                <i class="pi pi-check" pButtonIcon></i>
-              </button>
-              <button (click)="onRowEditCancel(income, ri)" class="p-button-sm" pButton pRipple type="button" pCancelEditableRow text rounded severity="danger">
-                <i class="pi pi-times" pButtonIcon></i>
-              </button>
-            }
+            <button (click)="editIncome(income)" class="p-button-sm" pButton pRipple type="button" text rounded severity="secondary">
+              <i class="pi pi-pencil" pButtonIcon></i>
+            </button>
+            <button (click)="onRowArchive(income, ri)" class="p-button-sm" pButton pRipple type="button" text rounded severity="danger">
+              <i class="pi pi-trash" pButtonIcon></i>
+            </button>
           </div>
         </td>
       </tr>

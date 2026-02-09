@@ -1,4 +1,4 @@
-import { IIncome } from '@features/incomes/types/incomes.interfaces';
+import { IIncome, type IncomeId } from '@features/incomes/types/incomes.interfaces';
 import { type } from '@ngrx/signals';
 import { eventGroup } from '@ngrx/signals/events';
 
@@ -14,8 +14,8 @@ export const incomesPageEvents = eventGroup({
     navigatePage: type<{ direction: CursorDirection; cursor: string | null; pageSize: number }>(),
     pageSizeChanged: type<{ rows: number }>(),
     add: type<{ income: Omit<IIncome, 'id'> }>(),
-    update: type<{ id: string; changes: Partial<IIncome> }>(),
-    remove: type<{ id: string }>(),
+    update: type<{ id: IncomeId; changes: Partial<IIncome> }>(),
+    remove: type<{ id: IncomeId }>(),
     filterApplied: type<{ filter: Partial<IIncomesFilter> }>(),
     filtersCleared: type<void>(),
     sortChanged: type<{ sort: IIncomesSortOrder }>(),
@@ -34,9 +34,9 @@ export const incomesApiEvents = eventGroup({
     addedSuccess: type<{ income: IIncome }>(),
     addedFailure: type<{ error: IStoreError }>(),
     updatedSuccess: type<{ income: IIncome }>(),
-    updatedFailure: type<{ id: string; error: IStoreError }>(),
-    removedSuccess: type<{ id: string }>(),
-    removedFailure: type<{ id: string; error: IStoreError }>(),
+    updatedFailure: type<{ id: IncomeId; error: IStoreError }>(),
+    removedSuccess: type<{ id: IncomeId }>(),
+    removedFailure: type<{ id: IncomeId; error: IStoreError }>(),
     categoriesLoadedSuccess: type<{ categories: string[] }>(),
     categoriesLoadedFailure: type<{ error: IStoreError }>(),
     statsLoadedSuccess: type<{ stats: IIncomeStats }>(),

@@ -1,21 +1,17 @@
 import { CurrencyPipe, DatePipe } from '@angular/common';
 import { ChangeDetectionStrategy, Component, computed, input, output, signal } from '@angular/core';
-import { FormsModule } from '@angular/forms';
 
-import { AutoComplete } from 'primeng/autocomplete';
 import { Button, ButtonDirective, ButtonIcon } from 'primeng/button';
 import { Chip } from 'primeng/chip';
-import { DatePicker } from 'primeng/datepicker';
-import { InputText } from 'primeng/inputtext';
 import { Ripple } from 'primeng/ripple';
 import { TableModule } from 'primeng/table';
-import { ToggleSwitch } from 'primeng/toggleswitch';
 
 import { IIncomesFilter } from '@features/incomes/store/incomes.state';
-import { IIncome } from '@features/incomes/types/incomes.interfaces';
+import { IIncome, type IncomeId } from '@features/incomes/types/incomes.interfaces';
 
 import { Currency } from '@core/types';
 import { ButtonBarDatepickerComponent } from '@shared/components/datepicker/button-bar-datepicker';
+import { AppDialogComponent } from '@shared/components/dialog';
 import { CursorPaginationComponent } from '@shared/components/pagination';
 import { IPageInfo, IPageNavigationEvent, IPageSizeChangeEvent } from '@shared/types';
 
@@ -25,23 +21,7 @@ export interface IFilterAppliedEvent {
 
 @Component({
   selector: 'app-incomes-table',
-  imports: [
-    CurrencyPipe,
-    DatePipe,
-    FormsModule,
-    AutoComplete,
-    Button,
-    ButtonDirective,
-    ButtonIcon,
-    Chip,
-    DatePicker,
-    InputText,
-    Ripple,
-    TableModule,
-    ToggleSwitch,
-    ButtonBarDatepickerComponent,
-    CursorPaginationComponent,
-  ],
+  imports: [CurrencyPipe, DatePipe, Button, ButtonDirective, ButtonIcon, Chip, Ripple, TableModule, ButtonBarDatepickerComponent, CursorPaginationComponent, AppDialogComponent],
   templateUrl: './incomes-table.component.html',
   styles: `
     :host {
@@ -62,55 +42,27 @@ export class IncomesTableComponent {
   readonly navigatePage = output<IPageNavigationEvent>();
   readonly pageSizeChange = output<IPageSizeChangeEvent>();
   readonly filtersApplied = output<IFilterAppliedEvent>();
+
   readonly filtersCleared = output<void>();
 
-  readonly datesFilter = signal<Date[] | null>((() => {
-    const now = new Date();
-    return [new Date(now.getFullYear(), now.getMonth(), 1), now];
-  })());
+  readonly editClicked = output<IncomeId>();
+  readonly deleteClicked = output<IncomeId>();
 
-  filteredCategories: string[] = [];
-
-  readonly #clonedIncomes = new Map<string, IIncome>();
+  readonly datesFilter = signal<Date[] | null>(
+    (() => {
+      const now = new Date();
+      return [new Date(now.getFullYear(), now.getMonth(), 1), now];
+    })(),
+  );
 
   readonly totalAmount = computed(() => this.data().reduce((sum, income) => sum + income.amount.amount, 0));
   readonly totalCurrency = computed(() => this.data()[0]?.amount.currency ?? Currency.PLN);
-
-  readonly availableCategories = computed(() => {
-    const allCategories = this.data().flatMap((income) => income.category);
-    return [...new Set(allCategories)].sort();
-  });
-
-  filterCategories(event: { query: string }): void {
-    const query = event.query.toLowerCase();
-    const available = this.availableCategories();
-
-    this.filteredCategories = available.filter((cat) => cat.toLowerCase().includes(query));
-
-    if (query && !this.filteredCategories.some((cat) => cat.toLowerCase() === query)) {
-      this.filteredCategories.push(query);
-    }
-  }
 
   onDatesFilterChange(dates: Date[] | null): void {
     this.datesFilter.set(dates);
   }
 
-  onRowEditInit(income: IIncome): void {
-    this.#clonedIncomes.set(income.id, { ...income });
-  }
-
-  onRowEditSave(income: IIncome): void {
-    this.#clonedIncomes.delete(income.id);
-  }
-
-  onRowEditCancel(income: IIncome, index: number): void {
-    const cloned = this.#clonedIncomes.get(income.id);
-    if (cloned) {
-      this.data()[index] = cloned;
-    }
-    this.#clonedIncomes.delete(income.id);
-  }
+  editIncome(_income: IIncome): void {}
 
   onRowArchive(_income: IIncome, index: number): void {
     this.data().splice(index, 1);

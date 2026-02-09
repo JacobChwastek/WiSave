@@ -5,12 +5,13 @@ import { IMoney } from '@core/types/money.interface';
 
 import type { IncomeFieldsFragment } from '../graphql/income.fragment.generated';
 import type { IIncome } from '../types/incomes.interfaces';
+import { asIncomeId } from '../types/income-id.type';
 
 @Injectable({ providedIn: 'root' })
 export class IncomesMapperService {
   mapToIncome(document: IncomeFieldsFragment): IIncome {
     return {
-      id: document.id,
+      id: asIncomeId(document.id),
       date: new Date(document.date),
       description: document.description,
       category: document.categories,
