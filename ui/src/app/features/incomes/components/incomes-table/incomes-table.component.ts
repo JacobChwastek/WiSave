@@ -98,7 +98,7 @@ export class IncomesTableComponent {
     this.editClicked.emit(_income.id);
   }
 
-  onRowDelete(income: IIncome): void {
-    this.deleteClicked.emit(income.id);
+  onRowDelete(_income: IIncome): void {
+    this.deleteClicked.emit(_income.id);
   }
 }

@@ -106,6 +106,7 @@ export class IncomesComponent implements OnInit {
   readonly monthlyStatsOffset = computed(() => this.store.monthlyStatsOffset());
   readonly monthlyStatsHasMore = computed(() => this.store.monthlyStatsHasMore());
   readonly monthlyStatsScale = computed(() => this.store.monthlyStatsScale());
+
   readonly statItems = computed((): IStatItem[] => {
     const stats = this.store.stats();
 
@@ -148,7 +149,9 @@ export class IncomesComponent implements OnInit {
     this.dispatch.navigatePage({ direction: event.direction, cursor: event.cursor, pageSize: event.pageSize });
   }
 
-  onDelete(id: IncomeId): void {}
+  onDelete(id: IncomeId): void {
+    this.#router.navigate([INCOMES_ROUTES.DELETE, id], { relativeTo: this.#route });
+  }
 
   onAdd(): void {
     this.#router.navigate([INCOMES_ROUTES.ADD], { relativeTo: this.#route });
