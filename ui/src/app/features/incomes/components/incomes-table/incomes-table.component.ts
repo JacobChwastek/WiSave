@@ -47,6 +47,8 @@ export class IncomesTableComponent {
 
   readonly editClicked = output<IncomeId>();
   readonly deleteClicked = output<IncomeId>();
+  readonly importClicked = output<void>();
+  readonly addClicked = output<void>();
 
   readonly datesFilter = signal<Date[] | null>(
     (() => {
@@ -60,12 +62,6 @@ export class IncomesTableComponent {
 
   onDatesFilterChange(dates: Date[] | null): void {
     this.datesFilter.set(dates);
-  }
-
-  editIncome(_income: IIncome): void {}
-
-  onRowArchive(_income: IIncome, index: number): void {
-    this.data().splice(index, 1);
   }
 
   filter(): void {
@@ -90,7 +86,19 @@ export class IncomesTableComponent {
     this.filtersCleared.emit();
   }
 
-  uploadIncomes(): void {}
+  uploadIncomes(): void {
+    this.importClicked.emit();
+  }
 
-  addNewIncome(): void {}
+  addNewIncome(): void {
+    this.addClicked.emit();
+  }
+
+  editIncome(_income: IIncome): void {
+    this.editClicked.emit(_income.id);
+  }
+
+  onRowDelete(income: IIncome): void {
+    this.deleteClicked.emit(income.id);
+  }
 }

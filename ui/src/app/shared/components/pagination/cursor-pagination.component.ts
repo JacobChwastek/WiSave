@@ -22,8 +22,6 @@ export interface IRowsPerPageOption {
       </div>
 
       <div class="flex items-center gap-3">
-        <span class="text-secondary-600 dark:text-dark-secondary-300 text-sm">{{ paginationInfo() }}</span>
-
         <div class="flex items-center gap-1">
           <p-button
             [disabled]="!pageInfo().hasPreviousPage || isLoading()"
@@ -65,10 +63,11 @@ export class CursorPaginationComponent {
   readonly navigatePage = output<IPageNavigationEvent>();
   readonly pageSizeChange = output<IPageSizeChangeEvent>();
 
-  readonly totalPages = computed(() => Math.ceil(this.totalRecords() / this.rows()));
+  readonly totalPages = computed(() => Math.max(1, Math.ceil(this.totalRecords() / this.rows())));
 
   readonly paginationInfo = computed(() => {
     const total = this.totalRecords();
+    if (total === 0) return `0 of 0`;
     const page = this.currentPage();
     const size = this.rows();
     const start = (page - 1) * size + 1;

@@ -8,7 +8,7 @@ import { SidebarComponent } from '@layout/sidebar';
   imports: [SidebarComponent, RouterOutlet],
   template: `
     <app-sidebar />
-    <div class="flex-1">
+    <div class="min-w-0 flex-1">
       <router-outlet />
     </div>
   `,

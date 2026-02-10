@@ -1,26 +1,33 @@
 import { Component, computed, inject, OnInit } from '@angular/core';
+import { toSignal } from '@angular/core/rxjs-interop';
+import { ActivatedRoute, NavigationEnd, Router, RouterOutlet } from '@angular/router';
+import { filter, map } from 'rxjs';
 
 import { TableModule } from 'primeng/table';
 
 import { IFilterAppliedEvent, IncomesTableComponent } from '@features/incomes/components/incomes-table/incomes-table.component';
 import { MonthlyIncomeChartComponent } from '@features/incomes/components/monthly-income-chart/monthly-income-chart.component';
+import { INCOMES_ROUTES } from '@features/incomes/constants/incomes-routes.constant';
 import { incomesPageEvents } from '@features/incomes/store/incomes.events';
 import { MonthlyStatsScale } from '@features/incomes/store/incomes.state';
 import { IncomesStore } from '@features/incomes/store/incomes.store';
 import { injectDispatch } from '@ngrx/signals/events';
 
 import { ChartCardComponent } from '@shared/components/chart-card';
+import { AppDialogComponent } from '@shared/components/dialog';
 import { ISegmentedToggleOption, SegmentedToggleComponent } from '@shared/components/segmented-toggle';
 import { StatGroupComponent } from '@shared/components/stat-card';
 import { formatAmount } from '@shared/helpers/money.helper';
 import { IPageNavigationEvent, IPageSizeChangeEvent, IStatItem } from '@shared/types';
 
+import { IncomeId } from '../types/income-id.type';
+
 @Component({
   selector: 'app-incomes',
-  imports: [TableModule, SegmentedToggleComponent, IncomesTableComponent, StatGroupComponent, ChartCardComponent, MonthlyIncomeChartComponent],
+  imports: [TableModule, SegmentedToggleComponent, IncomesTableComponent, StatGroupComponent, ChartCardComponent, MonthlyIncomeChartComponent, AppDialogComponent, RouterOutlet],
   template: `
-    <div class="flex h-full flex-1 gap-8 p-4">
-      <div class="flex w-3/4 flex-col gap-4">
+    <div class="flex h-full min-w-0 flex-1 gap-8 p-4">
+      <div class="flex min-w-0 flex-2 flex-col gap-4 2xl:flex-3">
         <div class="flex items-center justify-end">
           <app-segmented-toggle [options]="statsScopeOptions" [value]="statsScope()" (valueChange)="onStatsScopeChange($event)" />
         </div>
@@ -33,11 +40,15 @@ import { IPageNavigationEvent, IPageSizeChangeEvent, IStatItem } from '@shared/t
           [currentPage]="store.pagination().currentPage"
           [pageInfo]="store.pagination().pageInfo"
           (navigatePage)="onNavigatePage($event)"
+          (deleteClicked)="onDelete($event)"
+          (editClicked)="onEdit($event)"
+          (importClicked)="onImport()"
+          (addClicked)="onAdd()"
           (pageSizeChange)="onPageSizeChange($event)"
           (filtersApplied)="onFilterApplied($event)"
           (filtersCleared)="onFiltersClear()" />
       </div>
-      <div class="w-1/4">
+      <div class="min-w-0 flex-1">
         <app-chart-card title="Monthly income" subtitle="Recurring vs non-recurring">
           <div class="mb-4 flex justify-end">
             <app-segmented-toggle [options]="monthlyStatsScaleOptions" [value]="monthlyStatsScale()" (valueChange)="onMonthlyStatsScaleChange($event)" />
@@ -51,6 +62,9 @@ import { IPageNavigationEvent, IPageSizeChangeEvent, IStatItem } from '@shared/t
         </app-chart-card>
       </div>
     </div>
+    <app-dialog [visible]="isChildRouteActive()" (visibleChange)="onDialogClose()">
+      <router-outlet></router-outlet>
+    </app-dialog>
   `,
   styles: `
     :host {
@@ -62,7 +76,17 @@ import { IPageNavigationEvent, IPageSizeChangeEvent, IStatItem } from '@shared/t
 })
 export class IncomesComponent implements OnInit {
   readonly store = inject(IncomesStore);
+  readonly #router = inject(Router);
+  readonly #route = inject(ActivatedRoute);
   readonly dispatch = injectDispatch(incomesPageEvents);
+
+  readonly isChildRouteActive = toSignal(
+    this.#router.events.pipe(
+      filter((e) => e instanceof NavigationEnd),
+      map(() => this.#route.children.length > 0),
+    ),
+    { initialValue: false },
+  );
 
   readonly statsScopeOptions: ISegmentedToggleOption[] = [
     { label: 'Recurring', value: 'recurring' },
@@ -122,6 +146,24 @@ export class IncomesComponent implements OnInit {
 
   onNavigatePage(event: IPageNavigationEvent): void {
     this.dispatch.navigatePage({ direction: event.direction, cursor: event.cursor, pageSize: event.pageSize });
+  }
+
+  onDelete(id: IncomeId): void {}
+
+  onAdd(): void {
+    this.#router.navigate([INCOMES_ROUTES.ADD], { relativeTo: this.#route });
+  }
+
+  onImport(): void {
+    this.#router.navigate([INCOMES_ROUTES.IMPORT], { relativeTo: this.#route });
+  }
+
+  onEdit(id: IncomeId): void {
+    this.#router.navigate([INCOMES_ROUTES.EDIT, id], { relativeTo: this.#route });
+  }
+
+  onDialogClose(): void {
+    this.#router.navigate(['.'], { relativeTo: this.#route });
   }
 
   onPageSizeChange(event: IPageSizeChangeEvent): void {
