@@ -1,3 +1,9 @@
+<p-confirmpopup
+  [pt]="{
+    icon: { class: 'text-sm' },
+    message: { class: 'text-sm font-normal' },
+    footer: { class: 'gap-2' }
+  }" />
 <div class="flex w-full flex-col">
   <p-table
     [value]="data()"
@@ -65,7 +71,7 @@
             <button (click)="editIncome(income)" class="p-button-sm" pButton pRipple type="button" text rounded severity="secondary">
               <i class="pi pi-pencil" pButtonIcon></i>
             </button>
-            <button (click)="onRowDelete(income)" class="p-button-sm" pButton pRipple type="button" text rounded severity="danger">
+            <button (click)="onRowDelete($event, income)" class="p-button-sm" pButton pRipple type="button" text rounded severity="danger">
               <i class="pi pi-trash" pButtonIcon></i>
             </button>
           </div>

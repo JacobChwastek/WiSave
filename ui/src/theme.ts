@@ -833,6 +833,46 @@ const WiSaveTheme = definePreset(Aura, {
         },
       },
     },
+    confirmpopup: {
+      root: {
+        borderRadius: '0.5rem',
+      },
+      content: {
+        padding: '0.75rem 1rem',
+        gap: '0.5rem',
+      },
+      icon: {
+        size: '0.875rem',
+      },
+      footer: {
+        padding: '0 1rem 0.75rem',
+        gap: '0.5rem',
+      },
+      colorScheme: {
+        light: {
+          root: {
+            background: 'var(--color-secondary-50)',
+            borderColor: 'var(--color-divider)',
+            color: 'var(--color-secondary-800)',
+            shadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1)',
+          },
+          icon: {
+            color: 'var(--color-secondary-500)',
+          },
+        },
+        dark: {
+          root: {
+            background: 'var(--color-dark-primary-800)',
+            borderColor: 'var(--color-dark-divider-strong)',
+            color: 'var(--color-dark-secondary-100)',
+            shadow: '0 4px 6px -1px rgba(0, 0, 0, 0.4), 0 2px 4px -2px rgba(0, 0, 0, 0.3)',
+          },
+          icon: {
+            color: 'var(--color-dark-secondary-300)',
+          },
+        },
+      },
+    },
     buttongroup: {
       colorScheme: {
         light: {

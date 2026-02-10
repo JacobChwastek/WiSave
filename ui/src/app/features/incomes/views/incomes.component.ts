@@ -149,9 +149,7 @@ export class IncomesComponent implements OnInit {
     this.dispatch.navigatePage({ direction: event.direction, cursor: event.cursor, pageSize: event.pageSize });
   }
 
-  onDelete(id: IncomeId): void {
-    this.#router.navigate([INCOMES_ROUTES.DELETE, id], { relativeTo: this.#route });
-  }
+  onDelete(_id: IncomeId): void {}
 
   onAdd(): void {
     this.#router.navigate([INCOMES_ROUTES.ADD], { relativeTo: this.#route });

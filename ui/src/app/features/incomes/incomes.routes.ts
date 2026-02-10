@@ -17,10 +17,6 @@ export const routes: Routes = [
         path: 'import',
         loadComponent: () => import('./views/import-incomes.component').then((m) => m.ImportIncomesComponent),
       },
-      {
-        path: 'delete/:id',
-        loadComponent: () => import('./views/delete-income.component').then((m) => m.DeleteIncomeComponent),
-      },
     ],
   },
 ];

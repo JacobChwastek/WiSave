@@ -1,8 +1,10 @@
 import { CurrencyPipe, DatePipe } from '@angular/common';
-import { ChangeDetectionStrategy, Component, computed, input, output, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, inject, input, output, signal } from '@angular/core';
 
+import { ConfirmationService } from 'primeng/api';
 import { Button, ButtonDirective, ButtonIcon } from 'primeng/button';
 import { Chip } from 'primeng/chip';
+import { ConfirmPopupModule } from 'primeng/confirmpopup';
 import { Ripple } from 'primeng/ripple';
 import { TableModule } from 'primeng/table';
 
@@ -11,7 +13,6 @@ import { IIncome, type IncomeId } from '@features/incomes/types/incomes.interfac
 
 import { Currency } from '@core/types';
 import { ButtonBarDatepickerComponent } from '@shared/components/datepicker/button-bar-datepicker';
-import { AppDialogComponent } from '@shared/components/dialog';
 import { CursorPaginationComponent } from '@shared/components/pagination';
 import { IPageInfo, IPageNavigationEvent, IPageSizeChangeEvent } from '@shared/types';
 
@@ -21,7 +22,8 @@ export interface IFilterAppliedEvent {
 
 @Component({
   selector: 'app-incomes-table',
-  imports: [CurrencyPipe, DatePipe, Button, ButtonDirective, ButtonIcon, Chip, Ripple, TableModule, ButtonBarDatepickerComponent, CursorPaginationComponent, AppDialogComponent],
+  imports: [CurrencyPipe, DatePipe, Button, ButtonDirective, ButtonIcon, Chip, ConfirmPopupModule, Ripple, TableModule, ButtonBarDatepickerComponent, CursorPaginationComponent],
+  providers: [ConfirmationService],
   templateUrl: './incomes-table.component.html',
   styles: `
     :host {
@@ -32,6 +34,8 @@ export interface IFilterAppliedEvent {
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class IncomesTableComponent {
+  #confirmationService = inject(ConfirmationService);
+
   readonly isLoading = input.required<boolean>();
   readonly data = input.required<IIncome[]>();
   readonly totalRecords = input<number>(0);
@@ -98,7 +102,25 @@ export class IncomesTableComponent {
     this.editClicked.emit(_income.id);
   }
 
-  onRowDelete(_income: IIncome): void {
-    this.deleteClicked.emit(_income.id);
+  onRowDelete(event: Event, income: IIncome): void {
+    this.#confirmationService.confirm({
+      target: event.currentTarget as EventTarget,
+      message: `Delete "${income.description}"?`,
+      icon: 'pi pi-trash',
+      rejectButtonProps: {
+        label: 'Cancel',
+        severity: 'secondary',
+        outlined: true,
+        size: 'small',
+      },
+      acceptButtonProps: {
+        label: 'Delete',
+        severity: 'danger',
+        size: 'small',
+      },
+      accept: () => {
+        this.deleteClicked.emit(income.id);
+      },
+    });
   }
 }
