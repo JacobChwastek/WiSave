@@ -1,26 +1,26 @@
-import { Component, computed, inject, OnInit } from '@angular/core';
+import { Component, computed, inject, type OnInit } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, NavigationEnd, Router, RouterOutlet } from '@angular/router';
 import { filter, map } from 'rxjs';
 
 import { TableModule } from 'primeng/table';
 
-import { IFilterAppliedEvent, IncomesTableComponent } from '@features/incomes/components/incomes-table/incomes-table.component';
+import { IncomesTableComponent, type IFilterAppliedEvent } from '@features/incomes/components/incomes-table/incomes-table.component';
 import { MonthlyIncomeChartComponent } from '@features/incomes/components/monthly-income-chart/monthly-income-chart.component';
 import { INCOMES_ROUTES } from '@features/incomes/constants/incomes-routes.constant';
 import { incomesPageEvents } from '@features/incomes/store/incomes.events';
-import { MonthlyStatsScale } from '@features/incomes/store/incomes.state';
+import { type MonthlyStatsScale } from '@features/incomes/store/incomes.state';
 import { IncomesStore } from '@features/incomes/store/incomes.store';
 import { injectDispatch } from '@ngrx/signals/events';
 
 import { ChartCardComponent } from '@shared/components/chart-card';
 import { AppDialogComponent } from '@shared/components/dialog';
-import { ISegmentedToggleOption, SegmentedToggleComponent } from '@shared/components/segmented-toggle';
+import { SegmentedToggleComponent, type ISegmentedToggleOption } from '@shared/components/segmented-toggle';
 import { StatGroupComponent } from '@shared/components/stat-card';
 import { formatAmount } from '@shared/helpers/money.helper';
-import { IPageNavigationEvent, IPageSizeChangeEvent, IStatItem } from '@shared/types';
+import { type IPageNavigationEvent, type IPageSizeChangeEvent, type IStatItem } from '@shared/types';
 
-import { IncomeId } from '../types/income-id.type';
+import { type IncomeId } from '../types/income-id.type';
 
 @Component({
   selector: 'app-incomes',
@@ -33,12 +33,12 @@ import { IncomeId } from '../types/income-id.type';
         </div>
         <app-stat-group [items]="statItems()" />
         <app-incomes-table
-          [isLoading]="store.isLoading()"
+          [isLoading]="isLoading()"
           [data]="incomes()"
-          [totalRecords]="store.pagination().totalRecords"
-          [rows]="store.pagination().rows"
-          [currentPage]="store.pagination().currentPage"
-          [pageInfo]="store.pagination().pageInfo"
+          [totalRecords]="pagination().totalRecords"
+          [rows]="pagination().rows"
+          [currentPage]="pagination().currentPage"
+          [pageInfo]="pagination().pageInfo"
           (navigatePage)="onNavigatePage($event)"
           (deleteClicked)="onDelete($event)"
           (editClicked)="onEdit($event)"
@@ -75,10 +75,10 @@ import { IncomeId } from '../types/income-id.type';
   `,
 })
 export class IncomesComponent implements OnInit {
-  readonly store = inject(IncomesStore);
+  readonly #store = inject(IncomesStore);
   readonly #router = inject(Router);
   readonly #route = inject(ActivatedRoute);
-  readonly dispatch = injectDispatch(incomesPageEvents);
+  readonly #dispatch = injectDispatch(incomesPageEvents);
 
   readonly isChildRouteActive = toSignal(
     this.#router.events.pipe(
@@ -99,16 +99,18 @@ export class IncomesComponent implements OnInit {
     { label: '12 months', value: 'year' },
   ];
 
-  readonly incomes = computed(() => this.store.entities());
-  readonly statsScope = computed(() => this.store.statsScope());
-  readonly monthlyStats = computed(() => this.store.monthlyStats());
-  readonly monthlyStatsLoading = computed(() => this.store.monthlyStatsLoading());
-  readonly monthlyStatsOffset = computed(() => this.store.monthlyStatsOffset());
-  readonly monthlyStatsHasMore = computed(() => this.store.monthlyStatsHasMore());
-  readonly monthlyStatsScale = computed(() => this.store.monthlyStatsScale());
+  readonly isLoading = computed(() => this.#store.isLoading());
+  readonly pagination = computed(() => this.#store.pagination());
+  readonly incomes = computed(() => this.#store.entities());
+  readonly statsScope = computed(() => this.#store.statsScope());
+  readonly monthlyStats = computed(() => this.#store.monthlyStats());
+  readonly monthlyStatsLoading = computed(() => this.#store.monthlyStatsLoading());
+  readonly monthlyStatsOffset = computed(() => this.#store.monthlyStatsOffset());
+  readonly monthlyStatsHasMore = computed(() => this.#store.monthlyStatsHasMore());
+  readonly monthlyStatsScale = computed(() => this.#store.monthlyStatsScale());
 
   readonly statItems = computed((): IStatItem[] => {
-    const stats = this.store.stats();
+    const stats = this.#store.stats();
 
     if (!stats) {
       return [];
@@ -142,41 +144,41 @@ export class IncomesComponent implements OnInit {
   });
 
   ngOnInit(): void {
-    this.dispatch.opened();
+    this.#dispatch.opened();
   }
 
   onNavigatePage(event: IPageNavigationEvent): void {
-    this.dispatch.navigatePage({ direction: event.direction, cursor: event.cursor, pageSize: event.pageSize });
+    this.#dispatch.navigatePage({ direction: event.direction, cursor: event.cursor, pageSize: event.pageSize });
   }
 
   onDelete(_id: IncomeId): void {}
 
   onAdd(): void {
-    this.#router.navigate([INCOMES_ROUTES.ADD], { relativeTo: this.#route });
+    void this.#router.navigate([INCOMES_ROUTES.ADD], { relativeTo: this.#route });
   }
 
   onImport(): void {
-    this.#router.navigate([INCOMES_ROUTES.IMPORT], { relativeTo: this.#route });
+    void this.#router.navigate([INCOMES_ROUTES.IMPORT], { relativeTo: this.#route });
   }
 
   onEdit(id: IncomeId): void {
-    this.#router.navigate([INCOMES_ROUTES.EDIT, id], { relativeTo: this.#route });
+    void this.#router.navigate([INCOMES_ROUTES.EDIT, id], { relativeTo: this.#route });
   }
 
   onDialogClose(): void {
-    this.#router.navigate(['.'], { relativeTo: this.#route });
+    void this.#router.navigate(['.'], { relativeTo: this.#route });
   }
 
   onPageSizeChange(event: IPageSizeChangeEvent): void {
-    this.dispatch.pageSizeChanged({ rows: event.rows });
+    this.#dispatch.pageSizeChanged({ rows: event.rows });
   }
 
   onFilterApplied(event: IFilterAppliedEvent): void {
-    this.dispatch.filterApplied({ filter: event.filter });
+    this.#dispatch.filterApplied({ filter: event.filter });
   }
 
   onFiltersClear(): void {
-    this.dispatch.filtersCleared();
+    this.#dispatch.filtersCleared();
   }
 
   onStatsScopeChange(scope: string): void {
@@ -188,11 +190,11 @@ export class IncomesComponent implements OnInit {
       return;
     }
 
-    this.dispatch.statsScopeChanged({ scope });
+    this.#dispatch.statsScopeChanged({ scope });
   }
 
   onMonthlyStatsNavigate(direction: 'back' | 'forward'): void {
-    this.dispatch.monthlyStatsNavigate({ direction });
+    this.#dispatch.monthlyStatsNavigate({ direction });
   }
 
   onMonthlyStatsScaleChange(scale: string): void {
@@ -204,6 +206,6 @@ export class IncomesComponent implements OnInit {
       return;
     }
 
-    this.dispatch.monthlyStatsScaleChanged({ scale: scale as MonthlyStatsScale });
+    this.#dispatch.monthlyStatsScaleChanged({ scale: scale as MonthlyStatsScale });
   }
 }

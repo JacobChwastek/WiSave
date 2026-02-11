@@ -1,5 +1,5 @@
 import { inject, Injectable } from '@angular/core';
-import { catchError, map, Observable, of } from 'rxjs';
+import { catchError, map, type Observable, of } from 'rxjs';
 
 import type { ErrorLike, OperationVariables, WatchQueryFetchPolicy } from '@apollo/client/core';
 import { CombinedGraphQLErrors } from '@apollo/client/errors';

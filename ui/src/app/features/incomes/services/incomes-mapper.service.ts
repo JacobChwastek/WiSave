@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 
 import { Currency } from '@core/types/currency.enum';
-import { IMoney } from '@core/types/money.interface';
+import { type IMoney } from '@core/types/money.interface';
 
 import type { IncomeFieldsFragment } from '../graphql/income.fragment.generated';
 import type { IIncome } from '../types/incomes.interfaces';

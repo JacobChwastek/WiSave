@@ -1,10 +1,10 @@
 import { inject, Injectable } from '@angular/core';
-import { map, Observable } from 'rxjs';
+import { map, type Observable } from 'rxjs';
 
 import { GraphQLService } from '@graphql/services/graphql.service';
 import type { IGraphQLResult } from '@graphql/types/graphql.types';
 
-import { ICursorPaginationParams } from '@shared/types';
+import { type ICursorPaginationParams } from '@shared/types';
 
 import {
   GetCategoriesDocument,
@@ -25,7 +25,7 @@ import {
   type GetTotalAmountQuery,
   type GetTotalAmountQueryVariables,
 } from '../graphql/incomes.queries.generated';
-import { IIncomeMonthlyStats, IIncomesFilter, IIncomesSortOrder, IIncomeStats } from '../store/incomes.state';
+import { type IIncomeMonthlyStats, type IIncomesFilter, type IIncomesSortOrder, type IIncomeStats } from '../store/incomes.state';
 import type { IIncome, IncomeId } from '../types/incomes.interfaces';
 import { IncomesMapperService } from './incomes-mapper.service';
 
@@ -80,6 +80,64 @@ export class IncomesGraphQLService {
         };
       }),
     );
+  }
+
+  getById(id: IncomeId): Observable<IGraphQLResult<IIncome | null>> {
+    return this.#graphql
+      .query<GetIncomeByIdQuery, GetIncomeByIdQueryVariables>(GetIncomeByIdDocument, { id })
+      .pipe(
+        map((result) => ({
+          data: result.data?.incomeById ? this.#mapper.mapToIncome(result.data.incomeById) : null,
+          error: result.error,
+        })),
+      );
+  }
+
+  getTotalAmount(currency?: string): Observable<IGraphQLResult<number>> {
+    return this.#graphql.query<GetTotalAmountQuery, GetTotalAmountQueryVariables>(GetTotalAmountDocument, { currency }).pipe(
+      map((result) => ({
+        data: result.data?.totalAmount ?? 0,
+        error: result.error,
+      })),
+    );
+  }
+
+  getCategories(): Observable<IGraphQLResult<string[]>> {
+    return this.#graphql.query<GetCategoriesQuery, Record<string, never>>(GetCategoriesDocument).pipe(
+      map((result) => ({
+        data: result.data?.categories ?? [],
+        error: result.error,
+      })),
+    );
+  }
+
+  getIncomeStats(includeNonRecurring = false): Observable<IGraphQLResult<IIncomeStats>> {
+    return this.#graphql.query<GetIncomeStatsQuery, GetIncomeStatsQueryVariables>(GetIncomeStatsDocument, { includeNonRecurring }).pipe(
+      map((result) => ({
+        data: {
+          yearRecurringTotal: result.data?.incomeStats.yearRecurringTotal ?? 0,
+          lastMonthRecurringTotal: result.data?.incomeStats.lastMonthRecurringTotal ?? 0,
+          lastMonthRecurringChangePct: result.data?.incomeStats.lastMonthRecurringChangePct ?? null,
+          thisMonthRecurringTotal: result.data?.incomeStats.thisMonthRecurringTotal ?? 0,
+          thisMonthRecurringChangePct: result.data?.incomeStats.thisMonthRecurringChangePct ?? null,
+          last3MonthsRecurringAverage: result.data?.incomeStats.last3MonthsRecurringAverage ?? 0,
+        },
+        error: result.error,
+      })),
+    );
+  }
+
+  getIncomeMonthlyStats(monthsBack = 5, offset = 0): Observable<IGraphQLResult<IIncomeMonthlyStats[]>> {
+    const skipMonths = offset * monthsBack;
+    return this.#graphql
+      .query<GetIncomeMonthlyStatsQuery, GetIncomeMonthlyStatsQueryVariables>(GetIncomeMonthlyStatsDocument, { monthsBack: monthsBack + skipMonths })
+      .pipe(
+        map((result) => {
+          const stats = result.data?.incomeMonthlyStats ?? [];
+          const sliced = skipMonths === 0 ? stats.slice(-monthsBack) : stats.slice(0, stats.length - skipMonths).slice(-monthsBack);
+          return { data: sliced, error: result.error };
+        }),
+      );
   }
 
   #buildQueryVariables(params: IIncomesQueryParams): GetIncomesQueryVariables {
@@ -142,63 +200,5 @@ export class IncomesGraphQLService {
     }
 
     return Object.keys(where).length > 0 ? where : undefined;
-  }
-
-  getById(id: IncomeId): Observable<IGraphQLResult<IIncome | null>> {
-    return this.#graphql
-      .query<GetIncomeByIdQuery, GetIncomeByIdQueryVariables>(GetIncomeByIdDocument, { id })
-      .pipe(
-        map((result) => ({
-          data: result.data?.incomeById ? this.#mapper.mapToIncome(result.data.incomeById) : null,
-          error: result.error,
-        })),
-      );
-  }
-
-  getTotalAmount(currency?: string): Observable<IGraphQLResult<number>> {
-    return this.#graphql.query<GetTotalAmountQuery, GetTotalAmountQueryVariables>(GetTotalAmountDocument, { currency }).pipe(
-      map((result) => ({
-        data: result.data?.totalAmount ?? 0,
-        error: result.error,
-      })),
-    );
-  }
-
-  getCategories(): Observable<IGraphQLResult<string[]>> {
-    return this.#graphql.query<GetCategoriesQuery, Record<string, never>>(GetCategoriesDocument).pipe(
-      map((result) => ({
-        data: result.data?.categories ?? [],
-        error: result.error,
-      })),
-    );
-  }
-
-  getIncomeStats(includeNonRecurring = false): Observable<IGraphQLResult<IIncomeStats>> {
-    return this.#graphql.query<GetIncomeStatsQuery, GetIncomeStatsQueryVariables>(GetIncomeStatsDocument, { includeNonRecurring }).pipe(
-      map((result) => ({
-        data: {
-          yearRecurringTotal: result.data?.incomeStats.yearRecurringTotal ?? 0,
-          lastMonthRecurringTotal: result.data?.incomeStats.lastMonthRecurringTotal ?? 0,
-          lastMonthRecurringChangePct: result.data?.incomeStats.lastMonthRecurringChangePct ?? null,
-          thisMonthRecurringTotal: result.data?.incomeStats.thisMonthRecurringTotal ?? 0,
-          thisMonthRecurringChangePct: result.data?.incomeStats.thisMonthRecurringChangePct ?? null,
-          last3MonthsRecurringAverage: result.data?.incomeStats.last3MonthsRecurringAverage ?? 0,
-        },
-        error: result.error,
-      })),
-    );
-  }
-
-  getIncomeMonthlyStats(monthsBack = 5, offset = 0): Observable<IGraphQLResult<IIncomeMonthlyStats[]>> {
-    const skipMonths = offset * monthsBack;
-    return this.#graphql
-      .query<GetIncomeMonthlyStatsQuery, GetIncomeMonthlyStatsQueryVariables>(GetIncomeMonthlyStatsDocument, { monthsBack: monthsBack + skipMonths })
-      .pipe(
-        map((result) => {
-          const stats = result.data?.incomeMonthlyStats ?? [];
-          const sliced = skipMonths === 0 ? stats.slice(-monthsBack) : stats.slice(0, stats.length - skipMonths).slice(-monthsBack);
-          return { data: sliced, error: result.error };
-        }),
-      );
   }
 }

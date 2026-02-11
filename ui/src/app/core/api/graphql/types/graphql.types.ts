@@ -24,7 +24,9 @@ export interface IPaginationVariables {
   before?: string;
 }
 
+import { type GraphQLRequestError } from './graphql-error';
+
 export interface IGraphQLResult<TData> {
   data: TData;
-  error: import('./graphql-error').GraphQLRequestError | null;
+  error: GraphQLRequestError | null;
 }

@@ -1,5 +1,5 @@
 import { withDevtools, withGlitchTracking, withTrackedReducer } from '@angular-architects/ngrx-toolkit';
-import { IIncome } from '@features/incomes/types/incomes.interfaces';
+import { type IIncome } from '@features/incomes/types/incomes.interfaces';
 import { signalStore, withState } from '@ngrx/signals';
 import { addEntity, removeEntity, setAllEntities, updateEntity, withEntities } from '@ngrx/signals/entities';
 import { on } from '@ngrx/signals/events';

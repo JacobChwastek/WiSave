@@ -1,10 +1,10 @@
-import { IIncome, type IncomeId } from '@features/incomes/types/incomes.interfaces';
+import { type IIncome, type IncomeId } from '@features/incomes/types/incomes.interfaces';
 import { type } from '@ngrx/signals';
 import { eventGroup } from '@ngrx/signals/events';
 
-import { CursorDirection, IPageInfo, type IStoreError } from '@shared/types';
+import { type CursorDirection, type IPageInfo, type IStoreError } from '@shared/types';
 
-import { IIncomeMonthlyStats, IIncomeStats, IncomeStatsScope, IIncomesFilter, IIncomesSortOrder, MonthlyStatsScale } from './incomes.state';
+import { type IIncomeMonthlyStats, type IIncomeStats, type IncomeStatsScope, type IIncomesFilter, type IIncomesSortOrder, type MonthlyStatsScale } from './incomes.state';
 
 // UI/Component events - commands from user interactions
 export const incomesPageEvents = eventGroup({

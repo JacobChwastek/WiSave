@@ -1,4 +1,4 @@
-import { IMoney } from '@core/types';
+import { type IMoney } from '@core/types';
 
 import type { IncomeId } from './income-id.type';
 

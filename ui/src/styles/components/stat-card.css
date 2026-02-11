@@ -1,0 +1,31 @@
+.stat-card {
+  @apply px-6 py-5;
+}
+
+.stat-card--standalone {
+  @apply bg-secondary-50 dark:bg-dark-primary-850 border-secondary-200 dark:border-dark-divider rounded-2xl border shadow-sm;
+}
+
+.stat-card__label {
+  @apply text-secondary-600 dark:text-dark-secondary-300 text-sm font-medium tracking-wide;
+}
+
+.stat-card__value {
+  @apply text-secondary-900 dark:text-dark-secondary-50 mt-3 text-3xl font-semibold tracking-tight;
+}
+
+.stat-card__description {
+  @apply text-secondary-500 dark:text-dark-secondary-400 mt-2 text-sm;
+}
+
+.stat-card__change {
+  @apply text-secondary-500 dark:text-dark-secondary-400 text-xs font-semibold;
+}
+
+.stat-card__change--positive {
+  @apply text-emerald-600 dark:text-emerald-400;
+}
+
+.stat-card__change--negative {
+  @apply text-rose-600 dark:text-rose-400;
+}

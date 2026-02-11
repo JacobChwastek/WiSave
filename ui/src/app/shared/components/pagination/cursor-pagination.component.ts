@@ -4,7 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { Button } from 'primeng/button';
 import { Select } from 'primeng/select';
 
-import { IPageInfo, IPageNavigationEvent, IPageSizeChangeEvent } from '@shared/types';
+import { type IPageInfo, type IPageNavigationEvent, type IPageSizeChangeEvent } from '@shared/types';
 
 export interface IRowsPerPageOption {
   label: string;

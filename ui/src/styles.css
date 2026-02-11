@@ -3,6 +3,7 @@
 @import "primeicons/primeicons.css";
 @import "./styles/colors.css";
 @import "./styles/primeng.css";
+@import "./styles/components/stat-card.css";
 
 
 @custom-variant dark (&:where(.dark, .dark *));

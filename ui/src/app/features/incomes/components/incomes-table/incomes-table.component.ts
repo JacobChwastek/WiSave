@@ -8,13 +8,13 @@ import { ConfirmPopupModule } from 'primeng/confirmpopup';
 import { Ripple } from 'primeng/ripple';
 import { TableModule } from 'primeng/table';
 
-import { IIncomesFilter } from '@features/incomes/store/incomes.state';
-import { IIncome, type IncomeId } from '@features/incomes/types/incomes.interfaces';
+import { type IIncomesFilter } from '@features/incomes/store/incomes.state';
+import { type IIncome, type IncomeId } from '@features/incomes/types/incomes.interfaces';
 
 import { Currency } from '@core/types';
 import { ButtonBarDatepickerComponent } from '@shared/components/datepicker/button-bar-datepicker';
 import { CursorPaginationComponent } from '@shared/components/pagination';
-import { IPageInfo, IPageNavigationEvent, IPageSizeChangeEvent } from '@shared/types';
+import { type IPageInfo, type IPageNavigationEvent, type IPageSizeChangeEvent } from '@shared/types';
 
 export interface IFilterAppliedEvent {
   filter: Partial<IIncomesFilter>;
@@ -34,7 +34,7 @@ export interface IFilterAppliedEvent {
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class IncomesTableComponent {
-  #confirmationService = inject(ConfirmationService);
+  readonly #confirmationService = inject(ConfirmationService);
 
   readonly isLoading = input.required<boolean>();
   readonly data = input.required<IIncome[]>();

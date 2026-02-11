@@ -151,6 +151,58 @@ export default tseslint.config(
       '@typescript-eslint/no-unused-vars': 'off', // Using unused-imports plugin instead
       '@typescript-eslint/no-empty-function': 'warn',
       '@typescript-eslint/consistent-type-definitions': ['error', 'interface'],
+      '@typescript-eslint/no-floating-promises': 'error',
+      '@typescript-eslint/no-misused-promises': ['error', { checksVoidReturn: false }],
+      '@typescript-eslint/consistent-type-imports': ['error', { prefer: 'type-imports', fixStyle: 'inline-type-imports' }],
+
+      // Enforce # private fields over private keyword
+      'no-restricted-syntax': [
+        'error',
+        {
+          selector: "PropertyDefinition[accessibility='private']",
+          message: 'Use # private fields instead of the private keyword.',
+        },
+        {
+          selector: "MethodDefinition[accessibility='private']",
+          message: 'Use # private methods instead of the private keyword.',
+        },
+        {
+          selector: "TSParameterProperty[accessibility='private']",
+          message: 'Use # private fields instead of private constructor parameters.',
+        },
+      ],
+
+      // Enforce class member ordering for Angular components
+      '@typescript-eslint/member-ordering': [
+        'error',
+        {
+          default: {
+            memberTypes: [
+              // Static
+              'static-field',
+              'static-method',
+
+              // Decorated fields (@ViewChild, @HostListener, etc.)
+              'decorated-field',
+
+              // Injected dependencies (#store = inject(...))
+              '#private-instance-field',
+
+              // Signal inputs/outputs, public fields, computed signals
+              'public-instance-field',
+
+              // Constructor
+              'constructor',
+
+              // Lifecycle hooks + public methods
+              'public-instance-method',
+
+              // Private methods
+              '#private-instance-method',
+            ],
+          },
+        },
+      ],
 
       // Unused imports (auto-fixable)
       'unused-imports/no-unused-imports': 'error',
@@ -167,6 +219,16 @@ export default tseslint.config(
 
       // No secrets (detect hardcoded secrets)
       'no-secrets/no-secrets': ['error', { tolerance: 4.5 }],
+    },
+  },
+  {
+    files: ['**/*.spec.ts', '**/*.test.ts'],
+    rules: {
+      'no-secrets/no-secrets': 'off',
+      'security/detect-non-literal-regexp': 'off',
+      'security/detect-unsafe-regex': 'off',
+      'security/detect-eval-with-expression': 'off',
+      'no-restricted-syntax': 'off',
     },
   },
   {

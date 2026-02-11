@@ -1,7 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { Component, input } from '@angular/core';
 
-import { IStatItem } from '@shared/types';
+import { type IStatItem } from '@shared/types';
 
 import { StatCardComponent } from './stat-card.component';
 
