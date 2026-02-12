@@ -8,9 +8,10 @@ import { TableModule } from 'primeng/table';
 import { IncomesTableComponent, type IFilterAppliedEvent } from '@features/incomes/components/incomes-table/incomes-table.component';
 import { MonthlyIncomeChartComponent } from '@features/incomes/components/monthly-income-chart/monthly-income-chart.component';
 import { INCOMES_ROUTES } from '@features/incomes/constants/incomes-routes.constant';
-import { incomesPageEvents } from '@features/incomes/store/incomes.events';
-import { type MonthlyStatsScale } from '@features/incomes/store/incomes.state';
-import { IncomesStore } from '@features/incomes/store/incomes.store';
+import { incomesPageEvents } from '@features/incomes/store/incomes/incomes.events';
+import { type MonthlyStatsScale } from '@features/incomes/types/incomes-state.types';
+import { IncomesStatsStore } from '@features/incomes/store/stats/incomes-stats.store';
+import { IncomesStore } from '@features/incomes/store/incomes/incomes.store';
 import { injectDispatch } from '@ngrx/signals/events';
 
 import { ChartCardComponent } from '@shared/components/chart-card';
@@ -76,6 +77,7 @@ import { type IncomeId } from '../types/income-id.type';
 })
 export class IncomesComponent implements OnInit {
   readonly #store = inject(IncomesStore);
+  readonly #statsStore = inject(IncomesStatsStore);
   readonly #router = inject(Router);
   readonly #route = inject(ActivatedRoute);
   readonly #dispatch = injectDispatch(incomesPageEvents);
@@ -102,15 +104,15 @@ export class IncomesComponent implements OnInit {
   readonly isLoading = computed(() => this.#store.isLoading());
   readonly pagination = computed(() => this.#store.pagination());
   readonly incomes = computed(() => this.#store.entities());
-  readonly statsScope = computed(() => this.#store.statsScope());
-  readonly monthlyStats = computed(() => this.#store.monthlyStats());
-  readonly monthlyStatsLoading = computed(() => this.#store.monthlyStatsLoading());
-  readonly monthlyStatsOffset = computed(() => this.#store.monthlyStatsOffset());
-  readonly monthlyStatsHasMore = computed(() => this.#store.monthlyStatsHasMore());
-  readonly monthlyStatsScale = computed(() => this.#store.monthlyStatsScale());
+  readonly statsScope = computed(() => this.#statsStore.statsScope());
+  readonly monthlyStats = computed(() => this.#statsStore.monthlyStats());
+  readonly monthlyStatsLoading = computed(() => this.#statsStore.monthlyStatsLoading());
+  readonly monthlyStatsOffset = computed(() => this.#statsStore.monthlyStatsOffset());
+  readonly monthlyStatsHasMore = computed(() => this.#statsStore.monthlyStatsHasMore());
+  readonly monthlyStatsScale = computed(() => this.#statsStore.monthlyStatsScale());
 
   readonly statItems = computed((): IStatItem[] => {
-    const stats = this.#store.stats();
+    const stats = this.#statsStore.stats();
 
     if (!stats) {
       return [];

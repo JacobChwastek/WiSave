@@ -4,8 +4,6 @@ import { map, type Observable } from 'rxjs';
 import { GraphQLService } from '@graphql/services/graphql.service';
 import type { IGraphQLResult } from '@graphql/types/graphql.types';
 
-import { type ICursorPaginationParams } from '@shared/types';
-
 import {
   GetCategoriesDocument,
   GetIncomeByIdDocument,
@@ -25,25 +23,10 @@ import {
   type GetTotalAmountQuery,
   type GetTotalAmountQueryVariables,
 } from '../graphql/incomes.queries.generated';
-import { type IIncomeMonthlyStats, type IIncomesFilter, type IIncomesSortOrder, type IIncomeStats } from '../store/incomes.state';
+import { type IIncomeMonthlyStats, type IIncomesFilter, type IIncomeStats } from '../types/incomes-state.types';
 import type { IIncome, IncomeId } from '../types/incomes.interfaces';
+import type { IIncomesQueryParams, IIncomesQueryResult } from '../types/incomes-query.types';
 import { IncomesMapperService } from './incomes-mapper.service';
-
-export interface IIncomesQueryResult {
-  incomes: IIncome[];
-  totalCount: number;
-  pageInfo: {
-    hasNextPage: boolean;
-    hasPreviousPage: boolean;
-    startCursor: string | null;
-    endCursor: string | null;
-  };
-}
-
-export interface IIncomesQueryParams extends ICursorPaginationParams {
-  filter?: IIncomesFilter;
-  sort?: IIncomesSortOrder;
-}
 
 @Injectable({ providedIn: 'root' })
 export class IncomesGraphQLService {

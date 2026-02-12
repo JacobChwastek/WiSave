@@ -7,9 +7,11 @@ import { Events, withEventHandlers } from '@ngrx/signals/events';
 import { GraphQLRequestError } from '@core/api/graphql';
 import { initialPagination, type CursorDirection, type IStoreError } from '@shared/types';
 
-import { IncomesGraphQLService, type IIncomesQueryParams } from '../services/incomes-graphql.service';
+import { IncomesGraphQLService } from '../../services/incomes-graphql.service';
+import type { IIncomesQueryParams } from '../../types/incomes-query.types';
 import { incomesApiEvents, incomesPageEvents } from './incomes.events';
-import { createInitialFilter, emptyFilter, initialSort, MONTHLY_STATS_SCALE_SIZES, type IIncomesFilter, type IIncomesSortOrder, type IncomeStatsScope, type MonthlyStatsScale } from './incomes.state';
+import { type IIncomesFilter, type IIncomesSortOrder } from '../../types/incomes-state.types';
+import { createInitialFilter, emptyFilter, initialSort } from './incomes.state';
 
 const toStoreError = (err: unknown): IStoreError => {
   if (err instanceof GraphQLRequestError) {
@@ -40,20 +42,6 @@ export function withIncomesEventHandlers() {
           catchError((err) => of(incomesApiEvents.categoriesLoadedFailure({ error: toStoreError(err) }))),
         );
 
-      const loadStats$ = (scope: IncomeStatsScope) =>
-        api.getIncomeStats(scope === 'all').pipe(
-          map((result) => (result.error ? incomesApiEvents.statsLoadedFailure({ error: toStoreError(result.error) }) : incomesApiEvents.statsLoadedSuccess({ stats: result.data }))),
-          catchError((err) => of(incomesApiEvents.statsLoadedFailure({ error: toStoreError(err) }))),
-        );
-
-      const loadMonthlyStats$ = (scale: MonthlyStatsScale, offset = 0) => {
-        const pageSize = MONTHLY_STATS_SCALE_SIZES[scale];
-        return api.getIncomeMonthlyStats(pageSize, offset).pipe(
-          map((result) => (result.error ? incomesApiEvents.monthlyStatsLoadedFailure({ error: toStoreError(result.error) }) : incomesApiEvents.monthlyStatsLoadedSuccess({ stats: result.data }))),
-          catchError((err) => of(incomesApiEvents.monthlyStatsLoadedFailure({ error: toStoreError(err) }))),
-        );
-      };
-
       const getQueryParams = (pageSize: number, direction: CursorDirection, cursor: string | null, filter?: IIncomesFilter, sort?: IIncomesSortOrder): IIncomesQueryParams => ({
         direction,
         cursor,
@@ -65,29 +53,11 @@ export function withIncomesEventHandlers() {
       const getFilter = (): IIncomesFilter => store.filter?.() ?? createInitialFilter();
       const getSort = (): IIncomesSortOrder => store.sort?.() ?? initialSort;
       const getRows = (): number => store.pagination?.().rows ?? initialPagination.rows;
-      const getStatsScope = (): IncomeStatsScope => store.statsScope?.() ?? 'recurring';
-      const getMonthlyStatsOffset = (): number => store.monthlyStatsOffset?.() ?? 0;
-      const getMonthlyStatsScale = (): MonthlyStatsScale => store.monthlyStatsScale?.() ?? 'quarter';
 
       return {
         loadIncomes$: events
           .on(incomesPageEvents.opened)
-          .pipe(
-            switchMap(() =>
-              merge(
-                loadIncomes$(getQueryParams(initialPagination.rows, 'first', null, getFilter(), getSort())),
-                loadCategories$(),
-                loadStats$(getStatsScope()),
-                loadMonthlyStats$(getMonthlyStatsScale(), getMonthlyStatsOffset()),
-              ),
-            ),
-          ),
-
-        statsScopeChanged$: events.on(incomesPageEvents.statsScopeChanged).pipe(switchMap(({ payload }) => loadStats$(payload.scope))),
-
-        monthlyStatsNavigate$: events.on(incomesPageEvents.monthlyStatsNavigate).pipe(switchMap(() => loadMonthlyStats$(getMonthlyStatsScale(), getMonthlyStatsOffset()))),
-
-        monthlyStatsScaleChanged$: events.on(incomesPageEvents.monthlyStatsScaleChanged).pipe(switchMap(({ payload }) => loadMonthlyStats$(payload.scale, 0))),
+          .pipe(switchMap(() => merge(loadIncomes$(getQueryParams(initialPagination.rows, 'first', null, getFilter(), getSort())), loadCategories$()))),
 
         navigatePage$: events
           .on(incomesPageEvents.navigatePage)
@@ -107,14 +77,30 @@ export function withIncomesEventHandlers() {
 
         sortChanged$: events.on(incomesPageEvents.sortChanged).pipe(switchMap(({ payload }) => loadIncomes$(getQueryParams(getRows(), 'first', null, getFilter(), payload.sort)))),
 
+        fetchById$: events.on(incomesPageEvents.fetchById).pipe(
+          switchMap(({ payload }) =>
+            api.getById(payload.id).pipe(
+              map((result) => {
+                if (result.error) {
+                  return incomesApiEvents.fetchByIdFailure({ error: toStoreError(result.error) });
+                }
+                if (!result.data) {
+                  return incomesApiEvents.fetchByIdFailure({ error: { message: 'Income not found', category: 'validation' } });
+                }
+                return incomesApiEvents.fetchByIdSuccess({ income: result.data });
+              }),
+              catchError((err) => of(incomesApiEvents.fetchByIdFailure({ error: toStoreError(err) }))),
+            ),
+          ),
+        ),
+
         logErrors$: events
           .on(
             incomesApiEvents.loadedFailure,
             incomesApiEvents.addedFailure,
             incomesApiEvents.updatedFailure,
             incomesApiEvents.removedFailure,
-            incomesApiEvents.statsLoadedFailure,
-            incomesApiEvents.monthlyStatsLoadedFailure,
+            incomesApiEvents.fetchByIdFailure,
           )
           .pipe(tap(({ payload }) => console.error('[Incomes API Error]', payload.error.category, payload.error.message))),
       };

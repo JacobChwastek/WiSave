@@ -3,7 +3,7 @@ import { Component, computed, inject, input, output } from '@angular/core';
 import { ButtonModule } from 'primeng/button';
 import { ChartModule } from 'primeng/chart';
 
-import { type IIncomeMonthlyStats } from '@features/incomes/store/incomes.state';
+import { type IIncomeMonthlyStats } from '@features/incomes/types/incomes-state.types';
 
 import { ThemeService } from '@core/services/theme.service';
 

@@ -1,7 +1,7 @@
 import { withDevtools, withGlitchTracking, withTrackedReducer } from '@angular-architects/ngrx-toolkit';
 import { type IIncome } from '@features/incomes/types/incomes.interfaces';
 import { signalStore, withState } from '@ngrx/signals';
-import { addEntity, removeEntity, setAllEntities, updateEntity, withEntities } from '@ngrx/signals/entities';
+import { addEntity, removeEntity, setAllEntities, setEntity, updateEntity, withEntities } from '@ngrx/signals/entities';
 import { on } from '@ngrx/signals/events';
 
 import { withIncomesEventHandlers } from './incomes.event-handlers';
@@ -14,7 +14,7 @@ export const IncomesStore = signalStore(
   withState(initialState),
   withEntities<IIncome>(),
   withTrackedReducer(
-    on(incomesPageEvents.opened, () => ({ isLoading: true, error: null, statsLoading: true, monthlyStatsLoading: true })),
+    on(incomesPageEvents.opened, () => ({ isLoading: true, error: null })),
     on(incomesPageEvents.navigatePage, ({ payload }, state) => {
       const currentPage = state.pagination.currentPage;
       const newPage = payload.direction === 'next' ? currentPage + 1 : payload.direction === 'previous' ? Math.max(1, currentPage - 1) : 1;
@@ -38,6 +38,7 @@ export const IncomesStore = signalStore(
         currentPage: 1,
       },
     })),
+    on(incomesPageEvents.fetchById, () => ({ isLoading: true, error: null })),
     on(incomesPageEvents.add, () => ({ isLoading: true, error: null })),
     on(incomesPageEvents.update, () => ({ isLoading: true, error: null })),
     on(incomesPageEvents.remove, () => ({ isLoading: true, error: null })),
@@ -74,17 +75,6 @@ export const IncomesStore = signalStore(
         currentPage: 1,
       },
     })),
-    on(incomesPageEvents.statsScopeChanged, ({ payload }) => ({ statsScope: payload.scope, statsLoading: true })),
-    on(incomesPageEvents.monthlyStatsNavigate, ({ payload }, state) => ({
-      monthlyStatsLoading: true,
-      monthlyStatsOffset: payload.direction === 'back' ? state.monthlyStatsOffset + 1 : Math.max(0, state.monthlyStatsOffset - 1),
-    })),
-    on(incomesPageEvents.monthlyStatsScaleChanged, ({ payload }) => ({
-      monthlyStatsLoading: true,
-      monthlyStatsScale: payload.scale,
-      monthlyStatsOffset: 0,
-    })),
-
     on(incomesApiEvents.loadedSuccess, ({ payload }, state) => [
       setAllEntities<IIncome>(payload.incomes),
       () => ({
@@ -106,6 +96,8 @@ export const IncomesStore = signalStore(
       () => ({ isLoading: false, error: null }),
     ]),
     on(incomesApiEvents.removedSuccess, ({ payload }) => [removeEntity(payload.id), () => ({ isLoading: false, error: null })]),
+    on(incomesApiEvents.fetchByIdSuccess, ({ payload }) => [setEntity<IIncome>(payload.income), () => ({ isLoading: false, error: null })]),
+    on(incomesApiEvents.fetchByIdFailure, ({ payload }) => ({ isLoading: false, error: payload.error })),
 
     on(incomesApiEvents.loadedFailure, ({ payload }, state) => ({
       isLoading: false,
@@ -138,26 +130,7 @@ export const IncomesStore = signalStore(
       error: payload.error,
     })),
 
-    // Stats
-    on(incomesApiEvents.statsLoadedSuccess, ({ payload }) => ({
-      stats: payload.stats,
-      statsLoading: false,
-    })),
-    on(incomesApiEvents.statsLoadedFailure, ({ payload }) => ({
-      statsLoading: false,
-      error: payload.error,
-    })),
-
-    // Monthly stats
-    on(incomesApiEvents.monthlyStatsLoadedSuccess, ({ payload }) => ({
-      monthlyStats: payload.stats,
-      monthlyStatsLoading: false,
-      monthlyStatsHasMore: payload.stats.length > 0,
-    })),
-    on(incomesApiEvents.monthlyStatsLoadedFailure, ({ payload }) => ({
-      monthlyStatsLoading: false,
-      error: payload.error,
-    })),
+    // Stats handled in IncomesStatsStore
   ),
   withIncomesEventHandlers(),
 );
