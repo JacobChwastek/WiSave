@@ -95,7 +95,7 @@ const INITIAL_FORM_VALUE = {
           <label class="text-secondary-700 dark:text-dark-secondary-100 text-sm font-medium" for="income-amount">Amount</label>
           <p-inputNumber
             [attr.aria-describedby]="isInvalid('amount') ? 'income-amount-error' : null"
-            [min]="0"
+            [min]="0.01"
             [minFractionDigits]="2"
             [maxFractionDigits]="2"
             class="w-full"

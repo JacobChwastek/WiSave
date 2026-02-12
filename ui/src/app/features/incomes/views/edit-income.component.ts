@@ -1,4 +1,4 @@
-import { Component, computed, effect, inject, untracked } from '@angular/core';
+import { Component, computed, effect, inject } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, Router } from '@angular/router';
 import { map } from 'rxjs';
@@ -55,16 +55,7 @@ export class EditIncomeComponent {
     { initialValue: null },
   );
 
-  readonly income = computed(() => {
-    const id = this.incomeId();
-
-    if (!id) {
-      return null;
-    }
-
-    return this.#store.entityMap()[id] ?? null;
-  });
-
+  readonly income = computed(() => this.#store.selectedIncome());
   readonly categories = computed(() => this.#store.availableCategories());
   readonly isBusy = computed(() => this.#store.isLoading() || this.#store.categoriesLoading());
   readonly isFetchingIncome = computed(() => Boolean(this.incomeId()) && !this.income() && this.isBusy());
@@ -72,11 +63,8 @@ export class EditIncomeComponent {
   constructor() {
     effect(() => {
       const id = this.incomeId();
-      const income = this.income();
-      const isLoading = untracked(() => this.#store.isLoading());
-
-      if (id && !income && !isLoading) {
-        untracked(() => this.#dispatch.fetchById({ id }));
+      if (id) {
+        this.#dispatch.selectIncome({ id });
       }
     });
   }
