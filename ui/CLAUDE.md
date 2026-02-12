@@ -40,6 +40,9 @@ yarn start
 # Production build
 yarn build
 
+# Development build (watch mode)
+yarn watch
+
 # Run all tests
 yarn test
 
@@ -49,11 +52,26 @@ yarn lint
 # Lint and auto-fix
 yarn lint:fix
 
+# ESLint only
+yarn eslint
+
+# ESLint auto-fix
+yarn eslint:fix
+
 # Format code with Prettier
 yarn format
 
 # Check formatting without changes
 yarn format:check
+
+# GraphQL codegen
+yarn codegen
+
+# Update schema and regenerate types
+yarn schema:update
+
+# Watch GraphQL codegen
+yarn codegen:watch
 ```
 
 ## Architecture
@@ -128,9 +146,23 @@ Features are lazy-loaded via router:
 
 Theme toggle managed by `ThemeService` with localStorage persistence.
 
+## GraphQL
+
+- Code generation is configured in `codegen.ts`.
+- Update schema + regenerate types: `yarn schema:update`
+- Regenerate types only: `yarn codegen`
+
+## Additional Docs
+
+- `../docs/README.md` - Entry point for project docs
+- `../docs/architecture.md` - Architecture overview
+- `../docs/commit-conventions.md` - Commit rules
+- `../docs/graphql-workflow.md` - GraphQL workflow details
+- `../docs/module-development.md` - Module development guidelines
+
 ## Testing
 
-Uses Vitest (not Karma/Jasmine). Tests follow `*.spec.ts` pattern.
+Tests run via Angular CLI (`ng test`) using the `@angular/build:unit-test` builder. Tests follow `*.spec.ts` pattern.
 
 ## Linting (ESLint)
 
@@ -184,6 +216,7 @@ interface IIncome {
 - Signal-based inputs (`input()`, `input.required()`)
 - Standalone components (no NgModules)
 - `inject()` function for DI
+- Built-in control flow (`@if`, `@for`, `@switch`)
 
 ## Naming Conventions
 
@@ -248,6 +281,7 @@ refactor: extract table pagination to shared component
 - Use `output()` for event emitters
 - Use `computed()` for derived state
 - Use `effect()` sparingly, prefer declarative patterns
+- Prefer built-in control flow (`@if`, `@for`, `@switch`) over `*ngIf`/`*ngFor`
 
 ### Don't
 
@@ -255,7 +289,7 @@ refactor: extract table pagination to shared component
 - Don't use constructor injection — use `inject()`
 - Don't import from other features directly — use `core/` for shared state
 - Don't access store from presentational components
-- Don't use `OnPush` change detection — app is zoneless
+- Don't rely on manual change detection (`ChangeDetectorRef`, `markForCheck`) — app is zoneless; prefer signals/async pipe patterns
 - Don't use `BehaviorSubject` for state — use Signal Store
 - Don't mutate state directly — use store methods
 - Don't use `ngOnInit` for simple initialization — use `inject()` or field initializers
