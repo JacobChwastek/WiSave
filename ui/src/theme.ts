@@ -254,6 +254,122 @@ const WiSaveTheme = definePreset(Aura, {
         },
       },
     },
+    multiselect: {
+      colorScheme: {
+        light: {
+          root: {
+            background: 'var(--color-secondary-50)',
+            disabledBackground: 'var(--color-secondary-100)',
+            borderColor: 'var(--color-divider)',
+            hoverBorderColor: 'var(--color-secondary-400)',
+            focusBorderColor: 'var(--color-accent-500)',
+            invalidBorderColor: '#ef4444',
+            color: 'var(--color-secondary-900)',
+            disabledColor: 'var(--color-secondary-400)',
+            placeholderColor: 'var(--color-secondary-400)',
+            shadow: '0 1px 2px 0 rgba(0, 0, 0, 0.05)',
+          },
+          dropdown: {
+            color: 'var(--color-secondary-500)',
+          },
+          overlay: {
+            background: 'var(--color-secondary-50)',
+            borderColor: 'var(--color-divider)',
+            color: 'var(--color-secondary-800)',
+            shadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1)',
+          },
+          option: {
+            focusBackground: 'var(--color-secondary-100)',
+            selectedBackground: 'var(--color-accent-500)',
+            selectedFocusBackground: 'var(--color-accent-600)',
+            color: 'var(--color-secondary-800)',
+            focusColor: 'var(--color-secondary-900)',
+            selectedColor: 'var(--color-secondary-50)',
+            selectedFocusColor: 'var(--color-secondary-50)',
+          },
+          clearIcon: {
+            color: 'var(--color-secondary-400)',
+          },
+        },
+        dark: {
+          root: {
+            background: 'var(--color-dark-primary-900)',
+            disabledBackground: 'var(--color-dark-primary-800)',
+            borderColor: 'var(--color-dark-primary-500)',
+            hoverBorderColor: 'var(--color-dark-primary-400)',
+            focusBorderColor: 'var(--color-accent-500)',
+            invalidBorderColor: '#ef4444',
+            color: 'var(--color-dark-secondary-50)',
+            disabledColor: 'var(--color-dark-secondary-400)',
+            placeholderColor: 'var(--color-dark-secondary-400)',
+            shadow: '0 1px 2px 0 rgba(0, 0, 0, 0.3)',
+          },
+          dropdown: {
+            color: 'var(--color-dark-secondary-200)',
+          },
+          overlay: {
+            background: 'var(--color-dark-primary-800)',
+            borderColor: 'var(--color-dark-divider-strong)',
+            color: 'var(--color-dark-secondary-100)',
+            shadow: '0 4px 6px -1px rgba(0, 0, 0, 0.4), 0 2px 4px -2px rgba(0, 0, 0, 0.3)',
+          },
+          option: {
+            focusBackground: 'var(--color-dark-primary-700)',
+            selectedBackground: 'var(--color-accent-600)',
+            selectedFocusBackground: 'var(--color-accent-500)',
+            color: 'var(--color-dark-secondary-100)',
+            focusColor: 'var(--color-dark-secondary-50)',
+            selectedColor: 'var(--color-dark-primary-950)',
+            selectedFocusColor: 'var(--color-dark-primary-950)',
+          },
+          clearIcon: {
+            color: 'var(--color-dark-secondary-300)',
+          },
+        },
+      },
+    },
+    checkbox: {
+      colorScheme: {
+        light: {
+          root: {
+            background: 'var(--color-secondary-50)',
+            checkedBackground: 'var(--color-accent-500)',
+            checkedHoverBackground: 'var(--color-accent-600)',
+            borderColor: 'var(--color-divider)',
+            hoverBorderColor: 'var(--color-secondary-400)',
+            focusBorderColor: 'var(--color-accent-500)',
+            checkedBorderColor: 'var(--color-accent-500)',
+            checkedHoverBorderColor: 'var(--color-accent-600)',
+            checkedFocusBorderColor: 'var(--color-accent-600)',
+            invalidBorderColor: '#ef4444',
+          },
+          icon: {
+            color: 'var(--color-secondary-50)',
+            checkedColor: 'var(--color-secondary-50)',
+            checkedHoverColor: 'var(--color-secondary-50)',
+          },
+        },
+        dark: {
+          root: {
+            background: 'var(--color-dark-primary-900)',
+            checkedBackground: 'var(--color-accent-500)',
+            checkedHoverBackground: 'var(--color-accent-600)',
+            borderColor: 'var(--color-dark-primary-500)',
+            hoverBorderColor: 'var(--color-dark-primary-400)',
+            focusBorderColor: 'var(--color-accent-500)',
+            checkedBorderColor: 'var(--color-accent-500)',
+            checkedHoverBorderColor: 'var(--color-accent-600)',
+            checkedFocusBorderColor: 'var(--color-accent-600)',
+            invalidBorderColor: '#ef4444',
+          },
+          icon: {
+            color: 'var(--color-dark-primary-950)',
+            checkedColor: 'var(--color-dark-primary-950)',
+            checkedHoverColor: 'var(--color-dark-primary-950)',
+          },
+        },
+      },
+    },
     autocomplete: {
       colorScheme: {
         light: {

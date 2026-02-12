@@ -18,6 +18,9 @@ export const appConfig: ApplicationConfig = {
     provideZonelessChangeDetection(),
     provideRouter(routes),
     providePrimeNG({
+      translation: {
+        dateFormat: 'dd/mm/yy',
+      },
       theme: {
         preset: WiSaveTheme,
         options: {
