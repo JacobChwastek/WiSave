@@ -1,6 +1,7 @@
 import { initialPagination, type IPagination, type IStoreError } from '@shared/types';
 
 import { type IIncomesFilter, type IIncomesSortOrder } from '../../types/incomes-state.types';
+import { type IIncome } from '../../types/incomes.interfaces';
 
 export interface IncomesState {
   isLoading: boolean;
@@ -10,6 +11,7 @@ export interface IncomesState {
   pagination: IPagination;
   availableCategories: string[];
   categoriesLoading: boolean;
+  selectedIncome: IIncome | null;
 }
 
 export function createInitialFilter(): IIncomesFilter {
@@ -47,4 +49,5 @@ export const initialState: IncomesState = {
   pagination: initialPagination,
   availableCategories: [],
   categoriesLoading: false,
+  selectedIncome: null,
 };

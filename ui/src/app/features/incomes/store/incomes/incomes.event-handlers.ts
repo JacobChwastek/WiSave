@@ -77,9 +77,13 @@ export function withIncomesEventHandlers() {
 
         sortChanged$: events.on(incomesPageEvents.sortChanged).pipe(switchMap(({ payload }) => loadIncomes$(getQueryParams(getRows(), 'first', null, getFilter(), payload.sort)))),
 
-        fetchById$: events.on(incomesPageEvents.fetchById).pipe(
-          switchMap(({ payload }) =>
-            api.getById(payload.id).pipe(
+        selectIncome$: events.on(incomesPageEvents.selectIncome).pipe(
+          switchMap(({ payload }) => {
+            const cached = store.entityMap()[payload.id];
+            if (cached) {
+              return of(incomesApiEvents.fetchByIdSuccess({ income: cached }));
+            }
+            return api.getById(payload.id).pipe(
               map((result) => {
                 if (result.error) {
                   return incomesApiEvents.fetchByIdFailure({ error: toStoreError(result.error) });
@@ -90,8 +94,8 @@ export function withIncomesEventHandlers() {
                 return incomesApiEvents.fetchByIdSuccess({ income: result.data });
               }),
               catchError((err) => of(incomesApiEvents.fetchByIdFailure({ error: toStoreError(err) }))),
-            ),
-          ),
+            );
+          }),
         ),
 
         logErrors$: events

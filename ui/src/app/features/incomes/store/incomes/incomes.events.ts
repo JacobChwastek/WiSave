@@ -22,7 +22,7 @@ export const incomesPageEvents = eventGroup({
     statsScopeChanged: type<{ scope: IncomeStatsScope }>(),
     monthlyStatsNavigate: type<{ direction: 'back' | 'forward' }>(),
     monthlyStatsScaleChanged: type<{ scale: MonthlyStatsScale }>(),
-    fetchById: type<{ id: IncomeId }>(),
+    selectIncome: type<{ id: IncomeId }>(),
   },
 });
 

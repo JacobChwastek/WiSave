@@ -38,7 +38,7 @@ export const IncomesStore = signalStore(
         currentPage: 1,
       },
     })),
-    on(incomesPageEvents.fetchById, () => ({ isLoading: true, error: null })),
+    on(incomesPageEvents.selectIncome, () => ({ isLoading: true, error: null })),
     on(incomesPageEvents.add, () => ({ isLoading: true, error: null })),
     on(incomesPageEvents.update, () => ({ isLoading: true, error: null })),
     on(incomesPageEvents.remove, () => ({ isLoading: true, error: null })),
@@ -91,13 +91,17 @@ export const IncomesStore = signalStore(
       }),
     ]),
     on(incomesApiEvents.addedSuccess, ({ payload }) => [addEntity<IIncome>(payload.income), () => ({ isLoading: false, error: null })]),
-    on(incomesApiEvents.updatedSuccess, ({ payload }) => [
+    on(incomesApiEvents.updatedSuccess, ({ payload }, state) => [
       updateEntity<IIncome>({ id: payload.income.id, changes: payload.income }),
-      () => ({ isLoading: false, error: null }),
+      () => ({
+        isLoading: false,
+        error: null,
+        selectedIncome: state.selectedIncome?.id === payload.income.id ? payload.income : state.selectedIncome,
+      }),
     ]),
     on(incomesApiEvents.removedSuccess, ({ payload }) => [removeEntity(payload.id), () => ({ isLoading: false, error: null })]),
-    on(incomesApiEvents.fetchByIdSuccess, ({ payload }) => [setEntity<IIncome>(payload.income), () => ({ isLoading: false, error: null })]),
-    on(incomesApiEvents.fetchByIdFailure, ({ payload }) => ({ isLoading: false, error: payload.error })),
+    on(incomesApiEvents.fetchByIdSuccess, ({ payload }) => [setEntity<IIncome>(payload.income), () => ({ isLoading: false, error: null, selectedIncome: payload.income })]),
+    on(incomesApiEvents.fetchByIdFailure, ({ payload }) => ({ isLoading: false, error: payload.error, selectedIncome: null })),
 
     on(incomesApiEvents.loadedFailure, ({ payload }, state) => ({
       isLoading: false,
