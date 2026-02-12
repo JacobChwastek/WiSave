@@ -51,3 +51,8 @@ export interface ICursorPaginationParams {
   cursor: string | null;
   pageSize: number;
 }
+
+export interface IRowsPerPageOption {
+  label: string;
+  value: number;
+}

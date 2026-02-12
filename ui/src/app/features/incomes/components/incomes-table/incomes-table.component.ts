@@ -1,5 +1,5 @@
 import { CurrencyPipe, DatePipe } from '@angular/common';
-import { ChangeDetectionStrategy, Component, computed, inject, input, output, signal } from '@angular/core';
+import { Component, computed, inject, input, output, signal } from '@angular/core';
 
 import { ConfirmationService } from 'primeng/api';
 import { Button, ButtonDirective, ButtonIcon } from 'primeng/button';
@@ -8,7 +8,7 @@ import { ConfirmPopupModule } from 'primeng/confirmpopup';
 import { Ripple } from 'primeng/ripple';
 import { TableModule } from 'primeng/table';
 
-import { type IIncomesFilter } from '@features/incomes/store/incomes.state';
+import { type IIncomesFilter } from '@features/incomes/types/incomes-state.types';
 import { type IIncome, type IncomeId } from '@features/incomes/types/incomes.interfaces';
 
 import { Currency } from '@core/types';
@@ -31,7 +31,6 @@ export interface IFilterAppliedEvent {
       flex: 1;
     }
   `,
-  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class IncomesTableComponent {
   readonly #confirmationService = inject(ConfirmationService);

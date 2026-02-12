@@ -1,15 +1,10 @@
-import { ChangeDetectionStrategy, Component, computed, input, output } from '@angular/core';
+import { Component, computed, input, output } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 
 import { Button } from 'primeng/button';
 import { Select } from 'primeng/select';
 
-import { type IPageInfo, type IPageNavigationEvent, type IPageSizeChangeEvent } from '@shared/types';
-
-export interface IRowsPerPageOption {
-  label: string;
-  value: number;
-}
+import { type IPageInfo, type IPageNavigationEvent, type IPageSizeChangeEvent, type IRowsPerPageOption } from '@shared/types';
 
 @Component({
   selector: 'app-cursor-pagination',
@@ -31,22 +26,12 @@ export interface IRowsPerPageOption {
             severity="secondary"
             size="small"
             ariaLabel="Previous page" />
-          <span class="text-secondary-700 dark:text-dark-secondary-200 min-w-12 text-center text-sm font-medium">
-            {{ currentPage() }} / {{ totalPages() }}
-          </span>
-          <p-button
-            [disabled]="!pageInfo().hasNextPage || isLoading()"
-            [text]="true"
-            (click)="onNextPage()"
-            icon="pi pi-chevron-right"
-            severity="secondary"
-            size="small"
-            ariaLabel="Next page" />
+          <span class="text-secondary-700 dark:text-dark-secondary-200 min-w-12 text-center text-sm font-medium"> {{ currentPage() }} / {{ totalPages() }} </span>
+          <p-button [disabled]="!pageInfo().hasNextPage || isLoading()" [text]="true" (click)="onNextPage()" icon="pi pi-chevron-right" severity="secondary" size="small" ariaLabel="Next page" />
         </div>
       </div>
     </div>
   `,
-  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class CursorPaginationComponent {
   readonly isLoading = input<boolean>(false);
