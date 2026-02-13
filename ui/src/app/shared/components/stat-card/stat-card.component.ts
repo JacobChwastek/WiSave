@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { ChangeDetectionStrategy, Component, input } from '@angular/core';
+import { Component, input } from '@angular/core';
 
 import { ChangePercentPipe } from '@shared/pipes/change-percent.pipe';
 
@@ -7,16 +7,15 @@ import { ChangePercentPipe } from '@shared/pipes/change-percent.pipe';
   selector: 'app-stat-card',
   standalone: true,
   imports: [CommonModule, ChangePercentPipe],
-  changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
-    <div class="stat-card" [class.stat-card--standalone]="appearance() === 'standalone'">
+    <div [class.stat-card--standalone]="appearance() === 'standalone'" class="stat-card">
       <div class="flex items-center justify-between gap-3">
         <p class="stat-card__label">
           {{ title() }}
         </p>
         @let changeInfo = change() | changePercent;
         @if (showChange() && changeInfo.value) {
-          <span class="stat-card__change" [class.stat-card__change--positive]="changeInfo.isPositive === true" [class.stat-card__change--negative]="changeInfo.isPositive === false">
+          <span [class.stat-card__change--positive]="changeInfo.isPositive === true" [class.stat-card__change--negative]="changeInfo.isPositive === false" class="stat-card__change">
             {{ changeInfo.sign }}{{ changeInfo.value }}%
           </span>
         }

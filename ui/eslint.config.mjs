@@ -170,6 +170,69 @@ export default tseslint.config(
           selector: "TSParameterProperty[accessibility='private']",
           message: 'Use # private fields instead of private constructor parameters.',
         },
+        {
+          selector:
+            "ClassDeclaration:has(Decorator[expression.callee.name='Component']) MethodDefinition[kind='constructor'] > FunctionExpression[params.length>0]",
+          message: 'Use inject() instead of constructor injection.',
+        },
+        {
+          selector:
+            "ClassDeclaration:has(Decorator[expression.callee.name='Directive']) MethodDefinition[kind='constructor'] > FunctionExpression[params.length>0]",
+          message: 'Use inject() instead of constructor injection.',
+        },
+        {
+          selector:
+            "ClassDeclaration:has(Decorator[expression.callee.name='Pipe']) MethodDefinition[kind='constructor'] > FunctionExpression[params.length>0]",
+          message: 'Use inject() instead of constructor injection.',
+        },
+        {
+          selector:
+            "ClassDeclaration:has(Decorator[expression.callee.name='Injectable']) MethodDefinition[kind='constructor'] > FunctionExpression[params.length>0]",
+          message: 'Use inject() instead of constructor injection.',
+        },
+        {
+          selector:
+            "Property[key.name='changeDetection'][value.type='MemberExpression'][value.object.name='ChangeDetectionStrategy'][value.property.name='OnPush']",
+          message: 'Do not use OnPush change detection; app is zoneless.',
+        },
+      ],
+
+      // Disallow importing ChangeDetectionStrategy (OnPush is not used)
+      'no-restricted-imports': [
+        'error',
+        {
+          paths: [
+            {
+              name: '@angular/core',
+              importNames: ['Input', 'Output', 'EventEmitter'],
+              message: 'Use signal inputs/outputs (input(), output()) instead of @Input/@Output/EventEmitter.',
+            },
+            {
+              name: '@angular/core',
+              importNames: ['ChangeDetectionStrategy'],
+              message: 'Do not import ChangeDetectionStrategy; OnPush is not used in this app.',
+            },
+            {
+              name: '@angular/core',
+              importNames: ['ChangeDetectorRef', 'NgZone'],
+              message: 'Do not import ChangeDetectorRef or NgZone; app is zoneless.',
+            },
+          ],
+        },
+      ],
+
+      // Warn on BehaviorSubject usage (prefer Signal Store or signals)
+      '@typescript-eslint/no-restricted-imports': [
+        'warn',
+        {
+          paths: [
+            {
+              name: 'rxjs',
+              importNames: ['BehaviorSubject'],
+              message: 'Avoid BehaviorSubject for state; prefer Signal Store or signals.',
+            },
+          ],
+        },
       ],
 
       // Enforce class member ordering for Angular components
