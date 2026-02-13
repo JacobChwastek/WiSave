@@ -1,5 +1,5 @@
 import { Component, computed, effect, input, output } from '@angular/core';
-import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { type AbstractControl, FormArray, FormControl, FormGroup, ReactiveFormsModule, type ValidationErrors, Validators } from '@angular/forms';
 
 import { Button } from 'primeng/button';
 import { DatePicker } from 'primeng/datepicker';
@@ -10,17 +10,9 @@ import { Select } from 'primeng/select';
 import { ToggleSwitch } from 'primeng/toggleswitch';
 
 import { type IIncome } from '@features/incomes/types/incomes.interfaces';
+import { type IncomeFormModel, type MetadataEntryModel } from '@features/incomes/types/income-edit-form.types';
 
 import { createMoney, Currency, CurrencySymbol } from '@core/types';
-
-interface IncomeFormModel {
-  date: FormControl<Date | null>;
-  description: FormControl<string>;
-  category: FormControl<string[]>;
-  amount: FormControl<number | null>;
-  currency: FormControl<Currency>;
-  recurring: FormControl<boolean>;
-}
 
 const DEFAULT_CURRENCY = Currency.PLN;
 
@@ -36,6 +28,11 @@ const INITIAL_FORM_VALUE = {
   amount: null as number | null,
   currency: DEFAULT_CURRENCY,
   recurring: false,
+};
+
+const trimmedRequired = (control: AbstractControl): ValidationErrors | null => {
+  const { value } = control;
+  return typeof value === 'string' && value.trim().length > 0 ? null : { required: true };
 };
 
 @Component({
@@ -134,6 +131,59 @@ const INITIAL_FORM_VALUE = {
         </div>
       </div>
 
+      <div class="flex flex-col gap-3">
+        <div class="flex items-center justify-between">
+          <div class="flex flex-col">
+            <span class="text-secondary-700 dark:text-dark-secondary-100 text-sm font-medium">Metadata</span>
+            <span class="text-secondary-500 dark:text-dark-secondary-300 text-xs">Add custom key-value data (optional).</span>
+          </div>
+          <p-button
+            [disabled]="isLoading()"
+            (click)="addMetadataEntry()"
+            type="button"
+            label="Add field"
+            icon="pi pi-plus"
+            severity="secondary"
+            size="small"
+            [text]="true" />
+        </div>
+        @for (entry of form.controls.metadata.controls; track entry; let i = $index) {
+          <div class="flex items-start gap-2">
+            <div class="flex flex-1 flex-col gap-1">
+              <input
+                [formControl]="entry.controls.key"
+                class="w-full"
+                pInputText
+                type="text"
+                placeholder="Key (e.g. tax)" />
+              @if (entry.controls.key.invalid && (entry.controls.key.dirty || entry.controls.key.touched)) {
+                <span class="text-danger-600 dark:text-danger-400 text-xs">Key is required.</span>
+              }
+            </div>
+            <div class="flex flex-1 flex-col gap-1">
+              <input
+                [formControl]="entry.controls.value"
+                class="w-full"
+                pInputText
+                type="text"
+                placeholder="Value (e.g. 19%)" />
+              @if (entry.controls.value.invalid && (entry.controls.value.dirty || entry.controls.value.touched)) {
+                <span class="text-danger-600 dark:text-danger-400 text-xs">Value is required.</span>
+              }
+            </div>
+            <p-button
+              [disabled]="isLoading()"
+              (click)="removeMetadataEntry(i)"
+              type="button"
+              icon="pi pi-trash"
+              severity="danger"
+              size="small"
+              [text]="true"
+              [rounded]="true" />
+          </div>
+        }
+      </div>
+
       <div class="border-secondary-200 dark:border-dark-divider flex items-center justify-end gap-2 pt-4">
         <p-button [disabled]="isLoading()" (click)="onCancel()" type="button" label="Cancel" icon="pi pi-times" severity="secondary" size="small" />
         <p-button [loading]="isLoading()" [disabled]="form.invalid || isLoading()" type="submit" label="Save" icon="pi pi-check" severity="success" size="small" />
@@ -160,6 +210,7 @@ export class IncomeEditFormComponent {
     amount: new FormControl<number | null>(null, { validators: [Validators.required, Validators.min(0.01)] }),
     currency: new FormControl<Currency>(DEFAULT_CURRENCY, { nonNullable: true, validators: [Validators.required] }),
     recurring: new FormControl(false, { nonNullable: true }),
+    metadata: new FormArray<FormGroup<MetadataEntryModel>>([]),
   });
 
   constructor() {
@@ -168,6 +219,7 @@ export class IncomeEditFormComponent {
 
       if (!income) {
         this.form.reset(INITIAL_FORM_VALUE, { emitEvent: false });
+        this.#clearMetadata();
         this.form.markAsPristine();
         this.form.markAsUntouched();
         return;
@@ -184,6 +236,12 @@ export class IncomeEditFormComponent {
         },
         { emitEvent: false },
       );
+      this.#clearMetadata();
+      if (income.metadata) {
+        for (const [key, value] of Object.entries(income.metadata)) {
+          this.addMetadataEntry(key, value);
+        }
+      }
       this.form.markAsPristine();
       this.form.markAsUntouched();
     });
@@ -209,12 +267,22 @@ export class IncomeEditFormComponent {
       return;
     }
 
+    const metadata: Record<string, string> = {};
+    for (const entry of this.form.controls.metadata.controls) {
+      const key = entry.controls.key.value.trim();
+      const val = entry.controls.value.value.trim();
+      if (key && val) {
+        metadata[key] = val;
+      }
+    }
+
     this.submitted.emit({
       date: value.date,
       description: value.description.trim(),
       category: value.category,
       amount: createMoney(value.amount, value.currency),
       recurring: value.recurring,
+      ...(Object.keys(metadata).length > 0 ? { metadata } : {}),
     });
   }
 
@@ -222,8 +290,25 @@ export class IncomeEditFormComponent {
     this.cancelled.emit();
   }
 
+  addMetadataEntry(key = '', value = ''): void {
+    this.form.controls.metadata.push(
+      new FormGroup<MetadataEntryModel>({
+        key: new FormControl(key, { nonNullable: true, validators: [trimmedRequired] }),
+        value: new FormControl(value, { nonNullable: true, validators: [trimmedRequired] }),
+      }),
+    );
+  }
+
+  removeMetadataEntry(index: number): void {
+    this.form.controls.metadata.removeAt(index);
+  }
+
   isInvalid(controlName: keyof IncomeFormModel): boolean {
     const control = this.form.controls[controlName];
     return control.invalid && (control.dirty || control.touched);
+  }
+
+  #clearMetadata(): void {
+    this.form.controls.metadata.clear();
   }
 }
