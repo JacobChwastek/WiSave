@@ -4,21 +4,14 @@ import { catchError, map, merge, of, switchMap, tap } from 'rxjs';
 import { signalStoreFeature } from '@ngrx/signals';
 import { Events, withEventHandlers } from '@ngrx/signals/events';
 
-import { GraphQLRequestError } from '@core/api/graphql';
-import { initialPagination, type CursorDirection, type IStoreError } from '@shared/types';
+import { initialPagination, type CursorDirection } from '@shared/types';
+import { toStoreError } from '@shared/helpers/store-error.helper';
 
 import { IncomesGraphQLService } from '../../services/incomes-graphql.service';
 import type { IIncomesQueryParams } from '../../types/incomes-query.types';
 import { incomesApiEvents, incomesPageEvents } from './incomes.events';
 import { type IIncomesFilter, type IIncomesSortOrder } from '../../types/incomes-state.types';
 import { createInitialFilter, emptyFilter, initialSort } from './incomes.state';
-
-const toStoreError = (err: unknown): IStoreError => {
-  if (err instanceof GraphQLRequestError) {
-    return { message: err.message, category: err.category };
-  }
-  return { message: err instanceof Error ? err.message : 'Unknown error', category: 'server' };
-};
 
 export function withIncomesEventHandlers() {
   return signalStoreFeature(

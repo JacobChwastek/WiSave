@@ -4,19 +4,11 @@ import { catchError, map, of, switchMap, tap } from 'rxjs';
 import { signalStoreFeature } from '@ngrx/signals';
 import { Events, withEventHandlers } from '@ngrx/signals/events';
 
-import { GraphQLRequestError } from '@core/api/graphql';
-import { type IStoreError } from '@shared/types';
+import { toStoreError } from '@shared/helpers/store-error.helper';
 
 import { IncomesGraphQLService } from '../../services/incomes-graphql.service';
-import { MONTHLY_STATS_SCALE_SIZES, type IncomeStatsScope, type MonthlyStatsScale } from '../../types/incomes-state.types';
+import { type IncomeStatsScope } from '../../types/incomes-state.types';
 import { incomesApiEvents, incomesPageEvents } from '../incomes/incomes.events';
-
-const toStoreError = (err: unknown): IStoreError => {
-  if (err instanceof GraphQLRequestError) {
-    return { message: err.message, category: err.category };
-  }
-  return { message: err instanceof Error ? err.message : 'Unknown error', category: 'server' };
-};
 
 export function withIncomesStatsEventHandlers() {
   return signalStoreFeature(
@@ -27,17 +19,15 @@ export function withIncomesStatsEventHandlers() {
           catchError((err) => of(incomesApiEvents.statsLoadedFailure({ error: toStoreError(err) }))),
         );
 
-      const loadMonthlyStats$ = (scale: MonthlyStatsScale, offset = 0) => {
-        const pageSize = MONTHLY_STATS_SCALE_SIZES[scale];
-        return api.getIncomeMonthlyStats(pageSize, offset).pipe(
+      const loadMonthlyStats$ = (year: number) => {
+        return api.getIncomeMonthlyStats(year).pipe(
           map((result) => (result.error ? incomesApiEvents.monthlyStatsLoadedFailure({ error: toStoreError(result.error) }) : incomesApiEvents.monthlyStatsLoadedSuccess({ stats: result.data }))),
           catchError((err) => of(incomesApiEvents.monthlyStatsLoadedFailure({ error: toStoreError(err) }))),
         );
       };
 
       const getStatsScope = (): IncomeStatsScope => store.statsScope?.() ?? 'recurring';
-      const getMonthlyStatsOffset = (): number => store.monthlyStatsOffset?.() ?? 0;
-      const getMonthlyStatsScale = (): MonthlyStatsScale => store.monthlyStatsScale?.() ?? 'quarter';
+      const getMonthlyStatsYear = (): number => store.monthlyStatsYear?.() ?? new Date().getFullYear();
 
       return {
         loadStats$: events
@@ -46,13 +36,11 @@ export function withIncomesStatsEventHandlers() {
 
         loadMonthlyStats$: events
           .on(incomesPageEvents.opened)
-          .pipe(switchMap(() => loadMonthlyStats$(getMonthlyStatsScale(), getMonthlyStatsOffset()))),
+          .pipe(switchMap(() => loadMonthlyStats$(getMonthlyStatsYear()))),
 
         statsScopeChanged$: events.on(incomesPageEvents.statsScopeChanged).pipe(switchMap(({ payload }) => loadStats$(payload.scope))),
 
-        monthlyStatsNavigate$: events.on(incomesPageEvents.monthlyStatsNavigate).pipe(switchMap(() => loadMonthlyStats$(getMonthlyStatsScale(), getMonthlyStatsOffset()))),
-
-        monthlyStatsScaleChanged$: events.on(incomesPageEvents.monthlyStatsScaleChanged).pipe(switchMap(({ payload }) => loadMonthlyStats$(payload.scale, 0))),
+        monthlyStatsYearChanged$: events.on(incomesPageEvents.monthlyStatsYearChanged).pipe(switchMap(() => loadMonthlyStats$(getMonthlyStatsYear()))),
 
         logErrors$: events
           .on(incomesApiEvents.statsLoadedFailure, incomesApiEvents.monthlyStatsLoadedFailure)

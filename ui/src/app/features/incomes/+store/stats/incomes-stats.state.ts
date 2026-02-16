@@ -1,6 +1,6 @@
 import { type IStoreError } from '@shared/types';
 
-import { type IIncomeMonthlyStats, type IIncomeStats, type IncomeStatsScope, type MonthlyStatsScale } from '../../types/incomes-state.types';
+import { type IIncomeMonthlyStats, type IIncomeStats, type IncomeStatsScope } from '../../types/incomes-state.types';
 
 export interface IncomesStatsState {
   error: IStoreError | null;
@@ -9,9 +9,7 @@ export interface IncomesStatsState {
   statsScope: IncomeStatsScope;
   monthlyStats: IIncomeMonthlyStats[];
   monthlyStatsLoading: boolean;
-  monthlyStatsOffset: number;
-  monthlyStatsHasMore: boolean;
-  monthlyStatsScale: MonthlyStatsScale;
+  monthlyStatsYear: number;
 }
 
 export const initialStatsState: IncomesStatsState = {
@@ -21,7 +19,5 @@ export const initialStatsState: IncomesStatsState = {
   statsScope: 'recurring',
   monthlyStats: [],
   monthlyStatsLoading: false,
-  monthlyStatsOffset: 0,
-  monthlyStatsHasMore: true,
-  monthlyStatsScale: 'quarter',
+  monthlyStatsYear: new Date().getFullYear(),
 };

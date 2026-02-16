@@ -47,7 +47,7 @@ export default tseslint.config(
         { type: 'feature-component', pattern: 'src/app/features/*/components/**', mode: 'full', capture: ['feature'] },
         { type: 'feature-container', pattern: 'src/app/features/*/containers/**', mode: 'full', capture: ['feature'] },
         { type: 'feature-view', pattern: 'src/app/features/*/views/**', mode: 'full', capture: ['feature'] },
-        { type: 'feature-store', pattern: 'src/app/features/*/store/**', mode: 'full', capture: ['feature'] },
+        { type: 'feature-store', pattern: 'src/app/features/*/+store/**', mode: 'full', capture: ['feature'] },
         { type: 'feature-type', pattern: 'src/app/features/*/types/**', mode: 'full', capture: ['feature'] },
         { type: 'feature-service', pattern: 'src/app/features/*/services/**', mode: 'full', capture: ['feature'] },
         { type: 'feature-helper', pattern: 'src/app/features/*/helpers/**', mode: 'full', capture: ['feature'] },

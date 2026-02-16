@@ -6,8 +6,8 @@ import { map } from 'rxjs';
 import { Button } from 'primeng/button';
 
 import { IncomeEditFormComponent } from '@features/incomes/components/income-edit-form/income-edit-form.component';
-import { incomesPageEvents } from '@features/incomes/store/incomes/incomes.events';
-import { IncomesStore } from '@features/incomes/store/incomes/incomes.store';
+import { incomesPageEvents } from '@features/incomes/+store/incomes/incomes.events';
+import { IncomesStore } from '@features/incomes/+store/incomes/incomes.store';
 import { asIncomeId } from '@features/incomes/types/income-id.type';
 import { type IIncome } from '@features/incomes/types/incomes.interfaces';
 import { injectDispatch } from '@ngrx/signals/events';

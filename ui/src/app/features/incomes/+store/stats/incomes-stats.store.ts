@@ -13,14 +13,9 @@ export const IncomesStatsStore = signalStore(
   withTrackedReducer(
     on(incomesPageEvents.opened, () => ({ statsLoading: true, monthlyStatsLoading: true, error: null })),
     on(incomesPageEvents.statsScopeChanged, ({ payload }) => ({ statsScope: payload.scope, statsLoading: true })),
-    on(incomesPageEvents.monthlyStatsNavigate, ({ payload }, state) => ({
+    on(incomesPageEvents.monthlyStatsYearChanged, ({ payload }, state) => ({
       monthlyStatsLoading: true,
-      monthlyStatsOffset: payload.direction === 'back' ? state.monthlyStatsOffset + 1 : Math.max(0, state.monthlyStatsOffset - 1),
-    })),
-    on(incomesPageEvents.monthlyStatsScaleChanged, ({ payload }) => ({
-      monthlyStatsLoading: true,
-      monthlyStatsScale: payload.scale,
-      monthlyStatsOffset: 0,
+      monthlyStatsYear: payload.direction === 'back' ? state.monthlyStatsYear - 1 : state.monthlyStatsYear + 1,
     })),
     on(incomesApiEvents.statsLoadedSuccess, ({ payload }) => ({
       stats: payload.stats,
@@ -34,7 +29,6 @@ export const IncomesStatsStore = signalStore(
     on(incomesApiEvents.monthlyStatsLoadedSuccess, ({ payload }) => ({
       monthlyStats: payload.stats,
       monthlyStatsLoading: false,
-      monthlyStatsHasMore: payload.stats.length > 0,
       error: null,
     })),
     on(incomesApiEvents.monthlyStatsLoadedFailure, ({ payload }) => ({
