@@ -88,10 +88,41 @@ signalStore({ providedIn: 'root' },
 )
 ```
 
-Stores are located in `features/<feature>/store/`. Access store in components using `inject()`:
+Stores are located in `features/<feature>/+store/`. The `+` prefix signals that the directory is a framework-level integration layer (inspired by SvelteKit/Analog conventions) — it contains store definitions, events, reducers, state, and event handlers, but no UI components. Access store in components using `inject()`:
 ```typescript
 #store = inject(IncomesStore);
 incomes = this.#store.incomes();
+```
+
+#### Event Handlers & RxJS Flattening Operators
+
+Event handlers use `@ngrx/signals/events` with `withEventHandlers`. Choose the flattening operator based on intent:
+
+| Operator | Use When | Example |
+|----------|----------|---------|
+| `exhaustMap` | Trigger should be ignored while a request is in-flight (prevent duplicate loads) | Page opened, select by ID |
+| `switchMap` | New parameter should cancel the in-flight request and start a fresh one | Filter/sort/page changes |
+
+#### Typing Event Handlers
+
+Use `signalStoreFeature` input constraints and `withProps` to avoid `any` on the store parameter:
+
+```typescript
+export function withFeatureEventHandlers() {
+  return signalStoreFeature(
+    { state: type<Pick<FeatureState, 'neededProp1' | 'neededProp2'>>() },
+    withProps(() => ({
+      _events: inject(Events),
+      _api: inject(FeatureApiService),
+    })),
+    withEventHandlers((store) => ({
+      // store is fully typed — no `any`
+      load$: store._events.on(pageEvents.opened).pipe(
+        exhaustMap(() => store._api.load(store.neededProp1())),
+      ),
+    })),
+  );
+}
 ```
 
 ### Component Patterns
@@ -105,15 +136,17 @@ All components are standalone (no NgModules). Key patterns:
 
 ```
 features/<feature>/
+├── +store/         # NgRx Signal Store (events, reducers, state, event handlers)
 ├── components/     # Presentational components
 ├── containers/     # Smart components (state-connected)
-├── store/          # NgRx Signal Store
 ├── types/          # Interfaces and types
 ├── views/          # Route-level components
 ├── services/       # Feature-specific services
 ├── helpers/        # Utility functions
 └── <feature>.routes.ts
 ```
+
+The `+store/` prefix convention marks the directory as a framework integration layer (not a UI layer). It may contain sub-stores (e.g., `+store/incomes/`, `+store/stats/`).
 
 ### Path Aliases
 
@@ -159,6 +192,7 @@ Theme toggle managed by `ThemeService` with localStorage persistence.
 - `../docs/commit-conventions.md` - Commit rules
 - `../docs/graphql-workflow.md` - GraphQL workflow details
 - `../docs/module-development.md` - Module development guidelines
+- `../docs/frontend-state-management.md` - Store conventions, event handlers, RxJS operators
 
 ## Testing
 
@@ -182,10 +216,10 @@ The boundaries plugin enforces layer separation:
 | `core/` | core only | shared, features, layout |
 | `shared/` | core, shared | features, layout |
 | `layout/` | core, shared, layout | features |
-| `feature/components/` | core, shared, types | **store**, other features |
-| `feature/containers/` | core, shared, types, components, store | other features |
+| `feature/components/` | core, shared, types | **+store**, other features |
+| `feature/containers/` | core, shared, types, components, +store | other features |
 | `feature/views/` | all feature internals, core, shared | other features |
-| `feature/store/` | core, types, services, helpers | components, other features |
+| `feature/+store/` | core, types, services, helpers | components, other features |
 
 **Key rules:**
 - Presentational components (`components/`) cannot access store
