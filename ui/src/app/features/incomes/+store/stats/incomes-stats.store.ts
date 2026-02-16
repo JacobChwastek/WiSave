@@ -1,9 +1,9 @@
 import { withDevtools, withGlitchTracking, withTrackedReducer } from '@angular-architects/ngrx-toolkit';
-import { signalStore, withState } from '@ngrx/signals';
+import { signalStore, withFeature, withState } from '@ngrx/signals';
 import { on } from '@ngrx/signals/events';
 
 import { incomesApiEvents, incomesPageEvents } from '../incomes/incomes.events';
-import { withIncomesStatsEventHandlers } from './incomes-stats.event-handlers';
+import { withIncomesStatsEventHandlers as withEventHandlers } from './incomes-stats.event-handlers';
 import { initialStatsState } from './incomes-stats.state';
 
 export const IncomesStatsStore = signalStore(
@@ -36,5 +36,5 @@ export const IncomesStatsStore = signalStore(
       error: payload.error,
     })),
   ),
-  withIncomesStatsEventHandlers(),
+  withFeature((store) => withEventHandlers(store)),
 );

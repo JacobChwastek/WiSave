@@ -1,23 +1,37 @@
-import { inject } from '@angular/core';
-import { catchError, map, merge, of, switchMap, tap } from 'rxjs';
+import { type Signal, inject } from '@angular/core';
+import { catchError, exhaustMap, map, merge, of, switchMap, tap } from 'rxjs';
 
 import { signalStoreFeature } from '@ngrx/signals';
+import { withProps } from '@ngrx/signals';
+import { type EntityMap } from '@ngrx/signals/entities';
 import { Events, withEventHandlers } from '@ngrx/signals/events';
 
-import { initialPagination, type CursorDirection } from '@shared/types';
+import { type IPagination, initialPagination, type CursorDirection } from '@shared/types';
 import { toStoreError } from '@shared/helpers/store-error.helper';
 
 import { IncomesGraphQLService } from '../../services/incomes-graphql.service';
 import type { IIncomesQueryParams } from '../../types/incomes-query.types';
-import { incomesApiEvents, incomesPageEvents } from './incomes.events';
 import { type IIncomesFilter, type IIncomesSortOrder } from '../../types/incomes-state.types';
-import { createInitialFilter, emptyFilter, initialSort } from './incomes.state';
+import { type IIncome } from '../../types/incomes.interfaces';
+import { incomesApiEvents, incomesPageEvents } from './incomes.events';
+import { emptyFilter } from './incomes.state';
 
-export function withIncomesEventHandlers() {
+export interface IncomesStoreSlice {
+  filter: Signal<IIncomesFilter>;
+  sort: Signal<IIncomesSortOrder>;
+  pagination: Signal<IPagination>;
+  entityMap: Signal<EntityMap<IIncome>>;
+}
+
+export function withIncomesEventHandlers(store: IncomesStoreSlice) {
   return signalStoreFeature(
-    withEventHandlers((store: any, events = inject(Events), api = inject(IncomesGraphQLService)) => {
+    withProps(() => ({
+      _events: inject(Events),
+      _api: inject(IncomesGraphQLService),
+    })),
+    withEventHandlers((props) => {
       const loadIncomes$ = (params: IIncomesQueryParams) =>
-        api.getAllWithPagination(params).pipe(
+        props._api.getAllWithPagination(params).pipe(
           map((result) =>
             incomesApiEvents.loadedSuccess({
               incomes: result.data.incomes,
@@ -30,7 +44,7 @@ export function withIncomesEventHandlers() {
         );
 
       const loadCategories$ = () =>
-        api.getCategories().pipe(
+        props._api.getCategories().pipe(
           map((result) => (result.error ? incomesApiEvents.categoriesLoadedFailure({ error: toStoreError(result.error) }) : incomesApiEvents.categoriesLoadedSuccess({ categories: result.data }))),
           catchError((err) => of(incomesApiEvents.categoriesLoadedFailure({ error: toStoreError(err) }))),
         );
@@ -43,40 +57,35 @@ export function withIncomesEventHandlers() {
         sort,
       });
 
-      const getFilter = (): IIncomesFilter => store.filter?.() ?? createInitialFilter();
-      const getSort = (): IIncomesSortOrder => store.sort?.() ?? initialSort;
-      const getRows = (): number => store.pagination?.().rows ?? initialPagination.rows;
-
       return {
-        loadIncomes$: events
+        loadIncomes$: props._events
           .on(incomesPageEvents.opened)
-          .pipe(switchMap(() => merge(loadIncomes$(getQueryParams(initialPagination.rows, 'first', null, getFilter(), getSort())), loadCategories$()))),
+          .pipe(exhaustMap(() => merge(loadIncomes$(getQueryParams(initialPagination.rows, 'first', null, store.filter(), store.sort())), loadCategories$()))),
 
-        navigatePage$: events
+        navigatePage$: props._events
           .on(incomesPageEvents.navigatePage)
-          .pipe(switchMap(({ payload }) => loadIncomes$(getQueryParams(payload.pageSize, payload.direction, payload.cursor, getFilter(), getSort())))),
+          .pipe(switchMap(({ payload }) => loadIncomes$(getQueryParams(payload.pageSize, payload.direction, payload.cursor, store.filter(), store.sort())))),
 
-        pageSizeChanged$: events.on(incomesPageEvents.pageSizeChanged).pipe(switchMap(({ payload }) => loadIncomes$(getQueryParams(payload.rows, 'first', null, getFilter(), getSort())))),
+        pageSizeChanged$: props._events.on(incomesPageEvents.pageSizeChanged).pipe(switchMap(({ payload }) => loadIncomes$(getQueryParams(payload.rows, 'first', null, store.filter(), store.sort())))),
 
-        filterApplied$: events.on(incomesPageEvents.filterApplied).pipe(
+        filterApplied$: props._events.on(incomesPageEvents.filterApplied).pipe(
           switchMap(({ payload }) => {
-            const currentFilter = getFilter();
-            const updatedFilter = { ...currentFilter, ...payload.filter };
-            return loadIncomes$(getQueryParams(getRows(), 'first', null, updatedFilter, getSort()));
+            const updatedFilter = { ...store.filter(), ...payload.filter };
+            return loadIncomes$(getQueryParams(store.pagination().rows, 'first', null, updatedFilter, store.sort()));
           }),
         ),
 
-        filtersCleared$: events.on(incomesPageEvents.filtersCleared).pipe(switchMap(() => loadIncomes$(getQueryParams(getRows(), 'first', null, emptyFilter, getSort())))),
+        filtersCleared$: props._events.on(incomesPageEvents.filtersCleared).pipe(switchMap(() => loadIncomes$(getQueryParams(store.pagination().rows, 'first', null, emptyFilter, store.sort())))),
 
-        sortChanged$: events.on(incomesPageEvents.sortChanged).pipe(switchMap(({ payload }) => loadIncomes$(getQueryParams(getRows(), 'first', null, getFilter(), payload.sort)))),
+        sortChanged$: props._events.on(incomesPageEvents.sortChanged).pipe(switchMap(({ payload }) => loadIncomes$(getQueryParams(store.pagination().rows, 'first', null, store.filter(), payload.sort)))),
 
-        selectIncome$: events.on(incomesPageEvents.selectIncome).pipe(
-          switchMap(({ payload }) => {
+        selectIncome$: props._events.on(incomesPageEvents.selectIncome).pipe(
+          exhaustMap(({ payload }) => {
             const cached = store.entityMap()[payload.id];
             if (cached) {
               return of(incomesApiEvents.fetchByIdSuccess({ income: cached }));
             }
-            return api.getById(payload.id).pipe(
+            return props._api.getById(payload.id).pipe(
               map((result) => {
                 if (result.error) {
                   return incomesApiEvents.fetchByIdFailure({ error: toStoreError(result.error) });
@@ -91,7 +100,7 @@ export function withIncomesEventHandlers() {
           }),
         ),
 
-        logErrors$: events
+        logErrors$: props._events
           .on(
             incomesApiEvents.loadedFailure,
             incomesApiEvents.addedFailure,

@@ -1,7 +1,7 @@
-import { inject } from '@angular/core';
-import { catchError, map, of, switchMap, tap } from 'rxjs';
+import { inject, type Signal } from '@angular/core';
+import { catchError, exhaustMap, map, of, switchMap, tap } from 'rxjs';
 
-import { signalStoreFeature } from '@ngrx/signals';
+import { signalStoreFeature, withProps } from '@ngrx/signals';
 import { Events, withEventHandlers } from '@ngrx/signals/events';
 
 import { toStoreError } from '@shared/helpers/store-error.helper';
@@ -10,39 +10,41 @@ import { IncomesGraphQLService } from '../../services/incomes-graphql.service';
 import { type IncomeStatsScope } from '../../types/incomes-state.types';
 import { incomesApiEvents, incomesPageEvents } from '../incomes/incomes.events';
 
-export function withIncomesStatsEventHandlers() {
+export interface StatsStoreSlice {
+  statsScope: Signal<IncomeStatsScope>;
+  monthlyStatsYear: Signal<number>;
+}
+
+export function withIncomesStatsEventHandlers(store: StatsStoreSlice) {
   return signalStoreFeature(
-    withEventHandlers((store: any, events = inject(Events), api = inject(IncomesGraphQLService)) => {
+    withProps(() => ({
+      _events: inject(Events),
+      _api: inject(IncomesGraphQLService),
+    })),
+    withEventHandlers((props) => {
       const loadStats$ = (scope: IncomeStatsScope) =>
-        api.getIncomeStats(scope === 'all').pipe(
+        props._api.getIncomeStats(scope === 'all').pipe(
           map((result) => (result.error ? incomesApiEvents.statsLoadedFailure({ error: toStoreError(result.error) }) : incomesApiEvents.statsLoadedSuccess({ stats: result.data }))),
           catchError((err) => of(incomesApiEvents.statsLoadedFailure({ error: toStoreError(err) }))),
         );
 
       const loadMonthlyStats$ = (year: number) => {
-        return api.getIncomeMonthlyStats(year).pipe(
+        return props._api.getIncomeMonthlyStats(year).pipe(
           map((result) => (result.error ? incomesApiEvents.monthlyStatsLoadedFailure({ error: toStoreError(result.error) }) : incomesApiEvents.monthlyStatsLoadedSuccess({ stats: result.data }))),
           catchError((err) => of(incomesApiEvents.monthlyStatsLoadedFailure({ error: toStoreError(err) }))),
         );
       };
 
-      const getStatsScope = (): IncomeStatsScope => store.statsScope?.() ?? 'recurring';
-      const getMonthlyStatsYear = (): number => store.monthlyStatsYear?.() ?? new Date().getFullYear();
-
       return {
-        loadStats$: events
-          .on(incomesPageEvents.opened)
-          .pipe(switchMap(() => loadStats$(getStatsScope()))),
+        loadStats$: props._events.on(incomesPageEvents.opened).pipe(exhaustMap(() => loadStats$(store.statsScope()))),
 
-        loadMonthlyStats$: events
-          .on(incomesPageEvents.opened)
-          .pipe(switchMap(() => loadMonthlyStats$(getMonthlyStatsYear()))),
+        loadMonthlyStats$: props._events.on(incomesPageEvents.opened).pipe(exhaustMap(() => loadMonthlyStats$(store.monthlyStatsYear()))),
 
-        statsScopeChanged$: events.on(incomesPageEvents.statsScopeChanged).pipe(switchMap(({ payload }) => loadStats$(payload.scope))),
+        statsScopeChanged$: props._events.on(incomesPageEvents.statsScopeChanged).pipe(switchMap(({ payload }) => loadStats$(payload.scope))),
 
-        monthlyStatsYearChanged$: events.on(incomesPageEvents.monthlyStatsYearChanged).pipe(switchMap(() => loadMonthlyStats$(getMonthlyStatsYear()))),
+        monthlyStatsYearChanged$: props._events.on(incomesPageEvents.monthlyStatsYearChanged).pipe(switchMap(() => loadMonthlyStats$(store.monthlyStatsYear()))),
 
-        logErrors$: events
+        logErrors$: props._events
           .on(incomesApiEvents.statsLoadedFailure, incomesApiEvents.monthlyStatsLoadedFailure)
           .pipe(tap(({ payload }) => console.error('[Income Stats API Error]', payload.error.category, payload.error.message))),
       };

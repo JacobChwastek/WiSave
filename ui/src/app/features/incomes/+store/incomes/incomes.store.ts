@@ -1,10 +1,10 @@
 import { withDevtools, withGlitchTracking, withTrackedReducer } from '@angular-architects/ngrx-toolkit';
 import { type IIncome } from '@features/incomes/types/incomes.interfaces';
-import { signalStore, withState } from '@ngrx/signals';
+import { signalStore, withFeature, withState } from '@ngrx/signals';
 import { addEntity, removeEntity, setAllEntities, setEntity, updateEntity, withEntities } from '@ngrx/signals/entities';
 import { on } from '@ngrx/signals/events';
 
-import { withIncomesEventHandlers } from './incomes.event-handlers';
+import { withIncomesEventHandlers as withEventHandlers } from './incomes.event-handlers';
 import { incomesApiEvents, incomesPageEvents } from './incomes.events';
 import { emptyFilter, initialState } from './incomes.state';
 
@@ -136,5 +136,5 @@ export const IncomesStore = signalStore(
 
     // Stats handled in IncomesStatsStore
   ),
-  withIncomesEventHandlers(),
+  withFeature((store) => withEventHandlers(store)),
 );
