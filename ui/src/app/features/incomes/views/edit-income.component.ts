@@ -42,7 +42,6 @@ import { injectDispatch } from '@ngrx/signals/events';
 })
 export class EditIncomeComponent {
   readonly #store = inject(IncomesStore);
-
   readonly #route = inject(ActivatedRoute);
   readonly #router = inject(Router);
   readonly #dispatch = injectDispatch(incomesPageEvents);
