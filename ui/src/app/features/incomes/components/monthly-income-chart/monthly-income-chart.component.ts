@@ -18,7 +18,7 @@ import { ThemeService } from '@core/services/theme.service';
         <span class="min-w-16 text-center font-semibold">{{ year() }}</span>
         <p-button [outlined]="true" [rounded]="true" [disabled]="!canGoForward()" [loading]="loading()" (onClick)="onGoForward()" icon="pi pi-chevron-right" size="small" severity="success" />
       </div>
-      <div class="h-72 flex w-full">
+      <div class="h-56 flex w-full xl:h-72 2xl:h-96">
         <p-chart [data]="chartData()" [options]="chartOptions()" [plugins]="chartPlugins" class="w-full" type="bar" />
       </div>
     </div>
