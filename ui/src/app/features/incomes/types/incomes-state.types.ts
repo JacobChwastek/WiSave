@@ -16,12 +16,11 @@ export interface IIncomesSortOrder {
 }
 
 export interface IIncomeStats {
-  yearRecurringTotal: number;
-  lastMonthRecurringTotal: number;
-  lastMonthRecurringChangePct: number | null;
-  thisMonthRecurringTotal: number;
-  thisMonthRecurringChangePct: number | null;
-  last3MonthsRecurringAverage: number;
+  lastYearTotal: number;
+  thisYearTotal: number;
+  thisMonthTotal: number;
+  last3MonthsAverage: number;
+  lastYearMonthlyAverage: number;
 }
 
 export interface IIncomeMonthlyStats {
@@ -32,11 +31,3 @@ export interface IIncomeMonthlyStats {
 }
 
 export type IncomeStatsScope = 'recurring' | 'all';
-
-export type MonthlyStatsScale = 'quarter' | 'half' | 'year';
-
-export const MONTHLY_STATS_SCALE_SIZES: Record<MonthlyStatsScale, number> = {
-  quarter: 3,
-  half: 6,
-  year: 12,
-};

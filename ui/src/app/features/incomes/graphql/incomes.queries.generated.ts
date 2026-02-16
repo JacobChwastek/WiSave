@@ -41,10 +41,10 @@ export type GetIncomeStatsQueryVariables = Types.Exact<{
 }>;
 
 
-export type GetIncomeStatsQuery = { __typename?: 'Query', incomeStats: { __typename?: 'IncomeStats', yearRecurringTotal: number, lastMonthRecurringTotal: number, lastMonthRecurringChangePct?: number | null, thisMonthRecurringTotal: number, thisMonthRecurringChangePct?: number | null, last3MonthsRecurringAverage: number } };
+export type GetIncomeStatsQuery = { __typename?: 'Query', incomeStats: { __typename?: 'IncomeStats', lastYearTotal: number, thisYearTotal: number, thisMonthTotal: number, last3MonthsAverage: number, lastYearMonthlyAverage: number } };
 
 export type GetIncomeMonthlyStatsQueryVariables = Types.Exact<{
-  monthsBack?: Types.InputMaybe<Types.Scalars['Int']['input']>;
+  year: Types.Scalars['Int']['input'];
 }>;
 
 
@@ -137,12 +137,11 @@ export const GetCategoriesDocument = gql`
 export const GetIncomeStatsDocument = gql`
     query GetIncomeStats($includeNonRecurring: Boolean) {
   incomeStats(includeNonRecurring: $includeNonRecurring) {
-    yearRecurringTotal
-    lastMonthRecurringTotal
-    lastMonthRecurringChangePct
-    thisMonthRecurringTotal
-    thisMonthRecurringChangePct
-    last3MonthsRecurringAverage
+    lastYearTotal
+    thisYearTotal
+    thisMonthTotal
+    last3MonthsAverage
+    lastYearMonthlyAverage
   }
 }
     `;
@@ -158,8 +157,8 @@ export const GetIncomeStatsDocument = gql`
     }
   }
 export const GetIncomeMonthlyStatsDocument = gql`
-    query GetIncomeMonthlyStats($monthsBack: Int) {
-  incomeMonthlyStats(monthsBack: $monthsBack) {
+    query GetIncomeMonthlyStats($year: Int!) {
+  incomeMonthlyStats(year: $year) {
     year
     month
     recurringTotal

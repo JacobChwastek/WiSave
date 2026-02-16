@@ -98,27 +98,24 @@ export class IncomesGraphQLService {
     return this.#graphql.query<GetIncomeStatsQuery, GetIncomeStatsQueryVariables>(GetIncomeStatsDocument, { includeNonRecurring }).pipe(
       map((result) => ({
         data: {
-          yearRecurringTotal: result.data?.incomeStats.yearRecurringTotal ?? 0,
-          lastMonthRecurringTotal: result.data?.incomeStats.lastMonthRecurringTotal ?? 0,
-          lastMonthRecurringChangePct: result.data?.incomeStats.lastMonthRecurringChangePct ?? null,
-          thisMonthRecurringTotal: result.data?.incomeStats.thisMonthRecurringTotal ?? 0,
-          thisMonthRecurringChangePct: result.data?.incomeStats.thisMonthRecurringChangePct ?? null,
-          last3MonthsRecurringAverage: result.data?.incomeStats.last3MonthsRecurringAverage ?? 0,
+          lastYearTotal: result.data?.incomeStats.lastYearTotal ?? 0,
+          thisYearTotal: result.data?.incomeStats.thisYearTotal ?? 0,
+          thisMonthTotal: result.data?.incomeStats.thisMonthTotal ?? 0,
+          last3MonthsAverage: result.data?.incomeStats.last3MonthsAverage ?? 0,
+          lastYearMonthlyAverage: result.data?.incomeStats.lastYearMonthlyAverage ?? 0,
         },
         error: result.error,
       })),
     );
   }
 
-  getIncomeMonthlyStats(monthsBack = 5, offset = 0): Observable<IGraphQLResult<IIncomeMonthlyStats[]>> {
-    const skipMonths = offset * monthsBack;
+  getIncomeMonthlyStats(year: number): Observable<IGraphQLResult<IIncomeMonthlyStats[]>> {
     return this.#graphql
-      .query<GetIncomeMonthlyStatsQuery, GetIncomeMonthlyStatsQueryVariables>(GetIncomeMonthlyStatsDocument, { monthsBack: monthsBack + skipMonths })
+      .query<GetIncomeMonthlyStatsQuery, GetIncomeMonthlyStatsQueryVariables>(GetIncomeMonthlyStatsDocument, { year })
       .pipe(
         map((result) => {
           const stats = result.data?.incomeMonthlyStats ?? [];
-          const sliced = skipMonths === 0 ? stats.slice(-monthsBack) : stats.slice(0, stats.length - skipMonths).slice(-monthsBack);
-          return { data: sliced, error: result.error };
+          return { data: stats, error: result.error };
         }),
       );
   }
