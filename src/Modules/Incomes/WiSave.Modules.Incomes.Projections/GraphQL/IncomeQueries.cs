@@ -56,9 +56,9 @@ public sealed class IncomeQueries
 
     public async Task<IEnumerable<MonthlyIncomeStats>> GetIncomeMonthlyStats(
         [Service] IncomeStatsService statsService,
-        int monthsBack = 12,
+        int year,
         CancellationToken ct = default)
     {
-        return await statsService.GetMonthlyStats(monthsBack, ct);
+        return await statsService.GetMonthlyStats(year, ct);
     }
 }

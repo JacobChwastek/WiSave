@@ -13,55 +13,41 @@ public sealed class IncomeStatsService(IMongoCollection<IncomeDocument> collecti
     {
         var now = DateTime.UtcNow;
         var startOfThisYear = new DateTime(now.Year, 1, 1, 0, 0, 0, DateTimeKind.Utc);
+        var startOfLastYear = new DateTime(now.Year - 1, 1, 1, 0, 0, 0, DateTimeKind.Utc);
         var startOfThisMonth = new DateTime(now.Year, now.Month, 1, 0, 0, 0, DateTimeKind.Utc);
-        var startOfLastMonth = startOfThisMonth.AddMonths(-1);
-        var startOfTwoMonthsAgo = startOfThisMonth.AddMonths(-2);
         var startOfThreeMonthsAgo = startOfThisMonth.AddMonths(-3);
 
         var baseFilter = includeNonRecurring
             ? Builders<IncomeDocument>.Filter.Empty
             : Builders<IncomeDocument>.Filter.Eq(x => x.Recurring, true);
 
-        var yearRecurring = await MongoAggregationHelper.SumForPeriod(
+        var lastYearTotal = await MongoAggregationHelper.SumForPeriod(
+            collection, baseFilter, x => x.Date, x => x.Amount, startOfLastYear, startOfThisYear, ct);
+
+        var thisYearTotal = await MongoAggregationHelper.SumForPeriod(
             collection, baseFilter, x => x.Date, x => x.Amount, startOfThisYear, now, ct);
 
-        var lastMonthRecurring = await MongoAggregationHelper.SumForPeriod(
-            collection, baseFilter, x => x.Date, x => x.Amount, startOfLastMonth, startOfThisMonth, ct);
-
-        var twoMonthsAgoRecurring = await MongoAggregationHelper.SumForPeriod(
-            collection, baseFilter, x => x.Date, x => x.Amount, startOfTwoMonthsAgo, startOfLastMonth, ct);
-
-        var thisMonthRecurring = await MongoAggregationHelper.SumForPeriod(
+        var thisMonthTotal = await MongoAggregationHelper.SumForPeriod(
             collection, baseFilter, x => x.Date, x => x.Amount, startOfThisMonth, now, ct);
 
-        var last3FullMonthsRecurring = await MongoAggregationHelper.SumForPeriod(
+        var last3FullMonths = await MongoAggregationHelper.SumForPeriod(
             collection, baseFilter, x => x.Date, x => x.Amount, startOfThreeMonthsAgo, startOfThisMonth, ct);
 
-        var last3MonthsAverage = last3FullMonthsRecurring / 3m;
-
         return new IncomeStats(
-            YearRecurringTotal: yearRecurring,
-            LastMonthRecurringTotal: lastMonthRecurring,
-            LastMonthRecurringChangePct: StatisticsHelper.CalculateChangePercent(lastMonthRecurring, twoMonthsAgoRecurring),
-            ThisMonthRecurringTotal: thisMonthRecurring,
-            ThisMonthRecurringChangePct: StatisticsHelper.CalculateChangePercent(thisMonthRecurring, lastMonthRecurring),
-            Last3MonthsRecurringAverage: last3MonthsAverage
+            LastYearTotal: lastYearTotal,
+            ThisYearTotal: thisYearTotal,
+            ThisMonthTotal: thisMonthTotal,
+            Last3MonthsAverage: last3FullMonths / 3m,
+            LastYearMonthlyAverage: lastYearTotal / 12m
         );
     }
 
     public async Task<IEnumerable<MonthlyIncomeStats>> GetMonthlyStats(
-        int monthsBack = 12,
+        int year,
         CancellationToken ct = default)
     {
-        if (monthsBack < 1)
-        {
-            return Enumerable.Empty<MonthlyIncomeStats>();
-        }
-
-        var now = DateTime.UtcNow;
-        var startOfThisMonth = new DateTime(now.Year, now.Month, 1, 0, 0, 0, DateTimeKind.Utc);
-        var startMonth = startOfThisMonth.AddMonths(-(monthsBack - 1));
-        var endMonth = startOfThisMonth.AddMonths(1);
+        var startMonth = new DateTime(year, 1, 1, 0, 0, 0, DateTimeKind.Utc);
+        var endMonth = new DateTime(year + 1, 1, 1, 0, 0, 0, DateTimeKind.Utc);
 
         var dateFilter = Builders<IncomeDocument>.Filter.Gte(x => x.Date, startMonth)
             & Builders<IncomeDocument>.Filter.Lt(x => x.Date, endMonth);
