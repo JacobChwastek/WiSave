@@ -17,8 +17,8 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  setup:
-    name: Setup Dependencies
+  lint:
+    name: Lint + Format + Typecheck + Codegen Drift
     runs-on: ubuntu-latest
     defaults:
       run:
@@ -40,40 +40,6 @@ jobs:
       - name: Install dependencies
         run: yarn install --immutable
 
-      - name: Upload dependencies artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: ui-node-modules
-          path: |
-            ui/node_modules
-            ui/.yarn/install-state.gz
-          retention-days: 1
-
-  lint:
-    name: Lint + Format + Typecheck + Codegen Drift
-    runs-on: ubuntu-latest
-    needs: setup
-    defaults:
-      run:
-        working-directory: ui
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      - name: Enable Corepack
-        run: corepack enable
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: 22
-
-      - name: Download dependencies artifact
-        uses: actions/download-artifact@v4
-        with:
-          name: ui-node-modules
-          path: ui
-
       - name: Run ESLint
         run: yarn lint
 
@@ -91,7 +57,6 @@ jobs:
   test:
     name: Unit Tests + Coverage
     runs-on: ubuntu-latest
-    needs: setup
     defaults:
       run:
         working-directory: ui
@@ -106,12 +71,11 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 22
+          cache: yarn
+          cache-dependency-path: ui/yarn.lock
 
-      - name: Download dependencies artifact
-        uses: actions/download-artifact@v4
-        with:
-          name: ui-node-modules
-          path: ui
+      - name: Install dependencies
+        run: yarn install --immutable
 
       - name: Run tests with coverage (fail on errors)
         env:
@@ -128,7 +92,6 @@ jobs:
   build:
     name: Production Build + Bundle Size
     runs-on: ubuntu-latest
-    needs: setup
     defaults:
       run:
         working-directory: ui
@@ -143,12 +106,11 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 22
+          cache: yarn
+          cache-dependency-path: ui/yarn.lock
 
-      - name: Download dependencies artifact
-        uses: actions/download-artifact@v4
-        with:
-          name: ui-node-modules
-          path: ui
+      - name: Install dependencies
+        run: yarn install --immutable
 
       - name: Build app (fail on errors)
         run: yarn build
@@ -178,7 +140,6 @@ jobs:
   advisory:
     name: Dependency Advisory (warning-only)
     runs-on: ubuntu-latest
-    needs: setup
     defaults:
       run:
         working-directory: ui
@@ -193,12 +154,11 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 22
+          cache: yarn
+          cache-dependency-path: ui/yarn.lock
 
-      - name: Download dependencies artifact
-        uses: actions/download-artifact@v4
-        with:
-          name: ui-node-modules
-          path: ui
+      - name: Install dependencies
+        run: yarn install --immutable
 
       - name: Vulnerability and update checks (warning-only)
         run: |
