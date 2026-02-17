@@ -1,0 +1,243 @@
+name: UI CI
+
+on:
+  push:
+    branches: [master]
+    paths:
+      - "ui/**"
+      - ".github/workflows/ui-ci.yml"
+  pull_request:
+    branches: [master]
+    paths:
+      - "ui/**"
+      - ".github/workflows/ui-ci.yml"
+
+concurrency:
+  group: ui-ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  setup:
+    name: Setup Dependencies
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ui
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: yarn
+          cache-dependency-path: ui/yarn.lock
+
+      - name: Enable Corepack
+        run: corepack enable
+
+      - name: Install dependencies
+        run: yarn install --immutable
+
+      - name: Upload node_modules artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ui-node-modules
+          path: ui/node_modules
+          retention-days: 1
+
+  lint:
+    name: Lint + Format + Typecheck + Codegen Drift
+    runs-on: ubuntu-latest
+    needs: setup
+    defaults:
+      run:
+        working-directory: ui
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Enable Corepack
+        run: corepack enable
+
+      - name: Download node_modules artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: ui-node-modules
+          path: ui/node_modules
+
+      - name: Run ESLint
+        run: yarn lint
+
+      - name: Check formatting
+        run: yarn format:check
+
+      - name: TypeScript type check
+        run: yarn tsc --noEmit -p tsconfig.app.json && yarn tsc --noEmit -p tsconfig.spec.json
+
+      - name: Verify GraphQL codegen is up to date
+        run: |
+          yarn codegen
+          git diff --exit-code -- . || (echo "Codegen output is outdated. Run 'yarn codegen' and commit generated files." && exit 1)
+
+  test:
+    name: Unit Tests + Coverage
+    runs-on: ubuntu-latest
+    needs: setup
+    defaults:
+      run:
+        working-directory: ui
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Enable Corepack
+        run: corepack enable
+
+      - name: Download node_modules artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: ui-node-modules
+          path: ui/node_modules
+
+      - name: Run tests with coverage (fail on errors)
+        env:
+          CI: true
+        run: yarn test --watch=false --code-coverage
+
+      - name: Upload coverage report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: ui-coverage
+          path: ui/coverage
+
+  build:
+    name: Production Build + Bundle Size
+    runs-on: ubuntu-latest
+    needs: setup
+    defaults:
+      run:
+        working-directory: ui
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Enable Corepack
+        run: corepack enable
+
+      - name: Download node_modules artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: ui-node-modules
+          path: ui/node_modules
+
+      - name: Build app (fail on errors)
+        run: yarn build
+
+      - name: Generate bundle size report
+        run: |
+          mkdir -p ci-reports
+          du -sh dist > ci-reports/dist-total-size.txt
+          find dist -type f -name "*.js" -exec du -h {} + | sort -h | tail -n 30 > ci-reports/top-js-assets.txt
+          {
+            echo "## Build size summary"
+            echo ""
+            echo "### Total dist size"
+            cat ci-reports/dist-total-size.txt
+            echo ""
+            echo "### Top 30 JS assets by size"
+            cat ci-reports/top-js-assets.txt
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Upload build size report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: ui-build-size-report
+          path: ui/ci-reports
+
+  advisory:
+    name: Dependency Advisory (warning-only)
+    runs-on: ubuntu-latest
+    needs: setup
+    defaults:
+      run:
+        working-directory: ui
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Enable Corepack
+        run: corepack enable
+
+      - name: Download node_modules artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: ui-node-modules
+          path: ui/node_modules
+
+      - name: Vulnerability and update checks (warning-only)
+        run: |
+          set +e
+
+          yarn npm audit --all > audit-report.txt 2>&1
+          AUDIT_EXIT=$?
+          if [ $AUDIT_EXIT -ne 0 ]; then
+            echo "::warning title=Dependency vulnerabilities detected::Check ui/audit-report.txt artifact."
+          fi
+
+          yarn outdated > outdated-report.txt 2>&1
+          OUTDATED_EXIT=$?
+          if [ $OUTDATED_EXIT -ne 0 ]; then
+            echo "::warning title=Outdated packages detected::Check ui/outdated-report.txt artifact."
+          fi
+
+          {
+            echo "## Dependency advisory summary"
+            echo ""
+            if [ $AUDIT_EXIT -ne 0 ]; then
+              echo "- ⚠️ Vulnerabilities found by \`yarn npm audit --all\`"
+            else
+              echo "- ✅ No vulnerabilities found by \`yarn npm audit --all\`"
+            fi
+            if [ $OUTDATED_EXIT -ne 0 ]; then
+              echo "- ⚠️ Outdated packages found by \`yarn outdated\`"
+            else
+              echo "- ✅ No outdated packages found by \`yarn outdated\`"
+            fi
+            echo ""
+            echo "Detailed logs are uploaded as workflow artifacts."
+          } >> "$GITHUB_STEP_SUMMARY"
+
+          exit 0
+
+      - name: Upload advisory reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: ui-dependency-advisory
+          path: |
+            ui/audit-report.txt
+            ui/outdated-report.txt
