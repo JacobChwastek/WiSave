@@ -72,7 +72,7 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: ui-node-modules
-          path: .
+          path: ui
 
       - name: Run ESLint
         run: yarn lint
@@ -111,7 +111,7 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: ui-node-modules
-          path: .
+          path: ui
 
       - name: Run tests with coverage (fail on errors)
         env:
@@ -148,7 +148,7 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: ui-node-modules
-          path: .
+          path: ui
 
       - name: Build app (fail on errors)
         run: yarn build
@@ -198,7 +198,7 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: ui-node-modules
-          path: .
+          path: ui
 
       - name: Vulnerability and update checks (warning-only)
         run: |
