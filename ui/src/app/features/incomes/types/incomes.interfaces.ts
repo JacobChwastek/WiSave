@@ -9,6 +9,7 @@ export interface IIncome {
   category: string[];
   amount: IMoney;
   recurring?: boolean;
+  metadata?: Record<string, string>;
 }
 
 export type { IncomeId };

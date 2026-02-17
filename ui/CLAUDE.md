@@ -40,6 +40,9 @@ yarn start
 # Production build
 yarn build
 
+# Development build (watch mode)
+yarn watch
+
 # Run all tests
 yarn test
 
@@ -49,11 +52,26 @@ yarn lint
 # Lint and auto-fix
 yarn lint:fix
 
+# ESLint only
+yarn eslint
+
+# ESLint auto-fix
+yarn eslint:fix
+
 # Format code with Prettier
 yarn format
 
 # Check formatting without changes
 yarn format:check
+
+# GraphQL codegen
+yarn codegen
+
+# Update schema and regenerate types
+yarn schema:update
+
+# Watch GraphQL codegen
+yarn codegen:watch
 ```
 
 ## Architecture
@@ -70,10 +88,41 @@ signalStore({ providedIn: 'root' },
 )
 ```
 
-Stores are located in `features/<feature>/store/`. Access store in components using `inject()`:
+Stores are located in `features/<feature>/+store/`. The `+` prefix signals that the directory is a framework-level integration layer (inspired by SvelteKit/Analog conventions) — it contains store definitions, events, reducers, state, and event handlers, but no UI components. Access store in components using `inject()`:
 ```typescript
 #store = inject(IncomesStore);
 incomes = this.#store.incomes();
+```
+
+#### Event Handlers & RxJS Flattening Operators
+
+Event handlers use `@ngrx/signals/events` with `withEventHandlers`. Choose the flattening operator based on intent:
+
+| Operator | Use When | Example |
+|----------|----------|---------|
+| `exhaustMap` | Trigger should be ignored while a request is in-flight (prevent duplicate loads) | Page opened, select by ID |
+| `switchMap` | New parameter should cancel the in-flight request and start a fresh one | Filter/sort/page changes |
+
+#### Typing Event Handlers
+
+Use `signalStoreFeature` input constraints and `withProps` to avoid `any` on the store parameter:
+
+```typescript
+export function withFeatureEventHandlers() {
+  return signalStoreFeature(
+    { state: type<Pick<FeatureState, 'neededProp1' | 'neededProp2'>>() },
+    withProps(() => ({
+      _events: inject(Events),
+      _api: inject(FeatureApiService),
+    })),
+    withEventHandlers((store) => ({
+      // store is fully typed — no `any`
+      load$: store._events.on(pageEvents.opened).pipe(
+        exhaustMap(() => store._api.load(store.neededProp1())),
+      ),
+    })),
+  );
+}
 ```
 
 ### Component Patterns
@@ -87,15 +136,17 @@ All components are standalone (no NgModules). Key patterns:
 
 ```
 features/<feature>/
+├── +store/         # NgRx Signal Store (events, reducers, state, event handlers)
 ├── components/     # Presentational components
 ├── containers/     # Smart components (state-connected)
-├── store/          # NgRx Signal Store
 ├── types/          # Interfaces and types
 ├── views/          # Route-level components
 ├── services/       # Feature-specific services
 ├── helpers/        # Utility functions
 └── <feature>.routes.ts
 ```
+
+The `+store/` prefix convention marks the directory as a framework integration layer (not a UI layer). It may contain sub-stores (e.g., `+store/incomes/`, `+store/stats/`).
 
 ### Path Aliases
 
@@ -128,9 +179,24 @@ Features are lazy-loaded via router:
 
 Theme toggle managed by `ThemeService` with localStorage persistence.
 
+## GraphQL
+
+- Code generation is configured in `codegen.ts`.
+- Update schema + regenerate types: `yarn schema:update`
+- Regenerate types only: `yarn codegen`
+
+## Additional Docs
+
+- `../docs/README.md` - Entry point for project docs
+- `../docs/architecture.md` - Architecture overview
+- `../docs/commit-conventions.md` - Commit rules
+- `../docs/graphql-workflow.md` - GraphQL workflow details
+- `../docs/module-development.md` - Module development guidelines
+- `../docs/frontend-state-management.md` - Store conventions, event handlers, RxJS operators
+
 ## Testing
 
-Uses Vitest (not Karma/Jasmine). Tests follow `*.spec.ts` pattern.
+Tests run via Angular CLI (`ng test`) using the `@angular/build:unit-test` builder. Tests follow `*.spec.ts` pattern.
 
 ## Linting (ESLint)
 
@@ -150,10 +216,10 @@ The boundaries plugin enforces layer separation:
 | `core/` | core only | shared, features, layout |
 | `shared/` | core, shared | features, layout |
 | `layout/` | core, shared, layout | features |
-| `feature/components/` | core, shared, types | **store**, other features |
-| `feature/containers/` | core, shared, types, components, store | other features |
+| `feature/components/` | core, shared, types | **+store**, other features |
+| `feature/containers/` | core, shared, types, components, +store | other features |
 | `feature/views/` | all feature internals, core, shared | other features |
-| `feature/store/` | core, types, services, helpers | components, other features |
+| `feature/+store/` | core, types, services, helpers | components, other features |
 
 **Key rules:**
 - Presentational components (`components/`) cannot access store
@@ -184,6 +250,7 @@ interface IIncome {
 - Signal-based inputs (`input()`, `input.required()`)
 - Standalone components (no NgModules)
 - `inject()` function for DI
+- Built-in control flow (`@if`, `@for`, `@switch`)
 
 ## Naming Conventions
 
@@ -248,6 +315,7 @@ refactor: extract table pagination to shared component
 - Use `output()` for event emitters
 - Use `computed()` for derived state
 - Use `effect()` sparingly, prefer declarative patterns
+- Prefer built-in control flow (`@if`, `@for`, `@switch`) over `*ngIf`/`*ngFor`
 
 ### Don't
 
@@ -255,7 +323,7 @@ refactor: extract table pagination to shared component
 - Don't use constructor injection — use `inject()`
 - Don't import from other features directly — use `core/` for shared state
 - Don't access store from presentational components
-- Don't use `OnPush` change detection — app is zoneless
+- Don't rely on manual change detection (`ChangeDetectorRef`, `markForCheck`) — app is zoneless; prefer signals/async pipe patterns
 - Don't use `BehaviorSubject` for state — use Signal Store
 - Don't mutate state directly — use store methods
 - Don't use `ngOnInit` for simple initialization — use `inject()` or field initializers

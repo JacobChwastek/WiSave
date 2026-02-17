@@ -4,8 +4,6 @@ import { map, type Observable } from 'rxjs';
 import { GraphQLService } from '@graphql/services/graphql.service';
 import type { IGraphQLResult } from '@graphql/types/graphql.types';
 
-import { type ICursorPaginationParams } from '@shared/types';
-
 import {
   GetCategoriesDocument,
   GetIncomeByIdDocument,
@@ -25,25 +23,10 @@ import {
   type GetTotalAmountQuery,
   type GetTotalAmountQueryVariables,
 } from '../graphql/incomes.queries.generated';
-import { type IIncomeMonthlyStats, type IIncomesFilter, type IIncomesSortOrder, type IIncomeStats } from '../store/incomes.state';
+import { type IIncomeMonthlyStats, type IIncomesFilter, type IIncomeStats } from '../types/incomes-state.types';
 import type { IIncome, IncomeId } from '../types/incomes.interfaces';
+import type { IIncomesQueryParams, IIncomesQueryResult } from '../types/incomes-query.types';
 import { IncomesMapperService } from './incomes-mapper.service';
-
-export interface IIncomesQueryResult {
-  incomes: IIncome[];
-  totalCount: number;
-  pageInfo: {
-    hasNextPage: boolean;
-    hasPreviousPage: boolean;
-    startCursor: string | null;
-    endCursor: string | null;
-  };
-}
-
-export interface IIncomesQueryParams extends ICursorPaginationParams {
-  filter?: IIncomesFilter;
-  sort?: IIncomesSortOrder;
-}
 
 @Injectable({ providedIn: 'root' })
 export class IncomesGraphQLService {
@@ -115,27 +98,24 @@ export class IncomesGraphQLService {
     return this.#graphql.query<GetIncomeStatsQuery, GetIncomeStatsQueryVariables>(GetIncomeStatsDocument, { includeNonRecurring }).pipe(
       map((result) => ({
         data: {
-          yearRecurringTotal: result.data?.incomeStats.yearRecurringTotal ?? 0,
-          lastMonthRecurringTotal: result.data?.incomeStats.lastMonthRecurringTotal ?? 0,
-          lastMonthRecurringChangePct: result.data?.incomeStats.lastMonthRecurringChangePct ?? null,
-          thisMonthRecurringTotal: result.data?.incomeStats.thisMonthRecurringTotal ?? 0,
-          thisMonthRecurringChangePct: result.data?.incomeStats.thisMonthRecurringChangePct ?? null,
-          last3MonthsRecurringAverage: result.data?.incomeStats.last3MonthsRecurringAverage ?? 0,
+          lastYearTotal: result.data?.incomeStats.lastYearTotal ?? 0,
+          thisYearTotal: result.data?.incomeStats.thisYearTotal ?? 0,
+          thisMonthTotal: result.data?.incomeStats.thisMonthTotal ?? 0,
+          last3MonthsAverage: result.data?.incomeStats.last3MonthsAverage ?? 0,
+          lastYearMonthlyAverage: result.data?.incomeStats.lastYearMonthlyAverage ?? 0,
         },
         error: result.error,
       })),
     );
   }
 
-  getIncomeMonthlyStats(monthsBack = 5, offset = 0): Observable<IGraphQLResult<IIncomeMonthlyStats[]>> {
-    const skipMonths = offset * monthsBack;
+  getIncomeMonthlyStats(year: number): Observable<IGraphQLResult<IIncomeMonthlyStats[]>> {
     return this.#graphql
-      .query<GetIncomeMonthlyStatsQuery, GetIncomeMonthlyStatsQueryVariables>(GetIncomeMonthlyStatsDocument, { monthsBack: monthsBack + skipMonths })
+      .query<GetIncomeMonthlyStatsQuery, GetIncomeMonthlyStatsQueryVariables>(GetIncomeMonthlyStatsDocument, { year })
       .pipe(
         map((result) => {
           const stats = result.data?.incomeMonthlyStats ?? [];
-          const sliced = skipMonths === 0 ? stats.slice(-monthsBack) : stats.slice(0, stats.length - skipMonths).slice(-monthsBack);
-          return { data: sliced, error: result.error };
+          return { data: stats, error: result.error };
         }),
       );
   }

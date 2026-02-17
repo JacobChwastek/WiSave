@@ -1,17 +1,8 @@
-import { ChangeDetectionStrategy, Component, computed, input, output } from '@angular/core';
+import { Component, computed, input, output } from '@angular/core';
 
 import { Dialog } from 'primeng/dialog';
 
-export type DialogPosition =
-  | 'center'
-  | 'top'
-  | 'bottom'
-  | 'left'
-  | 'right'
-  | 'topleft'
-  | 'topright'
-  | 'bottomleft'
-  | 'bottomright';
+export type DialogPosition = 'center' | 'top' | 'bottom' | 'left' | 'right' | 'topleft' | 'topright' | 'bottomleft' | 'bottomright';
 
 export type DialogPositionInput = DialogPosition | 'top-left' | 'top-right' | 'bottom-left' | 'bottom-right';
 
@@ -32,7 +23,7 @@ const POSITION_ALIASES: Readonly<Record<DialogPositionInput, DialogPosition>> = 
 };
 
 const DEFAULT_DIALOG_STYLE: Readonly<Record<string, string>> = {
-  width: 'min(42rem, 92vw)',
+  width: 'min(56rem, 92vw)',
 };
 
 const DEFAULT_DIALOG_BREAKPOINTS: Readonly<Record<string, string>> = {
@@ -40,8 +31,7 @@ const DEFAULT_DIALOG_BREAKPOINTS: Readonly<Record<string, string>> = {
   '640px': '95vw',
 };
 
-const DEFAULT_DIALOG_STYLE_CLASS =
-  'rounded-2xl border border-secondary-200 bg-secondary-50 shadow-xl dark:border-dark-divider dark:bg-dark-primary-850';
+const DEFAULT_DIALOG_STYLE_CLASS = 'rounded-2xl border border-secondary-200 bg-secondary-50 shadow-xl dark:border-dark-divider dark:bg-dark-primary-850';
 
 const DEFAULT_DIALOG_CONTENT_CLASS = 'px-6 py-5 text-secondary-700 dark:text-dark-secondary-100';
 
@@ -53,7 +43,6 @@ const DEFAULT_DIALOG_MASK_CLASS = 'bg-secondary-900/40 backdrop-blur-[2px] dark:
   template: `
     <p-dialog
       [visible]="visible()"
-      (visibleChange)="visibleChange.emit($event)"
       [modal]="modal()"
       [dismissableMask]="dismissableMask()"
       [closeOnEscape]="closeOnEscape()"
@@ -71,9 +60,9 @@ const DEFAULT_DIALOG_MASK_CLASS = 'bg-secondary-900/40 backdrop-blur-[2px] dark:
       [styleClass]="dialogStyleClass()"
       [contentStyleClass]="contentStyleClassResolved()"
       [maskStyleClass]="maskStyleClassResolved()"
+      (visibleChange)="visibleChange.emit($event)"
       (onShow)="opened.emit()"
-      (onHide)="closed.emit()"
-    >
+      (onHide)="closed.emit()">
       <ng-template pTemplate="header">
         <ng-content select="[dialogHeader]" />
       </ng-template>
@@ -85,7 +74,6 @@ const DEFAULT_DIALOG_MASK_CLASS = 'bg-secondary-900/40 backdrop-blur-[2px] dark:
       </ng-template>
     </p-dialog>
   `,
-  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class AppDialogComponent {
   readonly visible = input<boolean>(false);
@@ -100,9 +88,9 @@ export class AppDialogComponent {
   readonly closable = input<boolean>(true);
   readonly draggable = input<boolean>(false);
   readonly resizable = input<boolean>(false);
-  readonly showHeader = input<boolean>(true);
+  readonly showHeader = input<boolean>(false);
   readonly blockScroll = input<boolean>(true);
-  readonly focusOnShow = input<boolean>(true);
+  readonly focusOnShow = input<boolean>(false);
 
   readonly position = input<DialogPositionInput>('center');
   readonly appendTo = input<'body' | 'self' | HTMLElement | null>('body');
@@ -117,15 +105,7 @@ export class AppDialogComponent {
 
   protected readonly dialogStyle = computed(() => this.style() ?? DEFAULT_DIALOG_STYLE);
   protected readonly resolvedPosition = computed(() => POSITION_ALIASES[this.position()]);
-  protected readonly dialogStyleClass = computed(() =>
-    this.styleClass() ? `${DEFAULT_DIALOG_STYLE_CLASS} ${this.styleClass()}` : DEFAULT_DIALOG_STYLE_CLASS,
-  );
-  protected readonly contentStyleClassResolved = computed(() =>
-    this.contentStyleClass()
-      ? `${DEFAULT_DIALOG_CONTENT_CLASS} ${this.contentStyleClass()}`
-      : DEFAULT_DIALOG_CONTENT_CLASS,
-  );
-  protected readonly maskStyleClassResolved = computed(() =>
-    this.maskStyleClass() ? `${DEFAULT_DIALOG_MASK_CLASS} ${this.maskStyleClass()}` : DEFAULT_DIALOG_MASK_CLASS,
-  );
+  protected readonly dialogStyleClass = computed(() => (this.styleClass() ? `${DEFAULT_DIALOG_STYLE_CLASS} ${this.styleClass()}` : DEFAULT_DIALOG_STYLE_CLASS));
+  protected readonly contentStyleClassResolved = computed(() => (this.contentStyleClass() ? `${DEFAULT_DIALOG_CONTENT_CLASS} ${this.contentStyleClass()}` : DEFAULT_DIALOG_CONTENT_CLASS));
+  protected readonly maskStyleClassResolved = computed(() => (this.maskStyleClass() ? `${DEFAULT_DIALOG_MASK_CLASS} ${this.maskStyleClass()}` : DEFAULT_DIALOG_MASK_CLASS));
 }

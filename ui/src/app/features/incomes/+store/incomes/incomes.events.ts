@@ -4,7 +4,7 @@ import { eventGroup } from '@ngrx/signals/events';
 
 import { type CursorDirection, type IPageInfo, type IStoreError } from '@shared/types';
 
-import { type IIncomeMonthlyStats, type IIncomeStats, type IncomeStatsScope, type IIncomesFilter, type IIncomesSortOrder, type MonthlyStatsScale } from './incomes.state';
+import { type IIncomeMonthlyStats, type IIncomeStats, type IncomeStatsScope, type IIncomesFilter, type IIncomesSortOrder } from '../../types/incomes-state.types';
 
 // UI/Component events - commands from user interactions
 export const incomesPageEvents = eventGroup({
@@ -20,8 +20,8 @@ export const incomesPageEvents = eventGroup({
     filtersCleared: type<void>(),
     sortChanged: type<{ sort: IIncomesSortOrder }>(),
     statsScopeChanged: type<{ scope: IncomeStatsScope }>(),
-    monthlyStatsNavigate: type<{ direction: 'back' | 'forward' }>(),
-    monthlyStatsScaleChanged: type<{ scale: MonthlyStatsScale }>(),
+    monthlyStatsYearChanged: type<{ direction: 'back' | 'forward' }>(),
+    selectIncome: type<{ id: IncomeId }>(),
   },
 });
 
@@ -43,5 +43,7 @@ export const incomesApiEvents = eventGroup({
     statsLoadedFailure: type<{ error: IStoreError }>(),
     monthlyStatsLoadedSuccess: type<{ stats: IIncomeMonthlyStats[] }>(),
     monthlyStatsLoadedFailure: type<{ error: IStoreError }>(),
+    fetchByIdSuccess: type<{ income: IIncome }>(),
+    fetchByIdFailure: type<{ error: IStoreError }>(),
   },
 });

@@ -1,5 +1,5 @@
 .stat-card {
-  @apply px-6 py-5;
+  @apply px-3 py-2 xl:px-5 xl:py-4 2xl:px-6 2xl:py-5;
 }
 
 .stat-card--standalone {
@@ -11,7 +11,7 @@
 }
 
 .stat-card__value {
-  @apply text-secondary-900 dark:text-dark-secondary-50 mt-3 text-3xl font-semibold tracking-tight;
+  @apply text-secondary-900 dark:text-dark-secondary-50 mt-1 text-xl font-semibold tracking-tight xl:mt-2 xl:text-2xl 2xl:mt-3 2xl:text-3xl;
 }
 
 .stat-card__description {

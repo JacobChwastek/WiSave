@@ -41,19 +41,18 @@ query GetCategories {
   categories
 }
 
-query GetIncomeStats($includeNonRecurring: Boolean) {
+query GetIncomeStats($includeNonRecurring: Boolean!) {
   incomeStats(includeNonRecurring: $includeNonRecurring) {
-    yearRecurringTotal
-    lastMonthRecurringTotal
-    lastMonthRecurringChangePct
-    thisMonthRecurringTotal
-    thisMonthRecurringChangePct
-    last3MonthsRecurringAverage
+    lastYearTotal
+    thisYearTotal
+    thisMonthTotal
+    last3MonthsAverage
+    lastYearMonthlyAverage
   }
 }
 
-query GetIncomeMonthlyStats($monthsBack: Int) {
-  incomeMonthlyStats(monthsBack: $monthsBack) {
+query GetIncomeMonthlyStats($year: Int!) {
+  incomeMonthlyStats(year: $year) {
     year
     month
     recurringTotal

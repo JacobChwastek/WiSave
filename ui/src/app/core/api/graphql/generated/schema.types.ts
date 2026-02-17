@@ -94,12 +94,11 @@ export type IncomeDocumentSortInput = {
 
 export type IncomeStats = {
   __typename?: 'IncomeStats';
-  last3MonthsRecurringAverage: Scalars['Decimal']['output'];
-  lastMonthRecurringChangePct?: Maybe<Scalars['Decimal']['output']>;
-  lastMonthRecurringTotal: Scalars['Decimal']['output'];
-  thisMonthRecurringChangePct?: Maybe<Scalars['Decimal']['output']>;
-  thisMonthRecurringTotal: Scalars['Decimal']['output'];
-  yearRecurringTotal: Scalars['Decimal']['output'];
+  last3MonthsAverage: Scalars['Decimal']['output'];
+  lastYearMonthlyAverage: Scalars['Decimal']['output'];
+  lastYearTotal: Scalars['Decimal']['output'];
+  thisMonthTotal: Scalars['Decimal']['output'];
+  thisYearTotal: Scalars['Decimal']['output'];
 };
 
 /** A connection to a list of items. */
@@ -169,7 +168,7 @@ export type QueryIncomeByIdArgs = {
 
 
 export type QueryIncomeMonthlyStatsArgs = {
-  monthsBack?: Scalars['Int']['input'];
+  year: Scalars['Int']['input'];
 };
 
 

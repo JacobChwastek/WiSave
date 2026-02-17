@@ -15,12 +15,11 @@ type IncomeDocument {
 }
 
 type IncomeStats {
-  yearRecurringTotal: Decimal!
-  lastMonthRecurringTotal: Decimal!
-  lastMonthRecurringChangePct: Decimal
-  thisMonthRecurringTotal: Decimal!
-  thisMonthRecurringChangePct: Decimal
-  last3MonthsRecurringAverage: Decimal!
+  lastYearTotal: Decimal!
+  thisYearTotal: Decimal!
+  thisMonthTotal: Decimal!
+  last3MonthsAverage: Decimal!
+  lastYearMonthlyAverage: Decimal!
 }
 
 "A connection to a list of items."
@@ -68,7 +67,7 @@ type Query {
   totalAmount(currency: String): Decimal! @cost(weight: "10")
   categories: [String!]! @cost(weight: "10")
   incomeStats(includeNonRecurring: Boolean! = false): IncomeStats! @cost(weight: "10")
-  incomeMonthlyStats(monthsBack: Int! = 12): [MonthlyIncomeStats!]! @cost(weight: "10")
+  incomeMonthlyStats(year: Int!): [MonthlyIncomeStats!]! @cost(weight: "10")
 }
 
 input BooleanOperationFilterInput {

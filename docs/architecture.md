@@ -111,6 +111,8 @@ ui/
 │   ├── core/          # Singleton services, API clients, GraphQL setup
 │   ├── shared/        # Reusable components, types, utilities
 │   ├── features/      # Feature modules (incomes, etc.)
+│   │   └── <feature>/
+│   │       └── +store/    # NgRx Signal Store (events, reducers, state, event handlers)
 │   └── layout/        # App shell, navigation
 └── schema.graphql     # Local copy for codegen (generated, gitignored)
 ```

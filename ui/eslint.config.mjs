@@ -28,6 +28,15 @@ export default tseslint.config(
       'no-secrets': noSecretsPlugin,
     },
     settings: {
+      'import/resolver': {
+        './eslint-import-resolver-local-ts.cjs': {
+          project: ['./tsconfig.json', './tsconfig.app.json', './tsconfig.spec.json'],
+        },
+        node: {
+          extensions: ['.js', '.mjs', '.cjs', '.ts', '.tsx', '.d.ts', '.json'],
+        },
+      },
+      'boundaries/dependency-nodes': ['import', 'dynamic-import', 'export'],
       'boundaries/elements': [
         // App layers
         { type: 'core', pattern: 'src/app/core/**', mode: 'full' },
@@ -38,10 +47,12 @@ export default tseslint.config(
         { type: 'feature-component', pattern: 'src/app/features/*/components/**', mode: 'full', capture: ['feature'] },
         { type: 'feature-container', pattern: 'src/app/features/*/containers/**', mode: 'full', capture: ['feature'] },
         { type: 'feature-view', pattern: 'src/app/features/*/views/**', mode: 'full', capture: ['feature'] },
-        { type: 'feature-store', pattern: 'src/app/features/*/store/**', mode: 'full', capture: ['feature'] },
+        { type: 'feature-store', pattern: 'src/app/features/*/+store/**', mode: 'full', capture: ['feature'] },
         { type: 'feature-type', pattern: 'src/app/features/*/types/**', mode: 'full', capture: ['feature'] },
         { type: 'feature-service', pattern: 'src/app/features/*/services/**', mode: 'full', capture: ['feature'] },
         { type: 'feature-helper', pattern: 'src/app/features/*/helpers/**', mode: 'full', capture: ['feature'] },
+        { type: 'feature-constant', pattern: 'src/app/features/*/constants/**', mode: 'full', capture: ['feature'] },
+        { type: 'feature-graphql', pattern: 'src/app/features/*/graphql/**', mode: 'full', capture: ['feature'] },
         { type: 'feature-route', pattern: 'src/app/features/*/*.routes.ts', mode: 'full', capture: ['feature'] },
         { type: 'feature', pattern: 'src/app/features/*/**', mode: 'full', capture: ['feature'] },
 
@@ -71,43 +82,168 @@ export default tseslint.config(
             // Layout can import from core, shared, and layout
             { from: 'layout', allow: ['core', 'shared', 'layout'] },
 
-            // Feature routes can import views and feature internals
-            { from: 'feature-route', allow: ['core', 'shared', 'feature-view', 'feature-store'] },
+            // Feature routes can import same-feature internals and app shared/core
+            {
+              from: 'feature-route',
+              allow: [
+                'core',
+                'shared',
+                ['feature-view', { feature: '${from.feature}' }],
+                ['feature-store', { feature: '${from.feature}' }],
+                ['feature-type', { feature: '${from.feature}' }],
+                ['feature-service', { feature: '${from.feature}' }],
+                ['feature-helper', { feature: '${from.feature}' }],
+                ['feature-component', { feature: '${from.feature}' }],
+                ['feature-container', { feature: '${from.feature}' }],
+                ['feature-constant', { feature: '${from.feature}' }],
+              ],
+            },
 
-            // Feature types can only import from core types
-            { from: 'feature-type', allow: ['core'] },
+            // Feature types can import core and same-feature types/constants
+            {
+              from: 'feature-type',
+              allow: [
+                'core',
+                'shared',
+                ['feature-type', { feature: '${from.feature}' }],
+                ['feature-constant', { feature: '${from.feature}' }],
+              ],
+            },
 
-            // Feature services can import types and core
-            { from: 'feature-service', allow: ['core', 'feature-type'] },
+            // Feature services can import same-feature internals and core
+            {
+              from: 'feature-service',
+              allow: [
+                'core',
+                ['feature-type', { feature: '${from.feature}' }],
+                ['feature-service', { feature: '${from.feature}' }],
+                ['feature-helper', { feature: '${from.feature}' }],
+                ['feature-graphql', { feature: '${from.feature}' }],
+                ['feature-constant', { feature: '${from.feature}' }],
+              ],
+            },
 
-            // Feature helpers can import types and core
-            { from: 'feature-helper', allow: ['core', 'feature-type'] },
+            // Feature helpers can import same-feature types/helpers/constants and core
+            {
+              from: 'feature-helper',
+              allow: [
+                'core',
+                ['feature-type', { feature: '${from.feature}' }],
+                ['feature-helper', { feature: '${from.feature}' }],
+                ['feature-constant', { feature: '${from.feature}' }],
+              ],
+            },
 
-            // Feature store can import types, services, helpers, and core
-            { from: 'feature-store', allow: ['core', 'feature-type', 'feature-service', 'feature-helper'] },
+            // Feature store can import same-feature types/services/helpers/store/constants and core
+            {
+              from: 'feature-store',
+              allow: [
+                'core',
+                'shared',
+                ['feature-type', { feature: '${from.feature}' }],
+                ['feature-service', { feature: '${from.feature}' }],
+                ['feature-helper', { feature: '${from.feature}' }],
+                ['feature-store', { feature: '${from.feature}' }],
+                ['feature-constant', { feature: '${from.feature}' }],
+              ],
+            },
 
             // Feature components (presentational) - NO store access
-            { from: 'feature-component', allow: ['core', 'shared', 'feature-type', 'feature-component'] },
+            {
+              from: 'feature-component',
+              allow: [
+                'core',
+                'shared',
+                ['feature-type', { feature: '${from.feature}' }],
+                ['feature-component', { feature: '${from.feature}' }],
+                ['feature-helper', { feature: '${from.feature}' }],
+                ['feature-constant', { feature: '${from.feature}' }],
+              ],
+            },
 
-            // Feature containers can import components, store, types
-            { from: 'feature-container', allow: ['core', 'shared', 'feature-type', 'feature-component', 'feature-store', 'feature-service'] },
+            // Feature containers can import same-feature UI/store/services/types and core/shared
+            {
+              from: 'feature-container',
+              allow: [
+                'core',
+                'shared',
+                ['feature-type', { feature: '${from.feature}' }],
+                ['feature-component', { feature: '${from.feature}' }],
+                ['feature-container', { feature: '${from.feature}' }],
+                ['feature-store', { feature: '${from.feature}' }],
+                ['feature-service', { feature: '${from.feature}' }],
+                ['feature-helper', { feature: '${from.feature}' }],
+                ['feature-constant', { feature: '${from.feature}' }],
+              ],
+            },
 
-            // Feature views can import everything within feature + shared/core
-            { from: 'feature-view', allow: ['core', 'shared', 'feature-type', 'feature-component', 'feature-container', 'feature-store', 'feature-service'] },
+            // Feature views can import same-feature internals + shared/core
+            {
+              from: 'feature-view',
+              allow: [
+                'core',
+                'shared',
+                ['feature-view', { feature: '${from.feature}' }],
+                ['feature-type', { feature: '${from.feature}' }],
+                ['feature-component', { feature: '${from.feature}' }],
+                ['feature-container', { feature: '${from.feature}' }],
+                ['feature-store', { feature: '${from.feature}' }],
+                ['feature-service', { feature: '${from.feature}' }],
+                ['feature-helper', { feature: '${from.feature}' }],
+                ['feature-constant', { feature: '${from.feature}' }],
+              ],
+            },
+
+            // Feature constants can import core/shared and same-feature constants/types
+            {
+              from: 'feature-constant',
+              allow: [
+                'core',
+                'shared',
+                ['feature-constant', { feature: '${from.feature}' }],
+                ['feature-type', { feature: '${from.feature}' }],
+              ],
+            },
+
+            // Feature GraphQL files can import core and same-feature GraphQL files
+            {
+              from: 'feature-graphql',
+              allow: [
+                'core',
+                ['feature-graphql', { feature: '${from.feature}' }],
+              ],
+            },
 
             // Generic feature (catch-all)
-            { from: 'feature', allow: ['core', 'shared', 'feature-type', 'feature-component', 'feature-container', 'feature-store', 'feature-service', 'feature-helper'] },
+            {
+              from: 'feature',
+              allow: [
+                'core',
+                'shared',
+                ['feature-type', { feature: '${from.feature}' }],
+                ['feature-component', { feature: '${from.feature}' }],
+                ['feature-container', { feature: '${from.feature}' }],
+                ['feature-store', { feature: '${from.feature}' }],
+                ['feature-service', { feature: '${from.feature}' }],
+                ['feature-helper', { feature: '${from.feature}' }],
+                ['feature-constant', { feature: '${from.feature}' }],
+                ['feature-graphql', { feature: '${from.feature}' }],
+              ],
+            },
 
             // Features root routing
             { from: 'features-routing', allow: ['feature-route'] },
 
             // App root files
-            { from: 'app', allow: ['core', 'shared', 'layout', 'feature', 'feature-route', 'features-routing', 'app'] },
+            { from: 'app', allow: ['core', 'shared', 'layout', 'feature', 'feature-route', 'features-routing', 'app', 'src-root'] },
             { from: 'main', allow: ['app'] },
             { from: 'src-root', allow: ['core', 'shared'] },
           ],
         },
       ],
+
+      // Prevent unknown imports between local files
+      'boundaries/no-unknown': 'error',
 
       // Prevent unknown files outside defined elements
       'boundaries/no-unknown-files': ['error'],
@@ -169,6 +305,69 @@ export default tseslint.config(
         {
           selector: "TSParameterProperty[accessibility='private']",
           message: 'Use # private fields instead of private constructor parameters.',
+        },
+        {
+          selector:
+            "ClassDeclaration:has(Decorator[expression.callee.name='Component']) MethodDefinition[kind='constructor'] > FunctionExpression[params.length>0]",
+          message: 'Use inject() instead of constructor injection.',
+        },
+        {
+          selector:
+            "ClassDeclaration:has(Decorator[expression.callee.name='Directive']) MethodDefinition[kind='constructor'] > FunctionExpression[params.length>0]",
+          message: 'Use inject() instead of constructor injection.',
+        },
+        {
+          selector:
+            "ClassDeclaration:has(Decorator[expression.callee.name='Pipe']) MethodDefinition[kind='constructor'] > FunctionExpression[params.length>0]",
+          message: 'Use inject() instead of constructor injection.',
+        },
+        {
+          selector:
+            "ClassDeclaration:has(Decorator[expression.callee.name='Injectable']) MethodDefinition[kind='constructor'] > FunctionExpression[params.length>0]",
+          message: 'Use inject() instead of constructor injection.',
+        },
+        {
+          selector:
+            "Property[key.name='changeDetection'][value.type='MemberExpression'][value.object.name='ChangeDetectionStrategy'][value.property.name='OnPush']",
+          message: 'Do not use OnPush change detection; app is zoneless.',
+        },
+      ],
+
+      // Disallow importing ChangeDetectionStrategy (OnPush is not used)
+      'no-restricted-imports': [
+        'error',
+        {
+          paths: [
+            {
+              name: '@angular/core',
+              importNames: ['Input', 'Output', 'EventEmitter'],
+              message: 'Use signal inputs/outputs (input(), output()) instead of @Input/@Output/EventEmitter.',
+            },
+            {
+              name: '@angular/core',
+              importNames: ['ChangeDetectionStrategy'],
+              message: 'Do not import ChangeDetectionStrategy; OnPush is not used in this app.',
+            },
+            {
+              name: '@angular/core',
+              importNames: ['ChangeDetectorRef', 'NgZone'],
+              message: 'Do not import ChangeDetectorRef or NgZone; app is zoneless.',
+            },
+          ],
+        },
+      ],
+
+      // Warn on BehaviorSubject usage (prefer Signal Store or signals)
+      '@typescript-eslint/no-restricted-imports': [
+        'warn',
+        {
+          paths: [
+            {
+              name: 'rxjs',
+              importNames: ['BehaviorSubject'],
+              message: 'Avoid BehaviorSubject for state; prefer Signal Store or signals.',
+            },
+          ],
         },
       ],
 

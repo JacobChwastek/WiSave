@@ -8,9 +8,9 @@ import { TableModule } from 'primeng/table';
 import { IncomesTableComponent, type IFilterAppliedEvent } from '@features/incomes/components/incomes-table/incomes-table.component';
 import { MonthlyIncomeChartComponent } from '@features/incomes/components/monthly-income-chart/monthly-income-chart.component';
 import { INCOMES_ROUTES } from '@features/incomes/constants/incomes-routes.constant';
-import { incomesPageEvents } from '@features/incomes/store/incomes.events';
-import { type MonthlyStatsScale } from '@features/incomes/store/incomes.state';
-import { IncomesStore } from '@features/incomes/store/incomes.store';
+import { incomesPageEvents } from '@features/incomes/+store/incomes/incomes.events';
+import { IncomesStatsStore } from '@features/incomes/+store/stats/incomes-stats.store';
+import { IncomesStore } from '@features/incomes/+store/incomes/incomes.store';
 import { injectDispatch } from '@ngrx/signals/events';
 
 import { ChartCardComponent } from '@shared/components/chart-card';
@@ -49,16 +49,12 @@ import { type IncomeId } from '../types/income-id.type';
           (filtersCleared)="onFiltersClear()" />
       </div>
       <div class="min-w-0 flex-1">
-        <app-chart-card title="Monthly income" subtitle="Recurring vs non-recurring">
-          <div class="mb-4 flex justify-end">
-            <app-segmented-toggle [options]="monthlyStatsScaleOptions" [value]="monthlyStatsScale()" (valueChange)="onMonthlyStatsScaleChange($event)" />
-          </div>
+        <app-chart-card title="Yearly income">
           <app-monthly-income-chart
             [stats]="monthlyStats()"
             [loading]="monthlyStatsLoading()"
-            [offset]="monthlyStatsOffset()"
-            [hasMore]="monthlyStatsHasMore()"
-            (navigate)="onMonthlyStatsNavigate($event)" />
+            [year]="monthlyStatsYear()"
+            (navigate)="onMonthlyStatsYearChange($event)" />
         </app-chart-card>
       </div>
     </div>
@@ -76,6 +72,7 @@ import { type IncomeId } from '../types/income-id.type';
 })
 export class IncomesComponent implements OnInit {
   readonly #store = inject(IncomesStore);
+  readonly #statsStore = inject(IncomesStatsStore);
   readonly #router = inject(Router);
   readonly #route = inject(ActivatedRoute);
   readonly #dispatch = injectDispatch(incomesPageEvents);
@@ -93,52 +90,50 @@ export class IncomesComponent implements OnInit {
     { label: 'All', value: 'all' },
   ];
 
-  readonly monthlyStatsScaleOptions: ISegmentedToggleOption[] = [
-    { label: '3 months', value: 'quarter' },
-    { label: '6 months', value: 'half' },
-    { label: '12 months', value: 'year' },
-  ];
 
   readonly isLoading = computed(() => this.#store.isLoading());
   readonly pagination = computed(() => this.#store.pagination());
   readonly incomes = computed(() => this.#store.entities());
-  readonly statsScope = computed(() => this.#store.statsScope());
-  readonly monthlyStats = computed(() => this.#store.monthlyStats());
-  readonly monthlyStatsLoading = computed(() => this.#store.monthlyStatsLoading());
-  readonly monthlyStatsOffset = computed(() => this.#store.monthlyStatsOffset());
-  readonly monthlyStatsHasMore = computed(() => this.#store.monthlyStatsHasMore());
-  readonly monthlyStatsScale = computed(() => this.#store.monthlyStatsScale());
+  readonly statsScope = computed(() => this.#statsStore.statsScope());
+  readonly monthlyStats = computed(() => this.#statsStore.monthlyStats());
+  readonly monthlyStatsLoading = computed(() => this.#statsStore.monthlyStatsLoading());
+  readonly monthlyStatsYear = computed(() => this.#statsStore.monthlyStatsYear());
 
   readonly statItems = computed((): IStatItem[] => {
-    const stats = this.#store.stats();
+    const stats = this.#statsStore.stats();
 
     if (!stats) {
       return [];
     }
 
+    const lastYear = new Date().getFullYear() - 1;
+    const currentMonth = new Intl.DateTimeFormat('en-US', { month: 'long' }).format(new Date());
+
     return [
       {
-        title: 'This year recurring',
-        value: formatAmount(stats.yearRecurringTotal),
-        description: 'since Jan 1 (UTC)',
-        showChange: false,
+        title: 'Last year',
+        value: formatAmount(stats.lastYearTotal),
+        description: `total ${lastYear}`,
       },
       {
-        title: 'Last month recurring',
-        value: formatAmount(stats.lastMonthRecurringTotal),
-        change: stats.lastMonthRecurringChangePct ?? undefined,
-        description: 'vs two months ago',
+        title: 'This year',
+        value: formatAmount(stats.thisYearTotal),
+        description: 'year to date',
       },
       {
-        title: 'This month recurring',
-        value: formatAmount(stats.thisMonthRecurringTotal),
-        change: stats.thisMonthRecurringChangePct ?? undefined,
-        description: 'vs last month',
+        title: 'This month',
+        value: formatAmount(stats.thisMonthTotal),
+        description: currentMonth,
       },
       {
-        title: 'Last 3 months avg',
-        value: formatAmount(stats.last3MonthsRecurringAverage),
+        title: 'Avg last 3 months',
+        value: formatAmount(stats.last3MonthsAverage),
         description: 'full months only',
+      },
+      {
+        title: 'Avg last year',
+        value: formatAmount(stats.lastYearMonthlyAverage),
+        description: `monthly avg ${lastYear}`,
       },
     ];
   });
@@ -193,19 +188,7 @@ export class IncomesComponent implements OnInit {
     this.#dispatch.statsScopeChanged({ scope });
   }
 
-  onMonthlyStatsNavigate(direction: 'back' | 'forward'): void {
-    this.#dispatch.monthlyStatsNavigate({ direction });
-  }
-
-  onMonthlyStatsScaleChange(scale: string): void {
-    if (scale !== 'quarter' && scale !== 'half' && scale !== 'year') {
-      return;
-    }
-
-    if (this.monthlyStatsScale() === scale) {
-      return;
-    }
-
-    this.#dispatch.monthlyStatsScaleChanged({ scale: scale as MonthlyStatsScale });
+  onMonthlyStatsYearChange(direction: 'back' | 'forward'): void {
+    this.#dispatch.monthlyStatsYearChanged({ direction });
   }
 }
