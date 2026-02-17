@@ -68,11 +68,11 @@ jobs:
         with:
           node-version: 22
 
-      - name: Download node_modules artifact
+      - name: Download dependencies artifact
         uses: actions/download-artifact@v4
         with:
           name: ui-node-modules
-          path: ui/node_modules
+          path: .
 
       - name: Run ESLint
         run: yarn lint
@@ -107,11 +107,11 @@ jobs:
         with:
           node-version: 22
 
-      - name: Download node_modules artifact
+      - name: Download dependencies artifact
         uses: actions/download-artifact@v4
         with:
           name: ui-node-modules
-          path: ui/node_modules
+          path: .
 
       - name: Run tests with coverage (fail on errors)
         env:
@@ -144,11 +144,11 @@ jobs:
         with:
           node-version: 22
 
-      - name: Download node_modules artifact
+      - name: Download dependencies artifact
         uses: actions/download-artifact@v4
         with:
           name: ui-node-modules
-          path: ui/node_modules
+          path: .
 
       - name: Build app (fail on errors)
         run: yarn build
@@ -194,11 +194,11 @@ jobs:
         with:
           node-version: 22
 
-      - name: Download node_modules artifact
+      - name: Download dependencies artifact
         uses: actions/download-artifact@v4
         with:
           name: ui-node-modules
-          path: ui/node_modules
+          path: .
 
       - name: Vulnerability and update checks (warning-only)
         run: |
