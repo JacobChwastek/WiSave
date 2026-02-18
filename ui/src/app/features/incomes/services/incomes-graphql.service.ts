@@ -23,9 +23,9 @@ import {
   type GetTotalAmountQuery,
   type GetTotalAmountQueryVariables,
 } from '../graphql/incomes.queries.generated';
+import type { IIncomesQueryParams, IIncomesQueryResult } from '../types/incomes-query.types';
 import { type IIncomeMonthlyStats, type IIncomesFilter, type IIncomeStats } from '../types/incomes-state.types';
 import type { IIncome, IncomeId } from '../types/incomes.interfaces';
-import type { IIncomesQueryParams, IIncomesQueryResult } from '../types/incomes-query.types';
 import { IncomesMapperService } from './incomes-mapper.service';
 
 @Injectable({ providedIn: 'root' })
@@ -66,14 +66,12 @@ export class IncomesGraphQLService {
   }
 
   getById(id: IncomeId): Observable<IGraphQLResult<IIncome | null>> {
-    return this.#graphql
-      .query<GetIncomeByIdQuery, GetIncomeByIdQueryVariables>(GetIncomeByIdDocument, { id })
-      .pipe(
-        map((result) => ({
-          data: result.data?.incomeById ? this.#mapper.mapToIncome(result.data.incomeById) : null,
-          error: result.error,
-        })),
-      );
+    return this.#graphql.query<GetIncomeByIdQuery, GetIncomeByIdQueryVariables>(GetIncomeByIdDocument, { id }).pipe(
+      map((result) => ({
+        data: result.data?.incomeById ? this.#mapper.mapToIncome(result.data.incomeById) : null,
+        error: result.error,
+      })),
+    );
   }
 
   getTotalAmount(currency?: string): Observable<IGraphQLResult<number>> {
@@ -110,14 +108,12 @@ export class IncomesGraphQLService {
   }
 
   getIncomeMonthlyStats(year: number): Observable<IGraphQLResult<IIncomeMonthlyStats[]>> {
-    return this.#graphql
-      .query<GetIncomeMonthlyStatsQuery, GetIncomeMonthlyStatsQueryVariables>(GetIncomeMonthlyStatsDocument, { year })
-      .pipe(
-        map((result) => {
-          const stats = result.data?.incomeMonthlyStats ?? [];
-          return { data: stats, error: result.error };
-        }),
-      );
+    return this.#graphql.query<GetIncomeMonthlyStatsQuery, GetIncomeMonthlyStatsQueryVariables>(GetIncomeMonthlyStatsDocument, { year }).pipe(
+      map((result) => {
+        const stats = result.data?.incomeMonthlyStats ?? [];
+        return { data: stats, error: result.error };
+      }),
+    );
   }
 
   #buildQueryVariables(params: IIncomesQueryParams): GetIncomesQueryVariables {

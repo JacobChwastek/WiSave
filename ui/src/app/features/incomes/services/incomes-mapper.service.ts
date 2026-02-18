@@ -4,8 +4,8 @@ import { Currency } from '@core/types/currency.enum';
 import { type IMoney } from '@core/types/money.interface';
 
 import type { IncomeFieldsFragment } from '../graphql/income.fragment.generated';
-import type { IIncome } from '../types/incomes.interfaces';
 import { asIncomeId } from '../types/income-id.type';
+import type { IIncome } from '../types/incomes.interfaces';
 
 @Injectable({ providedIn: 'root' })
 export class IncomesMapperService {

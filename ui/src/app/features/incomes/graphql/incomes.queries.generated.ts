@@ -37,7 +37,7 @@ export type GetCategoriesQueryVariables = Types.Exact<{ [key: string]: never; }>
 export type GetCategoriesQuery = { __typename?: 'Query', categories: Array<string> };
 
 export type GetIncomeStatsQueryVariables = Types.Exact<{
-  includeNonRecurring?: Types.InputMaybe<Types.Scalars['Boolean']['input']>;
+  includeNonRecurring: Types.Scalars['Boolean']['input'];
 }>;
 
 
@@ -135,7 +135,7 @@ export const GetCategoriesDocument = gql`
     }
   }
 export const GetIncomeStatsDocument = gql`
-    query GetIncomeStats($includeNonRecurring: Boolean) {
+    query GetIncomeStats($includeNonRecurring: Boolean!) {
   incomeStats(includeNonRecurring: $includeNonRecurring) {
     lastYearTotal
     thisYearTotal

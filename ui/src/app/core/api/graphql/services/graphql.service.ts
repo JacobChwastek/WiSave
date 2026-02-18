@@ -1,5 +1,5 @@
 import { inject, Injectable } from '@angular/core';
-import { catchError, map, type Observable, of } from 'rxjs';
+import { catchError, map, of, type Observable } from 'rxjs';
 
 import type { ErrorLike, OperationVariables, WatchQueryFetchPolicy } from '@apollo/client/core';
 import { CombinedGraphQLErrors } from '@apollo/client/errors';
@@ -26,9 +26,7 @@ export class GraphQLService {
     variables?: TVariables,
     options?: { fetchPolicy?: WatchQueryFetchPolicy },
   ): Observable<IGraphQLResult<TData>> {
-    return this.#apollo
-      .watchQuery<TData, TVariables>({ query: document, variables, errorPolicy: 'all', ...(options ?? {}) } as never)
-      .valueChanges.pipe(
+    return this.#apollo.watchQuery<TData, TVariables>({ query: document, variables, errorPolicy: 'all', ...(options ?? {}) } as never).valueChanges.pipe(
       map((result) => this.#toResult<TData>(result.error as ErrorLike | undefined, result.data as TData)),
       catchError((err) => of(this.#networkError<TData>(err))),
     );

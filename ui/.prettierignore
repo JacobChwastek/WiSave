@@ -29,6 +29,10 @@ yarn.lock
 .env
 .env.*
 
+# Generated (GraphQL codegen)
+*.generated.ts
+**/generated/**
+
 # Misc
 *.log
 tmp

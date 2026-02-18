@@ -6,7 +6,7 @@ import { Component, input } from '@angular/core';
   standalone: true,
   imports: [CommonModule],
   template: `
-    <section class="bg-secondary-50 dark:bg-dark-primary-850 border border-secondary-200 dark:border-dark-divider rounded-2xl shadow-sm">
+    <section class="bg-secondary-50 dark:bg-dark-primary-850 border-secondary-200 dark:border-dark-divider rounded-2xl border shadow-sm">
       <header class="border-secondary-100 dark:border-dark-divider border-b px-6 py-4">
         <h3 class="text-secondary-900 dark:text-dark-secondary-50 text-base font-semibold">{{ title() }}</h3>
         @if (subtitle()) {

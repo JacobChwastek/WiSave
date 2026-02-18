@@ -13,7 +13,7 @@ export interface ISegmentedToggleOption {
   template: `
     <div class="border-secondary-200 dark:border-dark-divider bg-secondary-50 dark:bg-dark-primary-850 inline-flex rounded-full border p-1">
       @for (option of options(); track option.value) {
-        <button type="button" [class]="buttonClass(option.value)" (click)="onSelect(option.value)">
+        <button [class]="buttonClass(option.value)" (click)="onSelect(option.value)" type="button">
           {{ option.label }}
         </button>
       }

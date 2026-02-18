@@ -1,0 +1,246 @@
+name: UI CI
+run-name: "UI CI — ${{ github.event_name == 'pull_request' && format('PR #{0}', github.event.pull_request.number) || github.ref_name }}"
+
+on:
+  push:
+    branches: [master]
+    paths:
+      - "ui/**"
+      - ".github/workflows/ui-ci.yml"
+  pull_request:
+    branches: [master]
+    paths:
+      - "ui/**"
+      - ".github/workflows/ui-ci.yml"
+
+concurrency:
+  group: ui-ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  lint:
+    name: Lint + Format + Typecheck + Codegen Drift
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ui
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Enable Corepack
+        run: corepack enable
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: yarn
+          cache-dependency-path: ui/yarn.lock
+
+      - name: Install dependencies
+        run: yarn install --immutable
+
+      - name: Run ESLint
+        run: yarn lint
+
+      - name: Check formatting
+        run: yarn format:check
+
+      - name: TypeScript type check
+        run: yarn tsc --noEmit -p tsconfig.app.json && yarn tsc --noEmit -p tsconfig.spec.json
+
+      - name: Copy GraphQL schema for codegen
+        run: cp ../schema.graphql schema.graphql
+
+      - name: Verify GraphQL codegen is up to date
+        run: |
+          yarn codegen
+          git diff --exit-code -- . || (echo "Codegen output is outdated. Run 'yarn codegen' and commit generated files." && exit 1)
+
+  test:
+    name: Unit Tests
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ui
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Enable Corepack
+        run: corepack enable
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: yarn
+          cache-dependency-path: ui/yarn.lock
+
+      - name: Install dependencies
+        run: yarn install --immutable
+
+      - name: Run tests
+        env:
+          CI: true
+        run: |
+          yarn test --watch=false 2>&1 | tee test-output.txt
+          TEST_EXIT=${PIPESTATUS[0]}
+
+          # Strip ANSI codes for reliable parsing
+          sed 's/\x1b\[[0-9;]*m//g' test-output.txt > test-clean.txt
+
+          PASSED=$(grep -oP '\d+(?= passed)' test-clean.txt | tail -1 || true)
+          FAILED=$(grep -oP '\d+(?= failed)' test-clean.txt | tail -1 || true)
+          PASSED=${PASSED:-0}
+          FAILED=${FAILED:-0}
+          TOTAL=$((PASSED + FAILED))
+
+          if [ $TEST_EXIT -eq 0 ]; then
+            STATUS="✅ All tests passed"
+          else
+            STATUS="❌ Some tests failed"
+          fi
+
+          {
+            echo "## Unit Tests"
+            echo ""
+            echo "$STATUS — **$PASSED** passed, **$FAILED** failed ($TOTAL total)"
+            echo ""
+            if [ $FAILED -gt 0 ]; then
+              echo "<details><summary>Failed tests</summary>"
+              echo ""
+              echo '```'
+              grep -E 'FAIL|Error|×' test-clean.txt || true
+              echo '```'
+              echo "</details>"
+              echo ""
+            fi
+            echo "<details><summary>Full output</summary>"
+            echo ""
+            echo '```'
+            cat test-clean.txt
+            echo '```'
+            echo "</details>"
+          } >> "$GITHUB_STEP_SUMMARY"
+
+          exit $TEST_EXIT
+
+  build:
+    name: Production Build + Bundle Size
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ui
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Enable Corepack
+        run: corepack enable
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: yarn
+          cache-dependency-path: ui/yarn.lock
+
+      - name: Install dependencies
+        run: yarn install --immutable
+
+      - name: Build app (fail on errors)
+        run: yarn build
+
+      - name: Generate bundle size summary
+        run: |
+          DIST_SIZE=$(du -sh dist | cut -f1)
+          {
+            echo "## Bundle Size"
+            echo ""
+            echo "**Total dist:** $DIST_SIZE"
+            echo ""
+            echo "| Size | File |"
+            echo "|-----:|------|"
+            find dist -type f -name "*.js" -exec du -h {} + | sort -rh | head -n 20 | while read -r size file; do
+              echo "| $size | \`${file#dist/}\` |"
+            done
+            echo ""
+            echo "<details><summary>CSS assets</summary>"
+            echo ""
+            echo "| Size | File |"
+            echo "|-----:|------|"
+            find dist -type f -name "*.css" -exec du -h {} + | sort -rh | while read -r size file; do
+              echo "| $size | \`${file#dist/}\` |"
+            done
+            echo "</details>"
+          } >> "$GITHUB_STEP_SUMMARY"
+
+  advisory:
+    name: Dependency Advisory (warning-only)
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ui
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Enable Corepack
+        run: corepack enable
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: yarn
+          cache-dependency-path: ui/yarn.lock
+
+      - name: Install dependencies
+        run: yarn install --immutable
+
+      - name: Vulnerability and update checks (warning-only)
+        run: |
+          set +e
+
+          yarn npm audit --all > audit-report.txt 2>&1
+          AUDIT_EXIT=$?
+
+          npx -y npm-check-updates > outdated-report.txt 2>&1
+          OUTDATED_EXIT=$?
+
+          {
+            echo "## Dependency Advisory"
+            echo ""
+
+            if [ $AUDIT_EXIT -ne 0 ]; then
+              echo "### ⚠️ Vulnerabilities found"
+              echo ""
+              echo "<details><summary>Audit report</summary>"
+              echo ""
+              echo '```'
+              cat audit-report.txt
+              echo '```'
+              echo "</details>"
+            else
+              echo "### ✅ No vulnerabilities found"
+            fi
+
+            echo ""
+
+            if [ $OUTDATED_EXIT -ne 0 ]; then
+              echo "### ⚠️ Outdated packages"
+              echo ""
+              echo "<details><summary>Outdated report</summary>"
+              echo ""
+              echo '```'
+              cat outdated-report.txt
+              echo '```'
+              echo "</details>"
+            else
+              echo "### ✅ All packages up to date"
+            fi
+          } >> "$GITHUB_STEP_SUMMARY"
+
+          exit 0
