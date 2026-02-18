@@ -85,11 +85,16 @@ jobs:
         env:
           CI: true
         run: |
-          yarn test --watch=false --reporter=verbose 2>&1 | tee test-output.txt
+          yarn test --watch=false 2>&1 | tee test-output.txt
           TEST_EXIT=${PIPESTATUS[0]}
 
-          PASSED=$(grep -cE '^\s*✓' test-output.txt || true)
-          FAILED=$(grep -cE '^\s*×' test-output.txt || true)
+          # Strip ANSI codes for reliable parsing
+          sed 's/\x1b\[[0-9;]*m//g' test-output.txt > test-clean.txt
+
+          PASSED=$(grep -oP '\d+(?= passed)' test-clean.txt | tail -1 || true)
+          FAILED=$(grep -oP '\d+(?= failed)' test-clean.txt | tail -1 || true)
+          PASSED=${PASSED:-0}
+          FAILED=${FAILED:-0}
           TOTAL=$((PASSED + FAILED))
 
           if [ $TEST_EXIT -eq 0 ]; then
@@ -107,7 +112,7 @@ jobs:
               echo "<details><summary>Failed tests</summary>"
               echo ""
               echo '```'
-              grep -A 5 '^\s*×' test-output.txt || true
+              grep -E 'FAIL|Error|×' test-clean.txt || true
               echo '```'
               echo "</details>"
               echo ""
@@ -115,7 +120,7 @@ jobs:
             echo "<details><summary>Full output</summary>"
             echo ""
             echo '```'
-            cat test-output.txt
+            cat test-clean.txt
             echo '```'
             echo "</details>"
           } >> "$GITHUB_STEP_SUMMARY"
