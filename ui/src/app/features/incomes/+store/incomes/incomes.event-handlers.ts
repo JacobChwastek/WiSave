@@ -1,13 +1,12 @@
-import { type Signal, inject } from '@angular/core';
+import { inject, type Signal } from '@angular/core';
 import { catchError, exhaustMap, map, merge, of, switchMap, tap } from 'rxjs';
 
-import { signalStoreFeature } from '@ngrx/signals';
-import { withProps } from '@ngrx/signals';
+import { signalStoreFeature, withProps } from '@ngrx/signals';
 import { type EntityMap } from '@ngrx/signals/entities';
 import { Events, withEventHandlers } from '@ngrx/signals/events';
 
-import { type IPagination, initialPagination, type CursorDirection } from '@shared/types';
 import { toStoreError } from '@shared/helpers/store-error.helper';
+import { initialPagination, type CursorDirection, type IPagination } from '@shared/types';
 
 import { IncomesGraphQLService } from '../../services/incomes-graphql.service';
 import type { IIncomesQueryParams } from '../../types/incomes-query.types';
@@ -77,7 +76,9 @@ export function withIncomesEventHandlers(store: IncomesStoreSlice) {
 
         filtersCleared$: props._events.on(incomesPageEvents.filtersCleared).pipe(switchMap(() => loadIncomes$(getQueryParams(store.pagination().rows, 'first', null, emptyFilter, store.sort())))),
 
-        sortChanged$: props._events.on(incomesPageEvents.sortChanged).pipe(switchMap(({ payload }) => loadIncomes$(getQueryParams(store.pagination().rows, 'first', null, store.filter(), payload.sort)))),
+        sortChanged$: props._events
+          .on(incomesPageEvents.sortChanged)
+          .pipe(switchMap(({ payload }) => loadIncomes$(getQueryParams(store.pagination().rows, 'first', null, store.filter(), payload.sort)))),
 
         selectIncome$: props._events.on(incomesPageEvents.selectIncome).pipe(
           exhaustMap(({ payload }) => {
@@ -101,13 +102,7 @@ export function withIncomesEventHandlers(store: IncomesStoreSlice) {
         ),
 
         logErrors$: props._events
-          .on(
-            incomesApiEvents.loadedFailure,
-            incomesApiEvents.addedFailure,
-            incomesApiEvents.updatedFailure,
-            incomesApiEvents.removedFailure,
-            incomesApiEvents.fetchByIdFailure,
-          )
+          .on(incomesApiEvents.loadedFailure, incomesApiEvents.addedFailure, incomesApiEvents.updatedFailure, incomesApiEvents.removedFailure, incomesApiEvents.fetchByIdFailure)
           .pipe(tap(({ payload }) => console.error('[Incomes API Error]', payload.error.category, payload.error.message))),
       };
     }),

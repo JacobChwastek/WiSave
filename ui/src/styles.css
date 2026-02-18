@@ -1,10 +1,9 @@
-@import "tailwindcss";
-@import "tailwindcss-primeui";
-@import "primeicons/primeicons.css";
-@import "./styles/colors.css";
-@import "./styles/primeng.css";
-@import "./styles/components/stat-card.css";
-
+@import 'tailwindcss';
+@import 'tailwindcss-primeui';
+@import 'primeicons/primeicons.css';
+@import './styles/colors.css';
+@import './styles/primeng.css';
+@import './styles/components/stat-card.css';
 
 @custom-variant dark (&:where(.dark, .dark *));
 
@@ -14,11 +13,14 @@ html {
 
 body {
   margin: 0;
-  font-family: system-ui, -apple-system, sans-serif;
+  font-family:
+    system-ui,
+    -apple-system,
+    sans-serif;
 }
 
-
-html, body {
+html,
+body {
   height: 100%;
   width: 100%;
 }

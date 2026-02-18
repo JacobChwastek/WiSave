@@ -1,5 +1,5 @@
 import { Component, computed, effect, input, output } from '@angular/core';
-import { type AbstractControl, FormArray, FormControl, FormGroup, ReactiveFormsModule, type ValidationErrors, Validators } from '@angular/forms';
+import { FormArray, FormControl, FormGroup, ReactiveFormsModule, Validators, type AbstractControl, type ValidationErrors } from '@angular/forms';
 
 import { Button } from 'primeng/button';
 import { DatePicker } from 'primeng/datepicker';
@@ -9,8 +9,8 @@ import { MultiSelect } from 'primeng/multiselect';
 import { Select } from 'primeng/select';
 import { ToggleSwitch } from 'primeng/toggleswitch';
 
-import { type IIncome } from '@features/incomes/types/incomes.interfaces';
 import { type IncomeFormModel, type MetadataEntryModel } from '@features/incomes/types/income-edit-form.types';
+import { type IIncome } from '@features/incomes/types/incomes.interfaces';
 
 import { createMoney, Currency, CurrencySymbol } from '@core/types';
 
@@ -137,49 +137,23 @@ const trimmedRequired = (control: AbstractControl): ValidationErrors | null => {
             <span class="text-secondary-700 dark:text-dark-secondary-100 text-sm font-medium">Metadata</span>
             <span class="text-secondary-500 dark:text-dark-secondary-300 text-xs">Add custom key-value data (optional).</span>
           </div>
-          <p-button
-            [disabled]="isLoading()"
-            (click)="addMetadataEntry()"
-            type="button"
-            label="Add field"
-            icon="pi pi-plus"
-            severity="secondary"
-            size="small"
-            [text]="true" />
+          <p-button [disabled]="isLoading()" [text]="true" (click)="addMetadataEntry()" type="button" label="Add field" icon="pi pi-plus" severity="secondary" size="small" />
         </div>
         @for (entry of form.controls.metadata.controls; track entry; let i = $index) {
           <div class="flex items-start gap-2">
             <div class="flex flex-1 flex-col gap-1">
-              <input
-                [formControl]="entry.controls.key"
-                class="w-full"
-                pInputText
-                type="text"
-                placeholder="Key (e.g. tax)" />
+              <input [formControl]="entry.controls.key" class="w-full" pInputText type="text" placeholder="Key (e.g. tax)" />
               @if (entry.controls.key.invalid && (entry.controls.key.dirty || entry.controls.key.touched)) {
                 <span class="text-danger-600 dark:text-danger-400 text-xs">Key is required.</span>
               }
             </div>
             <div class="flex flex-1 flex-col gap-1">
-              <input
-                [formControl]="entry.controls.value"
-                class="w-full"
-                pInputText
-                type="text"
-                placeholder="Value (e.g. 19%)" />
+              <input [formControl]="entry.controls.value" class="w-full" pInputText type="text" placeholder="Value (e.g. 19%)" />
               @if (entry.controls.value.invalid && (entry.controls.value.dirty || entry.controls.value.touched)) {
                 <span class="text-danger-600 dark:text-danger-400 text-xs">Value is required.</span>
               }
             </div>
-            <p-button
-              [disabled]="isLoading()"
-              (click)="removeMetadataEntry(i)"
-              type="button"
-              icon="pi pi-trash"
-              severity="danger"
-              size="small"
-              [text]="true"
-              [rounded]="true" />
+            <p-button [disabled]="isLoading()" [text]="true" [rounded]="true" (click)="removeMetadataEntry(i)" type="button" icon="pi pi-trash" severity="danger" size="small" />
           </div>
         }
       </div>

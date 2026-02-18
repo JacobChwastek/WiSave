@@ -102,12 +102,7 @@ export default tseslint.config(
             // Feature types can import core and same-feature types/constants
             {
               from: 'feature-type',
-              allow: [
-                'core',
-                'shared',
-                ['feature-type', { feature: '${from.feature}' }],
-                ['feature-constant', { feature: '${from.feature}' }],
-              ],
+              allow: ['core', 'shared', ['feature-type', { feature: '${from.feature}' }], ['feature-constant', { feature: '${from.feature}' }]],
             },
 
             // Feature services can import same-feature internals and core
@@ -126,12 +121,7 @@ export default tseslint.config(
             // Feature helpers can import same-feature types/helpers/constants and core
             {
               from: 'feature-helper',
-              allow: [
-                'core',
-                ['feature-type', { feature: '${from.feature}' }],
-                ['feature-helper', { feature: '${from.feature}' }],
-                ['feature-constant', { feature: '${from.feature}' }],
-              ],
+              allow: ['core', ['feature-type', { feature: '${from.feature}' }], ['feature-helper', { feature: '${from.feature}' }], ['feature-constant', { feature: '${from.feature}' }]],
             },
 
             // Feature store can import same-feature types/services/helpers/store/constants and core
@@ -197,21 +187,13 @@ export default tseslint.config(
             // Feature constants can import core/shared and same-feature constants/types
             {
               from: 'feature-constant',
-              allow: [
-                'core',
-                'shared',
-                ['feature-constant', { feature: '${from.feature}' }],
-                ['feature-type', { feature: '${from.feature}' }],
-              ],
+              allow: ['core', 'shared', ['feature-constant', { feature: '${from.feature}' }], ['feature-type', { feature: '${from.feature}' }]],
             },
 
             // Feature GraphQL files can import core and same-feature GraphQL files
             {
               from: 'feature-graphql',
-              allow: [
-                'core',
-                ['feature-graphql', { feature: '${from.feature}' }],
-              ],
+              allow: ['core', ['feature-graphql', { feature: '${from.feature}' }]],
             },
 
             // Generic feature (catch-all)
@@ -307,28 +289,23 @@ export default tseslint.config(
           message: 'Use # private fields instead of private constructor parameters.',
         },
         {
-          selector:
-            "ClassDeclaration:has(Decorator[expression.callee.name='Component']) MethodDefinition[kind='constructor'] > FunctionExpression[params.length>0]",
+          selector: "ClassDeclaration:has(Decorator[expression.callee.name='Component']) MethodDefinition[kind='constructor'] > FunctionExpression[params.length>0]",
           message: 'Use inject() instead of constructor injection.',
         },
         {
-          selector:
-            "ClassDeclaration:has(Decorator[expression.callee.name='Directive']) MethodDefinition[kind='constructor'] > FunctionExpression[params.length>0]",
+          selector: "ClassDeclaration:has(Decorator[expression.callee.name='Directive']) MethodDefinition[kind='constructor'] > FunctionExpression[params.length>0]",
           message: 'Use inject() instead of constructor injection.',
         },
         {
-          selector:
-            "ClassDeclaration:has(Decorator[expression.callee.name='Pipe']) MethodDefinition[kind='constructor'] > FunctionExpression[params.length>0]",
+          selector: "ClassDeclaration:has(Decorator[expression.callee.name='Pipe']) MethodDefinition[kind='constructor'] > FunctionExpression[params.length>0]",
           message: 'Use inject() instead of constructor injection.',
         },
         {
-          selector:
-            "ClassDeclaration:has(Decorator[expression.callee.name='Injectable']) MethodDefinition[kind='constructor'] > FunctionExpression[params.length>0]",
+          selector: "ClassDeclaration:has(Decorator[expression.callee.name='Injectable']) MethodDefinition[kind='constructor'] > FunctionExpression[params.length>0]",
           message: 'Use inject() instead of constructor injection.',
         },
         {
-          selector:
-            "Property[key.name='changeDetection'][value.type='MemberExpression'][value.object.name='ChangeDetectionStrategy'][value.property.name='OnPush']",
+          selector: "Property[key.name='changeDetection'][value.type='MemberExpression'][value.object.name='ChangeDetectionStrategy'][value.property.name='OnPush']",
           message: 'Do not use OnPush change detection; app is zoneless.',
         },
       ],
@@ -458,6 +435,6 @@ export default tseslint.config(
     },
   },
   {
-    ignores: ['dist/', '.angular/', 'node_modules/', '.yarn/', '.pnp.*', 'coverage/'],
+    ignores: ['dist/', '.angular/', 'node_modules/', '.yarn/', '.pnp.*', 'coverage/', 'codegen.ts'],
   },
 );

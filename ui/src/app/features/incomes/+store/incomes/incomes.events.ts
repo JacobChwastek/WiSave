@@ -4,7 +4,7 @@ import { eventGroup } from '@ngrx/signals/events';
 
 import { type CursorDirection, type IPageInfo, type IStoreError } from '@shared/types';
 
-import { type IIncomeMonthlyStats, type IIncomeStats, type IncomeStatsScope, type IIncomesFilter, type IIncomesSortOrder } from '../../types/incomes-state.types';
+import { type IIncomeMonthlyStats, type IIncomesFilter, type IIncomesSortOrder, type IIncomeStats, type IncomeStatsScope } from '../../types/incomes-state.types';
 
 // UI/Component events - commands from user interactions
 export const incomesPageEvents = eventGroup({

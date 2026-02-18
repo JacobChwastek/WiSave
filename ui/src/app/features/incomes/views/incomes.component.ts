@@ -5,12 +5,12 @@ import { filter, map } from 'rxjs';
 
 import { TableModule } from 'primeng/table';
 
+import { incomesPageEvents } from '@features/incomes/+store/incomes/incomes.events';
+import { IncomesStore } from '@features/incomes/+store/incomes/incomes.store';
+import { IncomesStatsStore } from '@features/incomes/+store/stats/incomes-stats.store';
 import { IncomesTableComponent, type IFilterAppliedEvent } from '@features/incomes/components/incomes-table/incomes-table.component';
 import { MonthlyIncomeChartComponent } from '@features/incomes/components/monthly-income-chart/monthly-income-chart.component';
 import { INCOMES_ROUTES } from '@features/incomes/constants/incomes-routes.constant';
-import { incomesPageEvents } from '@features/incomes/+store/incomes/incomes.events';
-import { IncomesStatsStore } from '@features/incomes/+store/stats/incomes-stats.store';
-import { IncomesStore } from '@features/incomes/+store/incomes/incomes.store';
 import { injectDispatch } from '@ngrx/signals/events';
 
 import { ChartCardComponent } from '@shared/components/chart-card';
@@ -50,11 +50,7 @@ import { type IncomeId } from '../types/income-id.type';
       </div>
       <div class="min-w-0 flex-1">
         <app-chart-card title="Yearly income">
-          <app-monthly-income-chart
-            [stats]="monthlyStats()"
-            [loading]="monthlyStatsLoading()"
-            [year]="monthlyStatsYear()"
-            (navigate)="onMonthlyStatsYearChange($event)" />
+          <app-monthly-income-chart [stats]="monthlyStats()" [loading]="monthlyStatsLoading()" [year]="monthlyStatsYear()" (navigate)="onMonthlyStatsYearChange($event)" />
         </app-chart-card>
       </div>
     </div>
@@ -89,7 +85,6 @@ export class IncomesComponent implements OnInit {
     { label: 'Recurring', value: 'recurring' },
     { label: 'All', value: 'all' },
   ];
-
 
   readonly isLoading = computed(() => this.#store.isLoading());
   readonly pagination = computed(() => this.#store.pagination());

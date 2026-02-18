@@ -1,3 +1,5 @@
+import { type GraphQLRequestError } from './graphql-error';
+
 export interface IPageInfo {
   hasNextPage: boolean;
   hasPreviousPage: boolean;
@@ -23,8 +25,6 @@ export interface IPaginationVariables {
   last?: number;
   before?: string;
 }
-
-import { type GraphQLRequestError } from './graphql-error';
 
 export interface IGraphQLResult<TData> {
   data: TData;

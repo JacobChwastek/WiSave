@@ -18,7 +18,7 @@ import { ThemeService } from '@core/services/theme.service';
         <span class="min-w-16 text-center font-semibold">{{ year() }}</span>
         <p-button [outlined]="true" [rounded]="true" [disabled]="!canGoForward()" [loading]="loading()" (onClick)="onGoForward()" icon="pi pi-chevron-right" size="small" severity="success" />
       </div>
-      <div class="h-56 flex w-full xl:h-72 2xl:h-96">
+      <div class="flex h-56 w-full xl:h-72 2xl:h-96">
         <p-chart [data]="chartData()" [options]="chartOptions()" [plugins]="chartPlugins" class="w-full" type="bar" />
       </div>
     </div>
@@ -148,7 +148,13 @@ export class MonthlyIncomeChartComponent {
         const avg = totals.length >= 2 ? totals.reduce((a, b) => a + b, 0) / totals.length : 0;
         chart.data.datasets[avgIndex].data = chart.data.datasets[avgIndex].data.map(() => avg);
       },
-      afterDatasetsDraw: (chart: { data: { datasets: { label?: string; borderColor?: string; data: number[] }[] }; isDatasetVisible: (i: number) => boolean; scales: Record<string, { getPixelForValue: (v: number) => number }>; chartArea: { right: number }; ctx: CanvasRenderingContext2D }) => {
+      afterDatasetsDraw: (chart: {
+        data: { datasets: { label?: string; borderColor?: string; data: number[] }[] };
+        isDatasetVisible: (i: number) => boolean;
+        scales: Record<string, { getPixelForValue: (v: number) => number }>;
+        chartArea: { right: number };
+        ctx: CanvasRenderingContext2D;
+      }) => {
         const avgIndex = chart.data.datasets.findIndex((ds) => ds.label === 'Average');
         if (avgIndex === -1 || !chart.isDatasetVisible(avgIndex)) return;
 
