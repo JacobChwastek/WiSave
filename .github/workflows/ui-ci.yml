@@ -77,10 +77,10 @@ jobs:
       - name: Install dependencies
         run: yarn install --immutable
 
-      - name: Run tests with coverage (fail on errors)
+      - name: Run tests (fail on errors)
         env:
           CI: true
-        run: yarn test --watch=false --code-coverage
+        run: yarn test --watch=false
 
       - name: Upload coverage report
         if: always()
