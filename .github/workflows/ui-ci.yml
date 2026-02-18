@@ -49,6 +49,9 @@ jobs:
       - name: TypeScript type check
         run: yarn tsc --noEmit -p tsconfig.app.json && yarn tsc --noEmit -p tsconfig.spec.json
 
+      - name: Copy GraphQL schema for codegen
+        run: cp ../schema.graphql schema.graphql
+
       - name: Verify GraphQL codegen is up to date
         run: |
           yarn codegen

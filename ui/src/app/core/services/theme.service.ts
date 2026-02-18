@@ -6,7 +6,8 @@ export class ThemeService {
 
   constructor() {
     const theme = localStorage.getItem('theme');
-    const isDark = theme === 'dark' || (!theme && window.matchMedia('(prefers-color-scheme: dark)').matches);
+    const prefersDark = typeof window.matchMedia === 'function' && window.matchMedia('(prefers-color-scheme: dark)').matches;
+    const isDark = theme === 'dark' || (!theme && prefersDark);
     this.isDarkMode.set(isDark);
     this.#applyTheme();
   }
