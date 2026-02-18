@@ -59,7 +59,7 @@ jobs:
           git diff --exit-code -- . || (echo "Codegen output is outdated. Run 'yarn codegen' and commit generated files." && exit 1)
 
   test:
-    name: Unit Tests + Coverage
+    name: Unit Tests
     runs-on: ubuntu-latest
     defaults:
       run:
@@ -81,17 +81,46 @@ jobs:
       - name: Install dependencies
         run: yarn install --immutable
 
-      - name: Run tests (fail on errors)
+      - name: Run tests
         env:
           CI: true
-        run: yarn test --watch=false
+        run: |
+          yarn test --watch=false --reporter=verbose 2>&1 | tee test-output.txt
+          TEST_EXIT=${PIPESTATUS[0]}
 
-      - name: Upload coverage report
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: ui-coverage
-          path: ui/coverage
+          PASSED=$(grep -cE '^\s*✓' test-output.txt || true)
+          FAILED=$(grep -cE '^\s*×' test-output.txt || true)
+          TOTAL=$((PASSED + FAILED))
+
+          if [ $TEST_EXIT -eq 0 ]; then
+            STATUS="✅ All tests passed"
+          else
+            STATUS="❌ Some tests failed"
+          fi
+
+          {
+            echo "## Unit Tests"
+            echo ""
+            echo "$STATUS — **$PASSED** passed, **$FAILED** failed ($TOTAL total)"
+            echo ""
+            if [ $FAILED -gt 0 ]; then
+              echo "<details><summary>Failed tests</summary>"
+              echo ""
+              echo '```'
+              grep -A 5 '^\s*×' test-output.txt || true
+              echo '```'
+              echo "</details>"
+              echo ""
+            fi
+            echo "<details><summary>Full output</summary>"
+            echo ""
+            echo '```'
+            cat test-output.txt
+            echo '```'
+            echo "</details>"
+          } >> "$GITHUB_STEP_SUMMARY"
+
+          exit $TEST_EXIT
 
   build:
     name: Production Build + Bundle Size
@@ -119,27 +148,29 @@ jobs:
       - name: Build app (fail on errors)
         run: yarn build
 
-      - name: Generate bundle size report
+      - name: Generate bundle size summary
         run: |
-          mkdir -p ci-reports
-          du -sh dist > ci-reports/dist-total-size.txt
-          find dist -type f -name "*.js" -exec du -h {} + | sort -h | tail -n 30 > ci-reports/top-js-assets.txt
+          DIST_SIZE=$(du -sh dist | cut -f1)
           {
-            echo "## Build size summary"
+            echo "## Bundle Size"
             echo ""
-            echo "### Total dist size"
-            cat ci-reports/dist-total-size.txt
+            echo "**Total dist:** $DIST_SIZE"
             echo ""
-            echo "### Top 30 JS assets by size"
-            cat ci-reports/top-js-assets.txt
+            echo "| Size | File |"
+            echo "|-----:|------|"
+            find dist -type f -name "*.js" -exec du -h {} + | sort -rh | head -n 20 | while read -r size file; do
+              echo "| $size | \`${file#dist/}\` |"
+            done
+            echo ""
+            echo "<details><summary>CSS assets</summary>"
+            echo ""
+            echo "| Size | File |"
+            echo "|-----:|------|"
+            find dist -type f -name "*.css" -exec du -h {} + | sort -rh | while read -r size file; do
+              echo "| $size | \`${file#dist/}\` |"
+            done
+            echo "</details>"
           } >> "$GITHUB_STEP_SUMMARY"
-
-      - name: Upload build size report
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: ui-build-size-report
-          path: ui/ci-reports
 
   advisory:
     name: Dependency Advisory (warning-only)
@@ -170,40 +201,41 @@ jobs:
 
           yarn npm audit --all > audit-report.txt 2>&1
           AUDIT_EXIT=$?
-          if [ $AUDIT_EXIT -ne 0 ]; then
-            echo "::warning title=Dependency vulnerabilities detected::Check ui/audit-report.txt artifact."
-          fi
 
-          yarn outdated > outdated-report.txt 2>&1
+          npx -y npm-check-updates > outdated-report.txt 2>&1
           OUTDATED_EXIT=$?
-          if [ $OUTDATED_EXIT -ne 0 ]; then
-            echo "::warning title=Outdated packages detected::Check ui/outdated-report.txt artifact."
-          fi
 
           {
-            echo "## Dependency advisory summary"
+            echo "## Dependency Advisory"
             echo ""
+
             if [ $AUDIT_EXIT -ne 0 ]; then
-              echo "- ⚠️ Vulnerabilities found by \`yarn npm audit --all\`"
+              echo "### ⚠️ Vulnerabilities found"
+              echo ""
+              echo "<details><summary>Audit report</summary>"
+              echo ""
+              echo '```'
+              cat audit-report.txt
+              echo '```'
+              echo "</details>"
             else
-              echo "- ✅ No vulnerabilities found by \`yarn npm audit --all\`"
+              echo "### ✅ No vulnerabilities found"
             fi
-            if [ $OUTDATED_EXIT -ne 0 ]; then
-              echo "- ⚠️ Outdated packages found by \`yarn outdated\`"
-            else
-              echo "- ✅ No outdated packages found by \`yarn outdated\`"
-            fi
+
             echo ""
-            echo "Detailed logs are uploaded as workflow artifacts."
+
+            if [ $OUTDATED_EXIT -ne 0 ]; then
+              echo "### ⚠️ Outdated packages"
+              echo ""
+              echo "<details><summary>Outdated report</summary>"
+              echo ""
+              echo '```'
+              cat outdated-report.txt
+              echo '```'
+              echo "</details>"
+            else
+              echo "### ✅ All packages up to date"
+            fi
           } >> "$GITHUB_STEP_SUMMARY"
 
           exit 0
-
-      - name: Upload advisory reports
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: ui-dependency-advisory
-          path: |
-            ui/audit-report.txt
-            ui/outdated-report.txt
